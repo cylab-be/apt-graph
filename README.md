@@ -2,19 +2,41 @@
 
 HTTP graph modeling for APT detection.
 
-## Batch processor
+## Requirements
+- java
+- Apache Maven
+
+## Starting the server
+
+```
+# get the latest version from github
+git pull
+
+# build the server
+cd server
+mvn clean package
+
+# start the server
+./start.sh
+
+# by default, the server is available at http://127.0.0.1:8080
+```
+
+## Architecture
+
+### Batch processor
 - parses a proxy log file
 - build one **requests k-nn graph** for each feature (time, url similarity, etc.)
 - stores the graphs in a database
 
-## UI
+### UI
 javascript UI that allows the user to choose:
 - parameters for aggregating **request graphs** into **URL k-nn graphs**
 - parameters for aggregating feature graphs into a single **combined graph** (simple version uses weighted average, a more evolved version might implement OWA or WOWA)
 - prunning threshold for cutting low weight edges
 - maximum cluster size for filtering resulting clusters
 
-## Server
+### Server
 Exposes a json-rpc server that, based on user parameters, will:
 - compute the **URL graphs**
 - compute the **combined graph**
@@ -23,6 +45,7 @@ Exposes a json-rpc server that, based on user parameters, will:
 - **filter** the clustered graph
 - return the remaining nodes and edges
 
+## Implemented RPC
 ### dummy
 
 The **dummy** rpc returns a list of disconnected graphs (the clusters):
