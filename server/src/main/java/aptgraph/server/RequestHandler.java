@@ -31,6 +31,10 @@ import info.debatty.java.graphs.SimilarityInterface;
 import info.debatty.java.graphs.build.GraphBuilder;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
 import info.debatty.java.stringsimilarity.JaroWinkler;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,11 +65,11 @@ public class RequestHandler {
      * A dummy method that returns some clusters of nodes and edges.
      * @return
      */
-    public final List<Graph<String>> dummy() {
+    public final List<Graph<String>> dummy() throws IOException {
 
         // Read some dummy strings
-        List<Node<String>> nodes = GraphBuilder.readFile(
-                getClass().getClassLoader().getResource("726-unique-spams").getFile());
+        List<Node<String>> nodes = readFile(
+                getClass().getResourceAsStream("/726-unique-spams"));
 
         // Compute k-nn graph
         ThreadedNNDescent<String> nndes = new ThreadedNNDescent<String>();
@@ -94,5 +98,18 @@ public class RequestHandler {
 
         return filtered;
 
+    }
+
+    private List<Node<String>> readFile(InputStream input) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        ArrayList<Node<String>> nodes = new ArrayList<Node<String>>();
+        String line;
+        int i = 0;
+        while ((line = reader.readLine()) != null) {
+            nodes.add(new Node(String.valueOf(i), line));
+            i++;
+        }
+        reader.close();
+        return nodes;
     }
 }
