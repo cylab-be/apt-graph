@@ -67,7 +67,7 @@ public class RequestHandler {
      */
     public final List<Graph<String>> dummy() throws IOException {
 
-        // Read some dummy strings
+        // Read graphs from disk...
         List<Node<String>> nodes = readFile(
                 getClass().getResourceAsStream("/726-unique-spams"));
 
@@ -81,6 +81,10 @@ public class RequestHandler {
             }
         });
         Graph<String> graph = nndes.computeGraph(nodes);
+
+        // Lire les graphes depuis le disque dur?
+
+        // Fusionner les graphes
 
         // Prune
         graph.prune(0.7);

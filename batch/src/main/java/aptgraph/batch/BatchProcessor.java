@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package aptgraph.batch;
 
 import info.debatty.java.graphs.Graph;
@@ -29,11 +23,19 @@ public class BatchProcessor {
             + "(\\S+)\\s(\\S+)\\s(\\S+)\\s(\\S+)\\s.*$";
     private final Pattern pattern;
 
+    /**
+     *
+     */
     public BatchProcessor() {
         pattern = Pattern.compile(regex);
     }
 
-    public final void analyze(InputStream file) throws IOException {
+    /**
+     *
+     * @param file
+     * @throws IOException if we cannot read the input file
+     */
+    public final void analyze(final InputStream file) throws IOException {
 
         System.out.println("Read and parse file...");
         LinkedList<Request> requests = parse(file);
@@ -58,6 +60,8 @@ public class BatchProcessor {
         System.out.println(time_graph.get(nodes.getFirst()));
 
         System.out.println("Build URL graph...");
+
+        System.out.println("Save graphs to disk...");
 
     }
 

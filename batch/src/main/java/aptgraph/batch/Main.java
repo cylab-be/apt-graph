@@ -19,8 +19,9 @@ public final class Main {
     /**
      *
      * @param args
-     * @throws ParseException
-     * @throws FileNotFoundException
+     * @throws ParseException If we cannot parse command line args
+     * @throws FileNotFoundException if the input file does not exist
+     * @throws IOException if we cannot read the input file
      */
     public static void main(final String[] args)
             throws ParseException, FileNotFoundException, IOException {

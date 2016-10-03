@@ -11,8 +11,9 @@ public class BatchProcessorTest extends TestCase {
 
     /**
      * Test of analyze method, of class BatchProcessor.
+     * @throws java.io.IOException if the input file is not found
      */
-    public void testAnalyze() throws IOException {
+    public final void testAnalyze() throws IOException {
         System.out.println("Test batch server with 1000 reqs");
         BatchProcessor processor = new BatchProcessor();
         processor.analyze(
