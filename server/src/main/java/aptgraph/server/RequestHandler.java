@@ -42,8 +42,11 @@ import java.util.List;
 public class RequestHandler {
     private final MongoDatabase db;
 
-    RequestHandler(final MongoDatabase mongodb) {
-        this.db = mongodb;
+    /**
+     *
+     */
+    public RequestHandler() {
+        this.db = null;
     }
 
     /**

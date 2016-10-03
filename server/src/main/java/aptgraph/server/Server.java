@@ -53,12 +53,12 @@ public class Server {
      */
     public final void start() {
         // Connect to mongodb
-        MongoClient mongodb = new MongoClient(
-                config.mongo_host, config.mongo_port);
-        MongoDatabase mongodb_database = mongodb.getDatabase(config.mongo_db);
+        //MongoClient mongodb = new MongoClient(
+        //        config.mongo_host, config.mongo_port);
+        //MongoDatabase mongodb_database = mongodb.getDatabase(config.mongo_db);
 
         // Create and run HTTP / JSON-RPC server
-        RequestHandler datastore_handler = new RequestHandler(mongodb_database);
+        RequestHandler datastore_handler = new RequestHandler();
         JsonRpcServer jsonrpc_server = new JsonRpcServer(datastore_handler);
 
         QueuedThreadPool thread_pool = new QueuedThreadPool(
