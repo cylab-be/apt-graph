@@ -45,12 +45,12 @@ class JettyHandler extends AbstractHandler {
     }
 
     public void handle(
-            String target,
-            Request baseRequest,
-            HttpServletRequest request,
-            HttpServletResponse response)
+            final String target,
+            final Request base_request,
+            final HttpServletRequest request,
+            final HttpServletResponse response)
             throws IOException, ServletException {
-        
+
         jsonrpc_server.handle(request, response);
     }
 }
