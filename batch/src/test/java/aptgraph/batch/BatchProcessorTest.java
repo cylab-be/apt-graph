@@ -1,5 +1,7 @@
 package aptgraph.batch;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import junit.framework.TestCase;
 
@@ -15,9 +17,12 @@ public class BatchProcessorTest extends TestCase {
      */
     public final void testAnalyze() throws IOException {
         System.out.println("Test batch server with 1000 reqs");
+        File temp_file = File.createTempFile("tempfile", ".tmp");
+
         BatchProcessor processor = new BatchProcessor();
         processor.analyze(
-                getClass().getResourceAsStream("/1000_http_requests.txt"));
+                getClass().getResourceAsStream("/1000_http_requests.txt"),
+                new FileOutputStream(temp_file));
 
     }
 

@@ -1,10 +1,12 @@
 package aptgraph.batch;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Thibault Debatty
  */
-class Request {
+class Request implements Serializable {
     int time;
     String client;
     String url;
