@@ -21,12 +21,16 @@ git pull
 cd core
 mvn clean install
 
-# build and run the batch processor to build the graph
+# to build and run the batch processor to build the graph
 cd ../batch
 mvn clean package
 ./batch.sh -i <proxy log file> -o <graph file>
 
-# build and run the server
+# there is a test file in src/test/resources
+# so you can test with
+./batch.sh -i ./src/test/resources/1000_http_requests.txt -o /tmp/mytest.ser
+
+# to build and run the server
 cd ../server
 mvn clean package
 ./start.sh -i <graph file>
@@ -34,10 +38,8 @@ mvn clean package
 # by default, the server is available at http://127.0.0.1:8080
 
 # There is a dummy graph file in folder src/test/resources
-# hence you can make tests with
+# so you can make tests with
 ./start.sh -i ./src/test/resources/dummy_graph.ser
-
-
 ```
 
 ## Architecture
