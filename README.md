@@ -6,20 +6,38 @@ HTTP graph modeling for APT detection.
 - java
 - Apache Maven
 
-## Starting the server
+## Maven modules
+- **core** : contains classes used by the batch processor and the server (Request, etc.).
+- **batch** : contains the batch processor
+- **server** : contains the json-rpc server and interactive fusion engine
+
+## Usage
 
 ```
 # get the latest version from github
 git pull
 
-# build the server
-cd server
-mvn clean package
+# build the core module
+cd core
+mvn clean install
 
-# start the server
-./start.sh
+# build and run the batch processor to build the graph
+cd ../batch
+mvn clean package
+./batch.sh -i <proxy log file> -o <graph file>
+
+# build and run the server
+cd ../server
+mvn clean package
+./start.sh -i <graph file>
 
 # by default, the server is available at http://127.0.0.1:8080
+
+# There is a dummy graph file in folder src/test/resources
+# hence you can make tests with
+./start.sh -i ./src/test/resources/dummy_graph.ser
+
+
 ```
 
 ## Architecture
@@ -53,57 +71,109 @@ The **dummy** rpc returns a list of disconnected graphs (the clusters):
 - Each node has an id and a value
 - the edges are represented as a hashmap that associates a source node and a destionation node
 
-In the example below, 2 clusters are represented. The first cluster contains only one node (node 81: "Codeine..."). The second cluster has two nodes (node 108 and node 107). Node 108 has one edge to node 107 (similarity: 0.99) and node 107 has one edge to node 108.
+The example below contains one cluster of 7 nodes...
 
 ```
 [
+{
+  "similarity": null,
+  "k": 10,
+  "nodes": [
     {
-      "similarity": null,
-      "k": 10,
-      "nodes": [
-        {
-          "id": "81",
-          "value": "Codeine (WILSON) 15mg x 30 $144.00 No Rx!!..."
-        }
-      ],
-      "hashMap": {
-        "(81 => Codeine (WILSON) 15mg x 30 $144.00 No Rx!!...": []
+      "id": "0",
+      "value": {
+        "time": 1472083251,
+        "client": "198.36.158.8",
+        "url": "http://ajdd.rygxzzaid.mk/xucjehmkd.html"
       }
     },
     {
-      "similarity": null,
-      "k": 10,
-      "nodes": [
-        {
-          "id": "108",
-          "value": "FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. vxd"
+      "id": "5",
+      "value": {
+        "time": 1472083251,
+        "client": "198.36.158.8",
+        "url": "http://rkfko.apyeqwrqg.cm/rdhufye.html"
+      }
+    },
+    {
+      "id": "6",
+      "value": {
+        "time": 1472083251,
+        "client": "198.36.158.8",
+        "url": "http://ootlgeqo.fomu.ve/sfidbhq.html"
+      }
+    },
+    {
+      "id": "3",
+      "value": {
+        "time": 1472083251,
+        "client": "198.36.158.8",
+        "url": "http://kfiger.wfltjx.cc/uxmt.html"
+      }
+    },
+    {
+      "id": "4",
+      "value": {
+        "time": 1472083251,
+        "client": "198.36.158.8",
+        "url": "http://isogbg.hgwpxah.nz/roeefw.html"
+      }
+    },
+    {
+      "id": "1",
+      "value": {
+        "time": 1472083251,
+        "client": "198.36.158.8",
+        "url": "http://epnazrk.wmaj.ga/zlrsmtcc.html"
+      }
+    },
+    {
+      "id": "2",
+      "value": {
+        "time": 1472083251,
+        "client": "198.36.158.8",
+        "url": "http://epnazrk.wmaj.ga/zjeglwir.html"
+      }
+    }
+  ],
+  "hashMap": {
+    "(0 => 1472083251\thttp://ajdd.rygxzzaid.mk/xucjehmkd.html 198.36.158.8)": [
+      {
+        "node": {
+          "id": "6",
+          "value": {
+            "time": 1472083251,
+            "client": "198.36.158.8",
+            "url": "http://ootlgeqo.fomu.ve/sfidbhq.html"
+          }
         },
-        {
-          "id": "107",
-          "value": "FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. ubs"
-        }
-      ],
-      "hashMap": {
-        "(108 => FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. vxd)": [
-          {
-            "node": {
-              "id": "107",
-              "value": "FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. ubs"
-            },
-            "similarity": 0.9994660019874573
+        "similarity": 1
+      },
+      {
+        "node": {
+          "id": "3",
+          "value": {
+            "time": 1472083251,
+            "client": "198.36.158.8",
+            "url": "http://kfiger.wfltjx.cc/uxmt.html"
           }
-        ],
-        "(107 => FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. ubs)": [
-          {
-            "node": {
-              "id": "108",
-              "value": "FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. vxd"
-            },
-            "similarity": 0.9994660019874573
+        },
+        "similarity": 1
+      },
+      {
+        "node": {
+          "id": "5",
+          "value": {
+            "time": 1472083251,
+            "client": "198.36.158.8",
+            "url": "http://rkfko.apyeqwrqg.cm/rdhufye.html"
           }
-        ]
-      }
-    },
+        },
+        "similarity": 1
+      },
+      {
+        "node": {
+          "id": "1",
     ...
 ```
 

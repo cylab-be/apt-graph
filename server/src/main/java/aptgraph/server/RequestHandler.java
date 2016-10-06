@@ -24,11 +24,9 @@
 
 package aptgraph.server;
 
+import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Node;
-import info.debatty.java.graphs.SimilarityInterface;
-import info.debatty.java.graphs.build.ThreadedNNDescent;
-import info.debatty.java.stringsimilarity.JaroWinkler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +40,11 @@ import java.util.List;
  * @author Thibault Debatty
  */
 public class RequestHandler {
+    private final Graph<Request> graph;
+
+    RequestHandler(final Graph<Request> graph) {
+        this.graph = graph;
+    }
 
     /**
      * A test json-rpc call, with no argument, that should return "hello".
@@ -55,41 +58,27 @@ public class RequestHandler {
      * A dummy method that returns some clusters of nodes and edges.
      * @return
      */
-    public final List<Graph<String>> dummy() throws IOException {
+    public final List<Graph<Request>> dummy() {
+        //Node<Request> node = graph.getNodes().iterator().next();
+        //System.out.println(node);
+        //System.out.println(graph.get(node));
 
-        // Read graphs from disk...
-        List<Node<String>> nodes = readFile(
-                getClass().getResourceAsStream("/726-unique-spams"));
-
-        // Compute k-nn graph
-        ThreadedNNDescent<String> nndes = new ThreadedNNDescent<String>();
-        nndes.setSimilarity(new SimilarityInterface<String>() {
-
-            public double similarity(String value1, String value2) {
-                JaroWinkler jw = new JaroWinkler();
-                return jw.similarity(value1, value2);
-            }
-        });
-        Graph<String> graph = nndes.computeGraph(nodes);
-
-        // Lire les graphes depuis le disque dur?
-
-        // Fusionner les graphes
+        // Fusion
 
         // Prune
-        graph.prune(0.7);
+        graph.prune(0.9);
 
         // Cluster
-        ArrayList<Graph<String>> clusters = graph.connectedComponents();
+        ArrayList<Graph<Request>> clusters = graph.connectedComponents();
 
         // Filter
-        LinkedList<Graph<String>> filtered = new LinkedList<Graph<String>>();
-        for (Graph<String> subgraph : clusters) {
-            if (subgraph.size() < 3) {
+        LinkedList<Graph<Request>> filtered = new LinkedList<Graph<Request>>();
+        for (Graph<Request> subgraph : clusters) {
+            if (subgraph.size() < 10) {
                 filtered.add(subgraph);
             }
         }
-
+        System.out.println("Found " + filtered.size() + " clusters");
         return filtered;
 
     }

@@ -1,5 +1,7 @@
 package aptgraph.batch;
 
+import aptgraph.core.Request;
+import aptgraph.core.TimeSimilarity;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Node;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
@@ -70,6 +72,7 @@ public class BatchProcessor {
         ObjectOutputStream output = new ObjectOutputStream(
                 new BufferedOutputStream(output_file));
         output.writeObject(time_graph);
+        output.close();
     }
 
 

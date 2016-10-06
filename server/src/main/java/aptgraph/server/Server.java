@@ -21,10 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package aptgraph.server;
 
+import aptgraph.core.Request;
 import com.googlecode.jsonrpc4j.JsonRpcServer;
+import info.debatty.java.graphs.Graph;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,31 +42,53 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
  * @author Thibault Debatty
  */
 public class Server {
-    private static final Logger LOGGER =
-            Logger.getLogger(Server.class.getName());
 
-    private org.eclipse.jetty.server.Server http_server;
+    private static final Logger LOGGER
+            = Logger.getLogger(Server.class.getName());
+
+    private volatile org.eclipse.jetty.server.Server http_server;
     private Config config;
+    private final InputStream input_file;
 
     /**
      * Instantiate a server with default configuration.
+     *
+     * @param input_file
      */
-    public Server() {
+    public Server(final InputStream input_file) {
         config = new Config();
+        this.input_file = input_file;
     }
 
     /**
-     * Start the server, blocking.
-     * This method will only return if the server crashed...
+     * Start the server, blocking. This method will only return if the server
+     * crashed...
      */
     public final void start() {
 
         LOGGER.info("Reading graphs from disk...");
+        Graph<Request> graph = null;
+        try {
+            ObjectInputStream input = new ObjectInputStream(
+                    new BufferedInputStream(input_file));
+            graph = (Graph<Request>) input.readObject();
+            input.close();
 
-        LOGGER.info("Start JSON-RPC server at http://" + config.server_host
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Could not read input file", ex);
+            return;
+
+        } catch (ClassNotFoundException ex) {
+            LOGGER.log(Level.SEVERE, "Class not found!", ex);
+            return;
+        }
+
+        LOGGER.info("Graph has " + graph.size() + " nodes");
+
+        LOGGER.info("Starting JSON-RPC server at http://" + config.server_host
                 + ":" + config.server_port);
-        RequestHandler datastore_handler = new RequestHandler();
-        JsonRpcServer jsonrpc_server = new JsonRpcServer(datastore_handler);
+        RequestHandler request_handler = new RequestHandler(graph);
+        JsonRpcServer jsonrpc_server = new JsonRpcServer(request_handler);
 
         QueuedThreadPool thread_pool = new QueuedThreadPool(
                 config.max_threads,
@@ -85,6 +112,18 @@ public class Server {
                     Level.SEVERE,
                     "Failed to start server: " + ex.getMessage(),
                     ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public final void stop() {
+        LOGGER.info("Stopping server...");
+        try {
+            http_server.stop();
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Failed to stop server properly :(", ex);
         }
     }
 }
