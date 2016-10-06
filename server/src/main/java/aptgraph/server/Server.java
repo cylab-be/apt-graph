@@ -25,9 +25,9 @@
 package aptgraph.server;
 
 import com.googlecode.jsonrpc4j.JsonRpcServer;
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoDatabase;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -37,6 +37,9 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
  * @author Thibault Debatty
  */
 public class Server {
+    private static final Logger LOGGER =
+            Logger.getLogger(Server.class.getName());
+
     private org.eclipse.jetty.server.Server http_server;
     private Config config;
 
@@ -52,12 +55,11 @@ public class Server {
      * This method will only return if the server crashed...
      */
     public final void start() {
-        // Connect to mongodb
-        //MongoClient mongodb = new MongoClient(
-        //        config.mongo_host, config.mongo_port);
-        //MongoDatabase mongodb_database = mongodb.getDatabase(config.mongo_db);
 
-        // Create and run HTTP / JSON-RPC server
+        LOGGER.info("Reading graphs from disk...");
+
+        LOGGER.info("Start JSON-RPC server at http://" + config.server_host
+                + ":" + config.server_port);
         RequestHandler datastore_handler = new RequestHandler();
         JsonRpcServer jsonrpc_server = new JsonRpcServer(datastore_handler);
 
@@ -79,7 +81,10 @@ public class Server {
         try {
             http_server.start();
         } catch (Exception ex) {
-            System.err.println("Failed to start datastore: " + ex.getMessage());
+            LOGGER.log(
+                    Level.SEVERE,
+                    "Failed to start server: " + ex.getMessage(),
+                    ex);
         }
     }
 }

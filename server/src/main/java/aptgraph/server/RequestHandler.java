@@ -24,11 +24,9 @@
 
 package aptgraph.server;
 
-import com.mongodb.client.MongoDatabase;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Node;
 import info.debatty.java.graphs.SimilarityInterface;
-import info.debatty.java.graphs.build.GraphBuilder;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import java.io.BufferedReader;
@@ -44,14 +42,6 @@ import java.util.List;
  * @author Thibault Debatty
  */
 public class RequestHandler {
-    private final MongoDatabase db;
-
-    /**
-     *
-     */
-    public RequestHandler() {
-        this.db = null;
-    }
 
     /**
      * A test json-rpc call, with no argument, that should return "hello".
@@ -104,8 +94,11 @@ public class RequestHandler {
 
     }
 
-    private List<Node<String>> readFile(InputStream input) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+    private List<Node<String>> readFile(final InputStream input)
+            throws IOException {
+
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(input));
         ArrayList<Node<String>> nodes = new ArrayList<Node<String>>();
         String line;
         int i = 0;
