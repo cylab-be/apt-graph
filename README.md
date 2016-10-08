@@ -24,11 +24,11 @@ mvn clean install
 # to build and run the batch processor to build the graph
 cd ../batch
 mvn clean package
-./batch.sh -i <proxy log file> -o <graph file>
+./analyze.sh -i <proxy log file> -o <graph file>
 
 # there is a test file in src/test/resources
 # so you can test with
-./batch.sh -i ./src/test/resources/1000_http_requests.txt -o /tmp/mytest.ser
+./analyze.sh -i ./src/test/resources/1000_http_requests.txt -o /tmp/mytest.ser
 
 # to build and run the server
 cd ../server
