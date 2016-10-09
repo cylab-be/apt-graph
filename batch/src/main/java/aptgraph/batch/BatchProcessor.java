@@ -26,8 +26,13 @@ public class BatchProcessor {
     private static final Logger LOGGER = Logger.getLogger(
             BatchProcessor.class.getName());
     private static final String REGEX =
-            "^(\\d{10})\\..*\\s(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
-            + "(\\S+)\\s(\\S+)\\s(\\S+)\\s(\\S+)\\s.*$";
+//            "^(\\d{10})\\..*\\s(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
+//            + "(\\S+)\\s(\\S+)\\s(\\S+)\\s(\\S+)\\s.*$";
+
+//   Regex to use for the full match of the squid log
+             "^(\\d{10})\\..*(\\d{3})\\s(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
+             +"(\\S+)\\/(\\d{3})\\s(\\d+)\\s(\\S+)\\s(\\S+)\\s\\-\\s(\\S+)\\/"
+             +"(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s(\\S+).*$";
 
     private final Pattern pattern;
 
@@ -105,8 +110,16 @@ public class BatchProcessor {
 
         Request request = new Request();
         request.time = Integer.valueOf(match.group(1));
-        request.client = match.group(2);
-        request.url = match.group(6);
+        request.elapsed = Integer.valueOf(match.group(2));
+        request.client = match.group(3);
+        request.code = match.group(4);
+        request.status = Integer.valueOf(match.group(5));
+        request.bytes = Integer.valueOf(match.group(6));
+        request.method = match.group(7);
+        request.url = match.group(8);
+        request.peerstatus = match.group(9);
+        request.peerhost = match.group(10);
+        request.type = match.group(11);
         return request;
     }
 
