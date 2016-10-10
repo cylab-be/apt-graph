@@ -20,7 +20,8 @@ public final class Main {
      * @param args
      */
     public static void main(final String[] args)
-            throws ParseException, FileNotFoundException {
+            throws ParseException, FileNotFoundException,
+            ClassNotFoundException, Exception {
 
         // Parse command line arguments
         Options options = new Options();

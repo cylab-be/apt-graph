@@ -71,25 +71,18 @@ public class Server {
     /**
      * Start the server, blocking. This method will only return if the server
      * crashed...
+     * @throws java.io.IOException if the graph file cannot be read
+     * @throws java.lang.ClassNotFoundException if the Graph class is not found
      */
-    public final void start() {
+    public final void start()
+            throws IOException, ClassNotFoundException, Exception {
 
         LOGGER.info("Reading graphs from disk...");
-        Graph<Request> graph = null;
-        try {
-            ObjectInputStream input = new ObjectInputStream(
-                    new BufferedInputStream(input_file));
-            graph = (Graph<Request>) input.readObject();
-            input.close();
+        ObjectInputStream input = new ObjectInputStream(
+                new BufferedInputStream(input_file));
+        Graph<Request> graph = (Graph<Request>) input.readObject();
+        input.close();
 
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Could not read input file", ex);
-            return;
-
-        } catch (ClassNotFoundException ex) {
-            LOGGER.log(Level.SEVERE, "Class not found!", ex);
-            return;
-        }
 
         LOGGER.info("Graph has " + graph.size() + " nodes");
 
@@ -114,14 +107,7 @@ public class Server {
         http_server.setConnectors(new Connector[]{http_connector});
         http_server.setHandler(new JettyHandler(jsonrpc_server));
 
-        try {
-            http_server.start();
-        } catch (Exception ex) {
-            LOGGER.log(
-                    Level.SEVERE,
-                    "Failed to start server: " + ex.getMessage(),
-                    ex);
-        }
+        http_server.start();
     }
 
     /**

@@ -24,6 +24,8 @@
 
 package aptgraph.server;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 /**
@@ -33,11 +35,12 @@ import junit.framework.TestCase;
 public class ServerTest extends TestCase {
 
     private static final int STARTUP_DELAY = 5000;
+    private volatile Exception server_thread_ex = null;
     /**
      * Test of start method, of class Server.
      * @throws java.lang.InterruptedException
      */
-    public final void testStart() throws InterruptedException {
+    public final void testStart() throws InterruptedException, Exception {
         System.out.println("start");
         final Server server = new Server(
                 getClass().getResourceAsStream("/dummy_graph.ser"));
@@ -52,7 +55,16 @@ public class ServerTest extends TestCase {
 
             @Override
             public void run() {
-                server.start();
+                try {
+                    server.start();
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(ServerTest.class.getName()).log(Level.SEVERE, null, ex);
+                    server_thread_ex = ex;
+
+                } catch (Exception ex) {
+                    Logger.getLogger(ServerTest.class.getName()).log(Level.SEVERE, null, ex);
+                    server_thread_ex = ex;
+                }
             }
         });
 
@@ -66,6 +78,11 @@ public class ServerTest extends TestCase {
 
         // Wait for the server to finish...
         server_thread.join();
+
+        // Throw the exception in the main thread, to mark the test as failed
+        if (server_thread_ex != null) {
+            throw server_thread_ex;
+        }
     }
 
 }
