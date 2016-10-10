@@ -1,0 +1,6 @@
+language: java
+install: cd apt-graph && mvn --quiet install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip=true
+script: mvn verify
+
+#after_success:
+#  - mvn clean cobertura:cobertura coveralls:report
