@@ -104,7 +104,8 @@ public class Server {
                 config.idle_timeout,
                 new ArrayBlockingQueue<Runnable>(config.max_pending_requests));
 
-        http_server = new org.eclipse.jetty.server.Server(thread_pool);
+        //http_server = new org.eclipse.jetty.server.Server(thread_pool);
+        http_server = new org.eclipse.jetty.server.Server();
 
         ServerConnector http_connector = new ServerConnector(http_server);
         http_connector.setHost(config.server_host);
