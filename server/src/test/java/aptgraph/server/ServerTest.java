@@ -32,7 +32,7 @@ import junit.framework.TestCase;
  */
 public class ServerTest extends TestCase {
 
-    private static final int STARTUP_DELAY = 3000;
+    private static final int STARTUP_DELAY = 5000;
     /**
      * Test of start method, of class Server.
      * @throws java.lang.InterruptedException
