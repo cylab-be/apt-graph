@@ -61,6 +61,14 @@ public class Server {
     }
 
     /**
+     * Set a non-default config.
+     * @param config
+     */
+    public final void setConfig(final Config config) {
+        this.config = config;
+    }
+
+    /**
      * Start the server, blocking. This method will only return if the server
      * crashed...
      */

@@ -28,7 +28,7 @@ package aptgraph.server;
  *
  * @author Thibault Debatty
  */
-class Config {
+public class Config {
 
     private static final int    DEFAULT_MAX_THREADS = 20;
     private static final int    DEFAULT_MIN_THREADS = 10;
