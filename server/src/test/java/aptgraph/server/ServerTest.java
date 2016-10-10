@@ -44,8 +44,6 @@ public class ServerTest extends TestCase {
 
         Config conf = new Config();
         conf.server_port = 12345;
-        conf.min_threads = 1;
-        conf.max_threads = 2;
         server.setConfig(conf);
 
         // Start the server in a separate thread, so we can wait and stop it

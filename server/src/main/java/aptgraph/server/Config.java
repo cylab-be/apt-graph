@@ -30,12 +30,12 @@ package aptgraph.server;
  */
 public class Config {
 
-    private static final int    DEFAULT_MAX_THREADS = 20;
+    private static final int    DEFAULT_MAX_THREADS = 40;
     private static final int    DEFAULT_MIN_THREADS = 10;
     private static final int    DEFAULT_IDLE_TIMEOUT = 60;
     private static final String DEFAULT_SERVER_HOST = "127.0.0.1";
     private static final int    DEFAULT_SERVER_PORT = 8080;
-    private static final int    DEFAULT_MAX_PENDING_REQUESTS = 20;
+    private static final int    DEFAULT_MAX_PENDING_REQUESTS = 300;
 
 
     // Datastore HTTP/JSON-RPC server parameters
