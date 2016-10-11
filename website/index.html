@@ -1,0 +1,28 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<head>
+  <title>Prototype</title>
+  <!-- CSS -->
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+</head>
+<body>
+	HElloooo
+  <!-- Js -->
+  <script src="d3.min.js"></script>
+  <script src="graph.js"></script>
+  <script src="json_methods.js"></script>
+  <script>
+	  var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
+	                           "method": "dummy",
+	                           "params": { },
+	                           "id": 123});
+    request.onreadystatechange = function () {
+		  if (request.readyState == 4 && request.status == 200){
+			 var json = JSON.parse(request.responseText);
+			 console.log("Server Response: " + json.result);
+       draw_graph(json);
+		  }
+	  }
+  </script>
+</body>
