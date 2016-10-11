@@ -28,15 +28,14 @@ package aptgraph.server;
  *
  * @author Thibault Debatty
  */
-class Config {
+public class Config {
 
-    private static final String DEFAULT_MONGO_DB = "APT-GRAPH";
-    private static final int    DEFAULT_MAX_THREADS = 20;
+    private static final int    DEFAULT_MAX_THREADS = 40;
     private static final int    DEFAULT_MIN_THREADS = 10;
     private static final int    DEFAULT_IDLE_TIMEOUT = 60;
     private static final String DEFAULT_SERVER_HOST = "127.0.0.1";
     private static final int    DEFAULT_SERVER_PORT = 8080;
-    private static final int    DEFAULT_MAX_PENDING_REQUESTS = 20;
+    private static final int    DEFAULT_MAX_PENDING_REQUESTS = 300;
 
 
     // Datastore HTTP/JSON-RPC server parameters
@@ -46,11 +45,6 @@ class Config {
     public String server_host = DEFAULT_SERVER_HOST;
     public int server_port = DEFAULT_SERVER_PORT;
     public int max_pending_requests = DEFAULT_MAX_PENDING_REQUESTS;
-
-    // MONGODB parameters
-    public String mongo_host = "127.0.0.1";
-    public int mongo_port = 27017;
-    public String mongo_db = DEFAULT_MONGO_DB;
 
     @Override
     public String toString() {

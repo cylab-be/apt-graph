@@ -2,6 +2,7 @@ package aptgraph.batch;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -29,20 +30,25 @@ public final class Main {
         // Parse command line arguments
         Options options = new Options();
         options.addOption("i", true, "Input file (required)");
+        options.addOption("o", true, "Output file (required)");
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        if (cmd.hasOption("h") || !cmd.hasOption("i")) {
+        if (cmd.hasOption("h")
+                || !cmd.hasOption("i")
+                || !cmd.hasOption("o")) {
+
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("java -jar batch-<version>.jar", options);
             return;
         }
 
-
         BatchProcessor processor = new BatchProcessor();
-        processor.analyze(new FileInputStream(cmd.getOptionValue("i")));
+        processor.analyze(
+                new FileInputStream(cmd.getOptionValue("i")),
+                new FileOutputStream(cmd.getOptionValue("o")));
 
     }
 

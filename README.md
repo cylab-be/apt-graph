@@ -6,20 +6,40 @@ HTTP graph modeling for APT detection.
 - java
 - Apache Maven
 
-## Starting the server
+## Maven modules
+- **core** : contains classes used by the batch processor and the server (Request, etc.).
+- **batch** : contains the batch processor
+- **server** : contains the json-rpc server and interactive fusion engine
+
+## Usage
 
 ```
 # get the latest version from github
 git pull
 
-# build the server
-cd server
-mvn clean package
+# build the core module
+cd core
+mvn clean install
 
-# start the server
-./start.sh
+# to build and run the batch processor to build the graph
+cd ../batch
+mvn clean package
+./analyze.sh -i <proxy log file> -o <graph file>
+
+# there is a test file in src/test/resources
+# so you can test with
+./analyze.sh -i ./src/test/resources/1000_http_requests.txt -o /tmp/mytest.ser
+
+# to build and run the server
+cd ../server
+mvn clean package
+./start.sh -i <graph file>
 
 # by default, the server is available at http://127.0.0.1:8080
+
+# There is a dummy graph file in folder src/test/resources
+# so you can make tests with
+./start.sh -i ./src/test/resources/dummy_graph.ser
 ```
 
 ## Architecture
@@ -53,58 +73,190 @@ The **dummy** rpc returns a list of disconnected graphs (the clusters):
 - Each node has an id and a value
 - the edges are represented as a hashmap that associates a source node and a destionation node
 
-In the example below, 2 clusters are represented. The first cluster contains only one node (node 81: "Codeine..."). The second cluster has two nodes (node 108 and node 107). Node 108 has one edge to node 107 (similarity: 0.99) and node 107 has one edge to node 108.
+The example below contains one cluster of 7 nodes...
 
 ```
-[
-    {
-      "similarity": null,
-      "k": 10,
-      "nodes": [
+{
+{
+    "similarity": null,
+    "k": 10,
+    "nodes": [
         {
-          "id": "81",
-          "value": "Codeine (WILSON) 15mg x 30 $144.00 No Rx!!..."
-        }
-      ],
-      "hashMap": {
-        "(81 => Codeine (WILSON) 15mg x 30 $144.00 No Rx!!...": []
-      }
-    },
-    {
-      "similarity": null,
-      "k": 10,
-      "nodes": [
-        {
-          "id": "108",
-          "value": "FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. vxd"
+            "id": "1",
+            "value": {
+                "time": 1472083251,
+                "elapsed": 920,
+                "client": "198.36.158.8",
+                "code": "TCP_MISS",
+                "status": 200,
+                "bytes": 765,
+                "method": "GET",
+                "url": "http://epnazrk.wmaj.ga/zlrsmtcc.html",
+                "peerstatus": "DIRECT",
+                "peerhost": "130.167.210.247",
+                "type": "text/html"
+            }
         },
         {
-          "id": "107",
-          "value": "FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. ubs"
+            "id": "2",
+            "value": {
+                "time": 1472083251,
+                "elapsed": 444,
+                "client": "198.36.158.8",
+                "code": "TCP_MISS",
+                "status": 200,
+                "bytes": 755,
+                "method": "GET",
+                "url": "http://epnazrk.wmaj.ga/zjeglwir.html",
+                "peerstatus": "DIRECT",
+                "peerhost": "130.167.210.247",
+                "type": "text/html"
+            }
+        },
+        {
+            "id": "3",
+            "value": {
+                "time": 1472083251,
+                "elapsed": 590,
+                "client": "198.36.158.8",
+                "code": "TCP_MISS",
+                "status": 200,
+                "bytes": 1083,
+                "method": "GET",
+                "url": "http://kfiger.wfltjx.cc/uxmt.html",
+                "peerstatus": "DIRECT",
+                "peerhost": "47.238.242.2",
+                "type": "text/html"
+            }
+        },
+        {
+            "id": "4",
+            "value": {
+                "time": 1472083251,
+                "elapsed": 683,
+                "client": "198.36.158.8",
+                "code": "TCP_MISS",
+                "status": 200,
+                "bytes": 1419,
+                "method": "GET",
+                "url": "http://isogbg.hgwpxah.nz/roeefw.html",
+                "peerstatus": "DIRECT",
+                "peerhost": "233.4.82.7",
+                "type": "text/html"
+            }
+        },
+        {
+            "id": "5",
+            "value": {
+                "time": 1472083251,
+                "elapsed": 442,
+                "client": "198.36.158.8",
+                "code": "TCP_MISS",
+                "status": 200,
+                "bytes": 1960,
+                "method": "GET",
+                "url": "http://rkfko.apyeqwrqg.cm/rdhufye.html",
+                "peerstatus": "DIRECT",
+                "peerhost": "249.70.126.8",
+                "type": "text/html"
+            }
+        },
+        {
+            "id": "6",
+            "value": {
+                "time": 1472083251,
+                "elapsed": 276,
+                "client": "198.36.158.8",
+                "code": "TCP_MISS",
+                "status": 200,
+                "bytes": 111,
+                "method": "GET",
+                "url": "http://ootlgeqo.fomu.ve/sfidbhq.html",
+                "peerstatus": "DIRECT",
+                "peerhost": "243.179.195.173",
+                "type": "text/html"
+            }
+        },
+        {
+            "id": "0",
+            "value": {
+                "time": 1472083251,
+                "elapsed": 575,
+                "client": "198.36.158.8",
+                "code": "TCP_MISS",
+                "status": 200,
+                "bytes": 1411,
+                "method": "GET",
+                "url": "http://ajdd.rygxzzaid.mk/xucjehmkd.html",
+                "peerstatus": "DIRECT",
+                "peerhost": "118.220.140.185",
+                "type": "text/html"
+            }
         }
-      ],
-      "hashMap": {
-        "(108 => FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. vxd)": [
-          {
-            "node": {
-              "id": "107",
-              "value": "FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. ubs"
+    ],
+    "hashMap": {
+        "(1 => 1472083251\thttp://epnazrk.wmaj.ga/zlrsmtcc.html 198.36.158.8)": [
+            {
+                "node": {
+                    "id": "4",
+                    "value": {
+                        "time": 1472083251,
+                        "elapsed": 683,
+                        "client": "198.36.158.8",
+                        "code": "TCP_MISS",
+                        "status": 200,
+                        "bytes": 1419,
+                        "method": "GET",
+                        "url": "http://isogbg.hgwpxah.nz/roeefw.html",
+                        "peerstatus": "DIRECT",
+                        "peerhost": "233.4.82.7",
+                        "type": "text/html"
+                    }
+                },
+                "similarity": 1
             },
-            "similarity": 0.9994660019874573
-          }
-        ],
-        "(107 => FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. ubs)": [
-          {
-            "node": {
-              "id": "108",
-              "value": "FakeWatches, Buy Rep1icaWatch, iRolexOmega, Breitling, Bvlgari and other Genuine Swiss Rep1icaWatches. vxd"
+            {
+                "node": {
+                    "id": "2",
+                    "value": {
+                        "time": 1472083251,
+                        "elapsed": 444,
+                        "client": "198.36.158.8",
+                        "code": "TCP_MISS",
+                        "status": 200,
+                        "bytes": 755,
+                        "method": "GET",
+                        "url": "http://epnazrk.wmaj.ga/zjeglwir.html",
+                        "peerstatus": "DIRECT",
+                        "peerhost": "130.167.210.247",
+                        "type": "text/html"
+                    }
+                },
+                "similarity": 1
             },
-            "similarity": 0.9994660019874573
-          }
-        ]
-      }
-    },
-    ...
+            {
+                "node": {
+                    "id": "5",
+                    "value": {
+                        "time": 1472083251,
+                        "elapsed": 442,
+                        "client": "198.36.158.8",
+                        "code": "TCP_MISS",
+                        "status": 200,
+                        "bytes": 1960,
+                        "method": "GET",
+                        "url": "http://rkfko.apyeqwrqg.cm/rdhufye.html",
+                        "peerstatus": "DIRECT",
+                        "peerhost": "249.70.126.8",
+                        "type": "text/html"
+                    }
+                },
+                "similarity": 1
+            },
+            {
+                "node": {
+                    "id": "6",
+            ...
 ```
 
-![](./dummy-rpc.png)
+ ![dummy-rpc](dummy-rpc.png)

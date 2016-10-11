@@ -1,14 +1,19 @@
 package aptgraph.batch;
 
+import aptgraph.core.Request;
+import aptgraph.core.TimeSimilarity;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Node;
-import info.debatty.java.graphs.SimilarityInterface;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,29 +23,41 @@ import java.util.regex.Pattern;
  */
 public class BatchProcessor {
 
-    private final String regex =
-            "^(\\d{10})\\..*\\s(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
-            + "(\\S+)\\s(\\S+)\\s(\\S+)\\s(\\S+)\\s.*$";
+    private static final Logger LOGGER = Logger.getLogger(
+            BatchProcessor.class.getName());
+    private static final String REGEX =
+//            "^(\\d{10})\\..*\\s(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
+//            + "(\\S+)\\s(\\S+)\\s(\\S+)\\s(\\S+)\\s.*$";
+
+//   Regex to use for the full match of the squid log
+             "^(\\d{10})\\..*(\\d{3})\\s(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
+             +"(\\S+)\\/(\\d{3})\\s(\\d+)\\s(\\S+)\\s(\\S+)\\s\\-\\s(\\S+)\\/"
+             +"(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s(\\S+).*$";
+
     private final Pattern pattern;
+
 
     /**
      *
      */
     public BatchProcessor() {
-        pattern = Pattern.compile(regex);
+        pattern = Pattern.compile(REGEX);
     }
 
     /**
      *
-     * @param file
+     * @param input_file
+     * @param output_file
      * @throws IOException if we cannot read the input file
      */
-    public final void analyze(final InputStream file) throws IOException {
+    public final void analyze(
+            final InputStream input_file, final FileOutputStream output_file)
+            throws IOException {
 
-        System.out.println("Read and parse file...");
-        LinkedList<Request> requests = parse(file);
+        LOGGER.info("Read and parse input file...");
+        LinkedList<Request> requests = parseFile(input_file);
 
-        System.out.println("Convert to nodes...");
+        LOGGER.info("Found " + requests.size() + " requests...");
         LinkedList<Node<Request>> nodes = new LinkedList<Node<Request>>();
         int i = 0;
         for (Request r : requests) {
@@ -48,29 +65,28 @@ public class BatchProcessor {
             i++;
         }
 
-        System.out.println("Build the time based graph...");
+        LOGGER.info("Build the time based graph...");
         ThreadedNNDescent<Request> nndes = new ThreadedNNDescent<Request>();
-        nndes.setSimilarity(new SimilarityInterface<Request>() {
-
-            public double similarity(final Request r1, final Request r2) {
-                return 1.0 / (1 + Math.abs(r1.time - r2.time));
-            }
-        });
+        nndes.setSimilarity(new TimeSimilarity());
         Graph<Request> time_graph = nndes.computeGraph(nodes);
         System.out.println(time_graph.get(nodes.getFirst()));
 
-        System.out.println("Build URL graph...");
+        //LOGGER.info("Build URL graph...");
 
-        System.out.println("Save graphs to disk...");
-
+        LOGGER.info("Save graphs to disk...");
+        ObjectOutputStream output = new ObjectOutputStream(
+                new BufferedOutputStream(output_file));
+        output.writeObject(time_graph);
+        output.close();
     }
+
 
     /**
      * Read and parse the input file line by line.
      * @param file
      * @return
      */
-    private LinkedList<Request> parse(final InputStream file)
+    private LinkedList<Request> parseFile(final InputStream file)
             throws IOException {
 
         LinkedList<Request> requests = new LinkedList<Request>();
@@ -78,13 +94,13 @@ public class BatchProcessor {
         String line = null;
 
         while ((line = in.readLine()) != null) {
-            requests.add(parse(line));
+            requests.add(parseLine(line));
         }
 
         return requests;
     }
 
-    private Request parse(final String line) {
+    private Request parseLine(final String line) {
 
         Matcher match = pattern.matcher(line);
 
@@ -94,8 +110,16 @@ public class BatchProcessor {
 
         Request request = new Request();
         request.time = Integer.valueOf(match.group(1));
-        request.client = match.group(2);
-        request.url = match.group(6);
+        request.elapsed = Integer.valueOf(match.group(2));
+        request.client = match.group(3);
+        request.code = match.group(4);
+        request.status = Integer.valueOf(match.group(5));
+        request.bytes = Integer.valueOf(match.group(6));
+        request.method = match.group(7);
+        request.url = match.group(8);
+        request.peerstatus = match.group(9);
+        request.peerhost = match.group(10);
+        request.type = match.group(11);
         return request;
     }
 

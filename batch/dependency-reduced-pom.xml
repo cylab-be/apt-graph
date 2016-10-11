@@ -2,16 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>apt-graph</groupId>
-  <artifactId>server</artifactId>
-  <name>server</name>
+  <artifactId>batch</artifactId>
+  <name>batch</name>
   <version>0.1-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
-  <licenses>
-    <license>
-      <name>MIT License</name>
-      <url>http://www.opensource.org/licenses/mit-license.php</url>
-    </license>
-  </licenses>
   <build>
     <plugins>
       <plugin>
@@ -44,7 +38,7 @@
               </filters>
               <transformers>
                 <transformer>
-                  <mainClass>aptgraph.server.Main</mainClass>
+                  <mainClass>aptgraph.batch.Main</mainClass>
                 </transformer>
               </transformers>
             </configuration>
