@@ -12,7 +12,7 @@ circle {
 
 text {
   fill: #000;
-  font: 10px sans-serif;
+  font: sans-serif;
   pointer-events: none;
 }
 

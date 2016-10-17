@@ -1,13 +1,35 @@
-function draw_graph(data_array){
-	var links = data_array;
-	for (var key in links[1].hashMap){
-		var regex = /\d+/g;
-		var matches = key.match(regex)
-		var value = links[1].hashMap[key];
-		console.log(value);
-		console.log(matches[0] + " goes to " + value[0].node.id + " force between is " + value[0].similarity);
+function draw_graph(json_data){
+	var data = json_data;
+	var links = [];
+	for (var n= 0; n < data.length; n++){
+		for (var key in data[n].hashMap){
+			var regex = /\d+/g;
+			var matches = key.match(regex);
+			var source_name = key.substring(key.indexOf("=> ") + 3, key.length - 1);
+			var source_id = matches[0];
+			var target, similarity;
+			var value = data[n].hashMap[key];
+			if (value.length == 0){
+				target = [source_id, source_name];
+				similarity = 0;
+				links.push({"source": [source_id, source_name], "target": target, "value": similarity});
+			} else {
+				for (var m= 0; m < value.length; m++){
+					target = [value[m].node.id, value[m].node.value];
+					similarity = value[m].similarity;
+					links.push({"source": [source_id, source_name], "target": target, "value": similarity});
+				}
+			}
+		}
 	}
+	//console.log(links);
 	var nodes = {};
+	
+	function findLinkToTarget(name){
+		for (var n= 0; n < links.length; n++){
+			
+		}
+	}
 	
 	// Compute the distinct nodes from the links.
 	links.forEach(function(link) {
@@ -18,15 +40,17 @@ function draw_graph(data_array){
 		link.value = +link.value;
 	});
 	
-	var width = 960,
-		height = 500;
+	//console.log(nodes);
+	
+	var width = screen.width;
+	var	height = screen.height;
 	
 	var force = d3.layout.force()
 		.nodes(d3.values(nodes))
 		.links(links)
 		.size([width, height])
-		.linkDistance(60)
-		.charge(-300)
+		.linkDistance(50)
+		.charge(-150)
 		.on("tick", tick)
 		.start();
 	
@@ -61,6 +85,22 @@ function draw_graph(data_array){
 		.data(force.nodes())
 	.enter().append("g")
 		.attr("class", "node")
+		.on("mouseover", function(d) {
+			var g = d3.select(this); // The node
+			// The class is used to remove the additional text later
+			var target = nodes[d.name];
+			console.log(target);
+			var info = g.append('text')
+				.classed('info', true)
+				.attr('x', 20)
+				.attr('y', 10)
+				.attr("font-size","30px")
+				.text(function(d) { return d.name[1]; });
+		})
+		.on("mouseout", function() {
+			// Remove the info text on mouse out.
+			d3.select(this).select('text.info').remove();
+		})
 		.call(force.drag);
 	
 	// add the nodes
@@ -71,7 +111,8 @@ function draw_graph(data_array){
 	node.append("text")
 		.attr("x", 12)
 		.attr("dy", ".35em")
-		.text(function(d) { return d.name; });
+		.attr("font-size", "10xp")
+		.text(function(d) { return d.name[0]; });
 	
 	// add the curvy lines
 	function tick() {
