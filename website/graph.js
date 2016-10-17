@@ -1,9 +1,9 @@
-function draw_graph(json_data){
-	d3.json(json_data, function(error, links) {
-	for (var key in links.result[1].hashMap){
+function draw_graph(data_array){
+	var links = data_array;
+	for (var key in links[1].hashMap){
 		var regex = /\d+/g;
 		var matches = key.match(regex)
-		var value = links.result[1].hashMap[key];
+		var value = links[1].hashMap[key];
 		console.log(value);
 		console.log(matches[0] + " goes to " + value[0].node.id + " force between is " + value[0].similarity);
 	}
@@ -91,6 +91,4 @@ function draw_graph(json_data){
 			.attr("transform", function(d) { 
 			return "translate(" + d.x + "," + d.y + ")"; });
 	}
-	
-	});
 }

@@ -13,15 +13,16 @@
   <script src="graph.js"></script>
   <script src="json_methods.js"></script>
   <script>
+    var json;
 	  var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
 	                           "method": "dummy",
 	                           "params": { },
 	                           "id": 123});
     request.onreadystatechange = function () {
 		  if (request.readyState == 4 && request.status == 200){
-			 var json = JSON.parse(request.responseText);
-			 console.log("Server Response: " + json.result);
-       draw_graph(json);
+			 json = JSON.parse(request.responseText);
+			 //console.log("Server Response: " + json.result);
+       draw_graph(json.result);
 		  }
 	  }
   </script>
