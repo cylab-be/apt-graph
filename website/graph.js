@@ -78,7 +78,10 @@ function draw_graph(json_data){
 	.enter().append("svg:path")
 	//    .attr("class", function(d) { return "link " + d.type; })
 		.attr("class", "link")
-		.attr("marker-end", "url(#end)");
+		.attr("marker-end", function(d) {if (d.value == 0){
+											return "";
+										} else {
+											return "url(#end)"}});
 	
 	// define the nodes
 	var node = svg.selectAll(".node")
@@ -89,7 +92,6 @@ function draw_graph(json_data){
 			var g = d3.select(this); // The node
 			// The class is used to remove the additional text later
 			var target = nodes[d.name];
-			console.log(target);
 			var info = g.append('text')
 				.classed('info', true)
 				.attr('x', 20)
