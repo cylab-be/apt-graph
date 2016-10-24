@@ -25,17 +25,15 @@ public class BatchProcessor {
 
     private static final Logger LOGGER = Logger.getLogger(
             BatchProcessor.class.getName());
-    private static final String REGEX =
-//            "^(\\d{10})\\..*\\s(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
-//            + "(\\S+)\\s(\\S+)\\s(\\S+)\\s(\\S+)\\s.*$";
 
-//   Regex to use for the full match of the squid log
-             "^(\\d{10})\\..*(\\d{3})\\s(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
-             +"(\\S+)\\/(\\d{3})\\s(\\d+)\\s(\\S+)\\s(\\S+)\\s\\-\\s(\\S+)\\/"
-             +"(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s(\\S+).*$";
+    // Regex to use for the full match of the squid log
+    private static final String REGEX
+            = "^(\\d{10})\\..*(\\d{3})\\s"
+            + "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
+            + "(\\S+)\\/(\\d{3})\\s(\\d+)\\s(\\S+)\\s(\\S+)\\s\\-\\s(\\S+)\\/"
+            + "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s(\\S+).*$";
 
     private final Pattern pattern;
-
 
     /**
      *
@@ -72,7 +70,6 @@ public class BatchProcessor {
         System.out.println(time_graph.get(nodes.getFirst()));
 
         //LOGGER.info("Build URL graph...");
-
         LOGGER.info("Save graphs to disk...");
         ObjectOutputStream output = new ObjectOutputStream(
                 new BufferedOutputStream(output_file));
@@ -80,9 +77,9 @@ public class BatchProcessor {
         output.close();
     }
 
-
     /**
      * Read and parse the input file line by line.
+     *
      * @param file
      * @return
      */
