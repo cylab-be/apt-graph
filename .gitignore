@@ -103,3 +103,4 @@ hs_err_pid*
 *~
 /batch/target/
 /core/target/
+/apt-graph/target/

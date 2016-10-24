@@ -108,18 +108,19 @@ public class BatchProcessor {
             throw new IllegalArgumentException("Regex did not match " + line);
         }
 
-        Request request = new Request();
-        request.time = Integer.valueOf(match.group(1));
-        request.elapsed = Integer.valueOf(match.group(2));
-        request.client = match.group(3);
-        request.code = match.group(4);
-        request.status = Integer.valueOf(match.group(5));
-        request.bytes = Integer.valueOf(match.group(6));
-        request.method = match.group(7);
-        request.url = match.group(8);
-        request.peerstatus = match.group(9);
-        request.peerhost = match.group(10);
-        request.type = match.group(11);
+        Request request = new Request(
+                Integer.valueOf(match.group(1)),
+                Integer.valueOf(match.group(2)),
+                match.group(3),
+                match.group(4),
+                Integer.valueOf(match.group(5)),
+                Integer.valueOf(match.group(6)),
+                match.group(7),
+                match.group(8),
+                match.group(9),
+                match.group(10),
+                match.group(11));
+
         return request;
     }
 
