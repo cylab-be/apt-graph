@@ -26,11 +26,6 @@ package aptgraph.server;
 
 import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
-import info.debatty.java.graphs.Node;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,22 +75,5 @@ public class RequestHandler {
         }
         System.out.println("Found " + filtered.size() + " clusters");
         return filtered;
-
-    }
-
-    private List<Node<String>> readFile(final InputStream input)
-            throws IOException {
-
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(input));
-        ArrayList<Node<String>> nodes = new ArrayList<Node<String>>();
-        String line;
-        int i = 0;
-        while ((line = reader.readLine()) != null) {
-            nodes.add(new Node(String.valueOf(i), line));
-            i++;
-        }
-        reader.close();
-        return nodes;
     }
 }

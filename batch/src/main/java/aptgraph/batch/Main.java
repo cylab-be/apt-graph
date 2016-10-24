@@ -45,10 +45,16 @@ public final class Main {
             return;
         }
 
-        BatchProcessor processor = new BatchProcessor();
-        processor.analyze(
-                new FileInputStream(cmd.getOptionValue("i")),
-                new FileOutputStream(cmd.getOptionValue("o")));
+        FileOutputStream output_stream =
+                new FileOutputStream(cmd.getOptionValue("o"));
+        try {
+            BatchProcessor processor = new BatchProcessor();
+            processor.analyze(
+                    new FileInputStream(cmd.getOptionValue("i")),
+                    output_stream);
+        } finally {
+            output_stream.close();
+        }
 
     }
 

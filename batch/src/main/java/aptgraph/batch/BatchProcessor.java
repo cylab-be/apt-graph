@@ -87,7 +87,8 @@ public class BatchProcessor {
             throws IOException {
 
         LinkedList<Request> requests = new LinkedList<Request>();
-        BufferedReader in = new BufferedReader(new InputStreamReader(file));
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(file, "UTF-8"));
         String line = null;
 
         while ((line = in.readLine()) != null) {
@@ -106,12 +107,12 @@ public class BatchProcessor {
         }
 
         Request request = new Request(
-                Integer.valueOf(match.group(1)),
-                Integer.valueOf(match.group(2)),
+                Integer.parseInt(match.group(1)),
+                Integer.parseInt(match.group(2)),
                 match.group(3),
                 match.group(4),
-                Integer.valueOf(match.group(5)),
-                Integer.valueOf(match.group(6)),
+                Integer.parseInt(match.group(5)),
+                Integer.parseInt(match.group(6)),
                 match.group(7),
                 match.group(8),
                 match.group(9),
