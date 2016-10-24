@@ -10,6 +10,7 @@ HTTP graph modeling for APT detection.
 - **core** : contains classes used by the batch processor and the server (Request, etc.).
 - **batch** : contains the batch processor
 - **server** : contains the json-rpc server and interactive fusion engine
+- **apt-graph** : parent module, allows to build all modules at once...
 
 ## Usage
 
@@ -17,22 +18,20 @@ HTTP graph modeling for APT detection.
 # get the latest version from github
 git pull
 
-# build the core module
-cd core
+# build all the modules together
+cd apt-graph
 mvn clean install
 
-# to build and run the batch processor to build the graph
+# to run the batch processor to build the graph
 cd ../batch
-mvn clean package
 ./analyze.sh -i <proxy log file> -o <graph file>
 
 # there is a test file in src/test/resources
 # so you can test with
 ./analyze.sh -i ./src/test/resources/1000_http_requests.txt -o /tmp/mytest.ser
 
-# to build and run the server
+# to run the server
 cd ../server
-mvn clean package
 ./start.sh -i <graph file>
 
 # by default, the server is available at http://127.0.0.1:8080
