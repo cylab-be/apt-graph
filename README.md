@@ -1,5 +1,7 @@
 # APT-GRAPH
 
+[![Build Status](https://travis-ci.org/RUCD/apt-graph.svg?branch=master)](https://travis-ci.org/RUCD/apt-graph)
+
 HTTP graph modeling for APT detection.
 
 ## Requirements
