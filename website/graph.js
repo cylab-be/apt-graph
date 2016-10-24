@@ -42,8 +42,8 @@ function draw_graph(json_data){
 	
 	//console.log(nodes);
 	
-	var width = screen.width;
-	var	height = screen.height;
+	var width = window.innerWidth; //screen.width;
+	var	height = window.innerHeight; //screen.height;
 	
 	var force = d3.layout.force()
 		.nodes(d3.values(nodes))
