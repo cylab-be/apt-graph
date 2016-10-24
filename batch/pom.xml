@@ -68,7 +68,7 @@
                 <executions>
                     <execution>
                         <id>validate</id>
-                        <phase>validate</phase>
+                        <phase>verify</phase>
                         <configuration>
                             <configLocation>checkstyle.xml</configLocation>
                             <cacheFile>../batch/target/checkstyle_cache</cacheFile>

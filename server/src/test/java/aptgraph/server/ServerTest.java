@@ -46,7 +46,7 @@ public class ServerTest extends TestCase {
                 getClass().getResourceAsStream("/dummy_graph.ser"));
 
         Config conf = new Config();
-        conf.server_port = 12345;
+        conf.setServerPort(12345);
         server.setConfig(conf);
 
         // Start the server in a separate thread, so we can wait and stop it

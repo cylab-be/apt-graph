@@ -39,15 +39,113 @@ public class Config {
 
 
     // Datastore HTTP/JSON-RPC server parameters
-    public int max_threads = DEFAULT_MAX_THREADS;
-    public int min_threads = DEFAULT_MIN_THREADS;
-    public int idle_timeout = DEFAULT_IDLE_TIMEOUT;
-    public String server_host = DEFAULT_SERVER_HOST;
-    public int server_port = DEFAULT_SERVER_PORT;
-    public int max_pending_requests = DEFAULT_MAX_PENDING_REQUESTS;
+    private int max_threads = DEFAULT_MAX_THREADS;
+    private int min_threads = DEFAULT_MIN_THREADS;
+    private int idle_timeout = DEFAULT_IDLE_TIMEOUT;
+    private String server_host = DEFAULT_SERVER_HOST;
+    private int server_port = DEFAULT_SERVER_PORT;
+    private int max_pending_requests = DEFAULT_MAX_PENDING_REQUESTS;
+
+    /**
+     *
+     * @return
+     */
+    public final int getMaxThreads() {
+        return max_threads;
+    }
+
+    /**
+     *
+     * @param max_threads
+     */
+    public final void setMaxThreads(final int max_threads) {
+        this.max_threads = max_threads;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public final int getMinThreads() {
+        return min_threads;
+    }
+
+    /**
+     *
+     * @param min_threads
+     */
+    public final void setMinThreads(final int min_threads) {
+        this.min_threads = min_threads;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public final int getIdleTimeout() {
+        return idle_timeout;
+    }
+
+    /**
+     *
+     * @param idle_timeout
+     */
+    public final void setIdleTimeout(final int idle_timeout) {
+        this.idle_timeout = idle_timeout;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public final String getServerHost() {
+        return server_host;
+    }
+
+    /**
+     *
+     * @param server_host
+     */
+    public final void setServerHost(final String server_host) {
+        this.server_host = server_host;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public final int getServerPort() {
+        return server_port;
+    }
+
+    /**
+     *
+     * @param server_port
+     */
+    public final void setServerPort(final int server_port) {
+        this.server_port = server_port;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public final int getMaxPendingRequests() {
+        return max_pending_requests;
+    }
+
+    /**
+     *
+     * @param max_pending_requests
+     */
+    public final void setMaxPendingRequests(final int max_pending_requests) {
+        this.max_pending_requests = max_pending_requests;
+    }
+
+
 
     @Override
-    public String toString() {
+    public final String toString() {
         return "Config with port " + this.server_port;
     }
 }

@@ -73,6 +73,7 @@ public class Server {
      * crashed...
      * @throws java.io.IOException if the graph file cannot be read
      * @throws java.lang.ClassNotFoundException if the Graph class is not found
+     * @throws java.lang.Exception if the server cannot start...
      */
     public final void start()
             throws IOException, ClassNotFoundException, Exception {
@@ -86,23 +87,25 @@ public class Server {
 
         LOGGER.info("Graph has " + graph.size() + " nodes");
 
-        LOGGER.info("Starting JSON-RPC server at http://" + config.server_host
-                + ":" + config.server_port);
+        LOGGER.info("Starting JSON-RPC server at http://"
+                + config.getServerHost()
+                + ":" + config.getServerPort());
         RequestHandler request_handler = new RequestHandler(graph);
         JsonRpcServer jsonrpc_server = new JsonRpcServer(request_handler);
 
         QueuedThreadPool thread_pool = new QueuedThreadPool(
-                config.max_threads,
-                config.min_threads,
-                config.idle_timeout,
-                new ArrayBlockingQueue<Runnable>(config.max_pending_requests));
+                config.getMaxThreads(),
+                config.getMinThreads(),
+                config.getIdleTimeout(),
+                new ArrayBlockingQueue<Runnable>(
+                        config.getMaxPendingRequests()));
 
         http_server = new org.eclipse.jetty.server.Server(thread_pool);
         //http_server = new org.eclipse.jetty.server.Server();
 
         ServerConnector http_connector = new ServerConnector(http_server);
-        http_connector.setHost(config.server_host);
-        http_connector.setPort(config.server_port);
+        http_connector.setHost(config.getServerHost());
+        http_connector.setPort(config.getServerPort());
 
         http_server.setConnectors(new Connector[]{http_connector});
         http_server.setHandler(new JettyHandler(jsonrpc_server));

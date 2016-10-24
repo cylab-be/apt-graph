@@ -18,6 +18,12 @@ public final class Main {
     /**
      *
      * @param args
+     * @throws org.apache.commons.cli.ParseException if command line cannot be
+     * parsed
+     * @throws java.io.FileNotFoundException if the graph file is not found
+     * @throws java.lang.ClassNotFoundException if the classes corresponding to
+     * graph elements are not found
+     * @throws java.lang.Exception if the server cannot start
      */
     public static void main(final String[] args)
             throws ParseException, FileNotFoundException,
