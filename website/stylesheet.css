@@ -16,3 +16,23 @@ text {
   pointer-events: none;
 }
 
+.button {
+    fill: grey; /* Green */
+    border: 10xp;
+    stroke-width: 10xp;
+}
+
+.button-text {
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.container_graph {
+    float: right;
+}
+
+.container_buttons {
+    float: left;
+}
