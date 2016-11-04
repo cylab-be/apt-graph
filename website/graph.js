@@ -42,8 +42,8 @@ function draw_graph(json_data){
 	
 	//console.log(nodes);
 	
-	var width = window.innerWidth; //screen.width;
-	var	height = window.innerHeight; //screen.height;
+	var width = window.innerWidth; 
+	var	height = window.innerHeight; 
 	
 	var force = d3.layout.force()
 		.nodes(d3.values(nodes))
@@ -53,9 +53,24 @@ function draw_graph(json_data){
 		.charge(-150)
 		.on("tick", tick)
 		.start();
-	
+
+	var buttons = d3.select("body").append("svg")
+		.attr("class", "container_buttons")
+		.attr("width", 200)
+		.attr("height", height)
+		.append("g");
+	var prune_button = buttons.append("rect")       // attach a rectangle
+		.attr("class", "button")
+		.attr("x", 20)         // position the left of the rectangle
+	    .attr("y", 50)          // position the top of the rectangle
+		.attr("height", 50)    // set the height
+		.attr("width", 100)     // set the width
+		.attr("rx", 10)         // set the x corner curve radius
+		.attr("ry", 10);        // set the y corner curve radius
+
 	var svg = d3.select("body").append("svg")
-		.attr("width", width)
+//		.attr("class", "container_graph")
+		.attr("width", width - 240)
 		.attr("height", height);
 	
 	// build the arrow.
@@ -134,4 +149,6 @@ function draw_graph(json_data){
 			.attr("transform", function(d) { 
 			return "translate(" + d.x + "," + d.y + ")"; });
 	}
+
+	prune_button.on("click",function(){watchNode(focus);});
 }
