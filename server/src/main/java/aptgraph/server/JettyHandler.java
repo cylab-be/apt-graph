@@ -44,12 +44,15 @@ class JettyHandler extends AbstractHandler {
         this.jsonrpc_server = jsonrpc_server;
     }
 
+    @Override
     public void handle(
             final String target,
             final Request base_request,
             final HttpServletRequest request,
             final HttpServletResponse response)
             throws IOException, ServletException {
+
+        response.addHeader("Access-Control-Allow-Origin", "*");
 
         jsonrpc_server.handle(request, response);
     }
