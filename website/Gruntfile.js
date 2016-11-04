@@ -4,12 +4,13 @@ module.exports = function(grunt) {
     git_deploy: {
       your_target: {
         options: {
-          url: 'git@github.com:example/repo.git'
+          url: 'https://github.com/RUCD/apt-graph.git'
         },
-        src: 'directory/to/deploy'
+        src: '.'
       },
     },
   })
   grunt.loadNpmTasks('grunt-git-deploy');
+  grunt.registerTask('default', ['git_deploy']);
 
 };
