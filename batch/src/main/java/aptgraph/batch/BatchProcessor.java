@@ -2,6 +2,7 @@ package aptgraph.batch;
 
 import aptgraph.core.Request;
 import aptgraph.core.TimeSimilarity;
+import aptgraph.core.URLSimilarity;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Node;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
@@ -64,17 +65,26 @@ public class BatchProcessor {
         }
 
         LOGGER.info("Build the time based graph...");
-        ThreadedNNDescent<Request> nndes = new ThreadedNNDescent<Request>();
-        nndes.setSimilarity(new TimeSimilarity());
-        Graph<Request> time_graph = nndes.computeGraph(nodes);
-        System.out.println(time_graph.get(nodes.getFirst()));
+        ThreadedNNDescent<Request> nndes_time =
+                new ThreadedNNDescent<Request>();
+        nndes_time.setSimilarity(new TimeSimilarity());
+        Graph<Request> time_graph = nndes_time.computeGraph(nodes);
 
-        //LOGGER.info("Build URL graph...");
+        LOGGER.info("Build the URL based graph...");
+        ThreadedNNDescent<Request> nndes_url = new ThreadedNNDescent<Request>();
+        nndes_url.setSimilarity(new URLSimilarity());
+        Graph<Request> url_graph = nndes_url.computeGraph(nodes);
+
+        //List of graphs
+        LinkedList<Graph> graphs = new LinkedList<Graph>();
+        graphs.add(time_graph);
+        graphs.add(url_graph);
+
         LOGGER.info("Save graphs to disk...");
-        ObjectOutputStream output = new ObjectOutputStream(
+        ObjectOutputStream output_time = new ObjectOutputStream(
                 new BufferedOutputStream(output_file));
-        output.writeObject(time_graph);
-        output.close();
+        output_time.writeObject(graphs);
+        output_time.close();
     }
 
     /**
