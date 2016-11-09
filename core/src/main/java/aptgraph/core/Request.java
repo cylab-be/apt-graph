@@ -15,10 +15,11 @@ public class Request implements Serializable {
     private final int elapsed;
     private final String client;
     private final String code;
-    private final int status; //
+    private final int status;
     private final int bytes;
     private final String method;
     private final String url;
+    private final String domain;
     private final String peerstatus;
     private final String peerhost;
     private final String type;
@@ -34,6 +35,7 @@ public class Request implements Serializable {
      * @param bytes
      * @param method
      * @param url
+     * @param domain
      * @param peerstatus
      * @param peerhost
      * @param type
@@ -47,6 +49,7 @@ public class Request implements Serializable {
             final int bytes,
             final String method,
             final String url,
+            final String domain,
             final String peerstatus,
             final String peerhost,
             final String type) {
@@ -59,6 +62,7 @@ public class Request implements Serializable {
         this.bytes = bytes;
         this.method = method;
         this.url = url;
+        this.domain = domain;
         this.peerstatus = peerstatus;
         this.peerhost = peerhost;
         this.type = type;
@@ -128,6 +132,14 @@ public class Request implements Serializable {
      */
     public final String getUrl() {
         return url;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public final String getDomain() {
+        return domain;
     }
 
     /**

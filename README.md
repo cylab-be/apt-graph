@@ -102,93 +102,139 @@ The example below contains one cluster of 7 nodes...
 
 ```
 {
-{
-    "similarity": null,
-    "k": 10,
-    "nodes": [
+  "jsonrpc": "2.0",
+  "id": 155,
+  "result": [
+    {
+      "similarity": null,
+      "k": 10,
+      "nodes": [
         {
-            "id": "1",
-            "value": {
-                "time": 1472083251,
-                "elapsed": 920,
-                "client": "198.36.158.8",
-                "code": "TCP_MISS",
-                "status": 200,
-                "bytes": 765,
-                "method": "GET",
-                "url": "http://epnazrk.wmaj.ga/zlrsmtcc.html",
-                "peerstatus": "DIRECT",
-                "peerhost": "130.167.210.247",
-                "type": "text/html"
-            }
+          "id": "1",
+          "value": {
+            "time": 1472083251,
+            "elapsed": 920,
+            "client": "198.36.158.8",
+            "code": "TCP_MISS",
+            "status": 200,
+            "bytes": 765,
+            "method": "GET",
+            "url": "http://epnazrk.wmaj.ga/zlrsmtcc.html",
+            "domain": "epnazrk.wmaj.ga",
+            "peerstatus": "DIRECT",
+            "peerhost": "130.167.210.247",
+            "type": "text/html"
+          }
         },
         {
-            "id": "2",
-            "value": {
-                "time": 1472083251,
-                "elapsed": 444,
-                "client": "198.36.158.8",
-                "code": "TCP_MISS",
-                "status": 200,
-                "bytes": 755,
-                "method": "GET",
-                "url": "http://epnazrk.wmaj.ga/zjeglwir.html",
-                "peerstatus": "DIRECT",
-                "peerhost": "130.167.210.247",
-                "type": "text/html"
-            }
+          "id": "2",
+          "value": {
+            "time": 1472083251,
+            "elapsed": 444,
+            "client": "198.36.158.8",
+            "code": "TCP_MISS",
+            "status": 200,
+            "bytes": 755,
+            "method": "GET",
+            "url": "http://epnazrk.wmaj.ga/zjeglwir.html",
+            "domain": "epnazrk.wmaj.ga",
+            "peerstatus": "DIRECT",
+            "peerhost": "130.167.210.247",
+            "type": "text/html"
+          }
         },
         {
-            "id": "3",
-            "value": {
-                "time": 1472083251,
-                "elapsed": 590,
-                "client": "198.36.158.8",
-                "code": "TCP_MISS",
-                "status": 200,
-                "bytes": 1083,
-                "method": "GET",
-                "url": "http://kfiger.wfltjx.cc/uxmt.html",
-                "peerstatus": "DIRECT",
-                "peerhost": "47.238.242.2",
-                "type": "text/html"
-            }
+          "id": "3",
+          "value": {
+            "time": 1472083251,
+            "elapsed": 590,
+            "client": "198.36.158.8",
+            "code": "TCP_MISS",
+            "status": 200,
+            "bytes": 1083,
+            "method": "GET",
+            "url": "http://kfiger.wfltjx.cc/uxmt.html",
+            "domain": "kfiger.wfltjx.cc",
+            "peerstatus": "DIRECT",
+            "peerhost": "47.238.242.2",
+            "type": "text/html"
+          }
         },
         {
-            "id": "4",
-            "value": {
-                "time": 1472083251,
-                "elapsed": 683,
-                "client": "198.36.158.8",
-                "code": "TCP_MISS",
-                "status": 200,
-                "bytes": 1419,
-                "method": "GET",
-                "url": "http://isogbg.hgwpxah.nz/roeefw.html",
-                "peerstatus": "DIRECT",
-                "peerhost": "233.4.82.7",
-                "type": "text/html"
-            }
+          "id": "4",
+          "value": {
+            "time": 1472083251,
+            "elapsed": 683,
+            "client": "198.36.158.8",
+            "code": "TCP_MISS",
+            "status": 200,
+            "bytes": 1419,
+            "method": "GET",
+            "url": "http://isogbg.hgwpxah.nz/roeefw.html",
+            "domain": "isogbg.hgwpxah.nz",
+            "peerstatus": "DIRECT",
+            "peerhost": "233.4.82.7",
+            "type": "text/html"
+          }
         },
         {
-            "id": "5",
-            "value": {
-                "time": 1472083251,
-                "elapsed": 442,
-                "client": "198.36.158.8",
-                "code": "TCP_MISS",
-                "status": 200,
-                "bytes": 1960,
-                "method": "GET",
-                "url": "http://rkfko.apyeqwrqg.cm/rdhufye.html",
-                "peerstatus": "DIRECT",
-                "peerhost": "249.70.126.8",
-                "type": "text/html"
-            }
+          "id": "5",
+          "value": {
+            "time": 1472083251,
+            "elapsed": 442,
+            "client": "198.36.158.8",
+            "code": "TCP_MISS",
+            "status": 200,
+            "bytes": 1960,
+            "method": "GET",
+            "url": "http://rkfko.apyeqwrqg.cm/rdhufye.html",
+            "domain": "rkfko.apyeqwrqg.cm",
+            "peerstatus": "DIRECT",
+            "peerhost": "249.70.126.8",
+            "type": "text/html"
+          }
         },
         {
-            "id": "6",
-            "value": {
+          "id": "6",
+          "value": {
+            "time": 1472083251,
+            "elapsed": 276,
+            "client": "198.36.158.8",
+            "code": "TCP_MISS",
+            "status": 200,
+            "bytes": 111,
+            "method": "GET",
+            "url": "http://ootlgeqo.fomu.ve/sfidbhq.html",
+            "domain": "ootlgeqo.fomu.ve",
+            "peerstatus": "DIRECT",
+            "peerhost": "243.179.195.173",
+            "type": "text/html"
+          }
+        },
+        {
+          "id": "0",
+          "value": {
+            "time": 1472083251,
+            "elapsed": 575,
+            "client": "198.36.158.8",
+            "code": "TCP_MISS",
+            "status": 200,
+            "bytes": 1411,
+            "method": "GET",
+            "url": "http://ajdd.rygxzzaid.mk/xucjehmkd.html",
+            "domain": "ajdd.rygxzzaid.mk",
+            "peerstatus": "DIRECT",
+            "peerhost": "118.220.140.185",
+            "type": "text/html"
+          }
+        }
+      ],
+      "hashMap": {
+        "(1 => 1472083251\thttp://epnazrk.wmaj.ga/zlrsmtcc.html 198.36.158.8)": [
+          {
+            "node": {
+              "id": "6",
+              "value": {
                 "time": 1472083251,
                 "elapsed": 276,
                 "client": "198.36.158.8",
@@ -197,14 +243,38 @@ The example below contains one cluster of 7 nodes...
                 "bytes": 111,
                 "method": "GET",
                 "url": "http://ootlgeqo.fomu.ve/sfidbhq.html",
+                "domain": "ootlgeqo.fomu.ve",
                 "peerstatus": "DIRECT",
                 "peerhost": "243.179.195.173",
                 "type": "text/html"
-            }
-        },
-        {
-            "id": "0",
-            "value": {
+              }
+            },
+            "similarity": 1
+          },
+          {
+            "node": {
+              "id": "4",
+              "value": {
+                "time": 1472083251,
+                "elapsed": 683,
+                "client": "198.36.158.8",
+                "code": "TCP_MISS",
+                "status": 200,
+                "bytes": 1419,
+                "method": "GET",
+                "url": "http://isogbg.hgwpxah.nz/roeefw.html",
+                "domain": "isogbg.hgwpxah.nz",
+                "peerstatus": "DIRECT",
+                "peerhost": "233.4.82.7",
+                "type": "text/html"
+              }
+            },
+            "similarity": 1
+          },
+          {
+            "node": {
+              "id": "0",
+              "value": {
                 "time": 1472083251,
                 "elapsed": 575,
                 "client": "198.36.158.8",
@@ -213,75 +283,18 @@ The example below contains one cluster of 7 nodes...
                 "bytes": 1411,
                 "method": "GET",
                 "url": "http://ajdd.rygxzzaid.mk/xucjehmkd.html",
+                "domain": "ajdd.rygxzzaid.mk",
                 "peerstatus": "DIRECT",
                 "peerhost": "118.220.140.185",
                 "type": "text/html"
-            }
-        }
-    ],
-    "hashMap": {
-        "(1 => 1472083251\thttp://epnazrk.wmaj.ga/zlrsmtcc.html 198.36.158.8)": [
-            {
-                "node": {
-                    "id": "4",
-                    "value": {
-                        "time": 1472083251,
-                        "elapsed": 683,
-                        "client": "198.36.158.8",
-                        "code": "TCP_MISS",
-                        "status": 200,
-                        "bytes": 1419,
-                        "method": "GET",
-                        "url": "http://isogbg.hgwpxah.nz/roeefw.html",
-                        "peerstatus": "DIRECT",
-                        "peerhost": "233.4.82.7",
-                        "type": "text/html"
-                    }
-                },
-                "similarity": 1
+              }
             },
-            {
-                "node": {
-                    "id": "2",
-                    "value": {
-                        "time": 1472083251,
-                        "elapsed": 444,
-                        "client": "198.36.158.8",
-                        "code": "TCP_MISS",
-                        "status": 200,
-                        "bytes": 755,
-                        "method": "GET",
-                        "url": "http://epnazrk.wmaj.ga/zjeglwir.html",
-                        "peerstatus": "DIRECT",
-                        "peerhost": "130.167.210.247",
-                        "type": "text/html"
-                    }
-                },
-                "similarity": 1
-            },
-            {
-                "node": {
-                    "id": "5",
-                    "value": {
-                        "time": 1472083251,
-                        "elapsed": 442,
-                        "client": "198.36.158.8",
-                        "code": "TCP_MISS",
-                        "status": 200,
-                        "bytes": 1960,
-                        "method": "GET",
-                        "url": "http://rkfko.apyeqwrqg.cm/rdhufye.html",
-                        "peerstatus": "DIRECT",
-                        "peerhost": "249.70.126.8",
-                        "type": "text/html"
-                    }
-                },
-                "similarity": 1
-            },
-            {
-                "node": {
-                    "id": "6",
-            ...
+            "similarity": 1
+          },
+          {
+            "node": {
+              "id": "2",
+          ...
 ```
 
  ![dummy-rpc](dummy-rpc.png)

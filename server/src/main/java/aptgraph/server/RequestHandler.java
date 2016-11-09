@@ -29,15 +29,11 @@ import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
 import info.debatty.java.graphs.Node;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -133,30 +129,25 @@ public class RequestHandler {
                 // Check each neighbor
                 for (Neighbor neighbor : merged_graph.get(request_node)) {
                     Request target_request = (Request) neighbor.node.value;
-                    try {
 
-                        // Find the corresponding domain name
-                        String other_domain_name =
-                                getDomain(target_request.getUrl());
-                        if (other_domain_name.equals(domain_name)) {
-                            continue;
-                        }
-
-                        Node<Domain> other_domain =
-                                domains.get(other_domain_name);
-                        double new_similarity = neighbor.similarity;
-                        if (other_domains_sim.containsKey(other_domain)) {
-                            new_similarity +=
-                                    other_domains_sim.get(other_domain);
-                        }
-
-                        other_domains_sim.put(
-                                other_domain,
-                                new_similarity);
-                    } catch (URISyntaxException ex) {
-                        Logger.getLogger(RequestHandler.class.getName())
-                                .log(Level.SEVERE, null, ex);
+                    // Find the corresponding domain name
+                    String other_domain_name =
+                            target_request.getDomain();
+                    if (other_domain_name.equals(domain_name)) {
+                        continue;
                     }
+
+                    Node<Domain> other_domain =
+                            domains.get(other_domain_name);
+                    double new_similarity = neighbor.similarity;
+                    if (other_domains_sim.containsKey(other_domain)) {
+                        new_similarity +=
+                                other_domains_sim.get(other_domain);
+                    }
+
+                    other_domains_sim.put(
+                            other_domain,
+                            new_similarity);
                 }
             }
 
@@ -201,22 +192,6 @@ public class RequestHandler {
         }
         System.out.println("Found " + filtered.size() + " clusters");
         return filtered;
-    }
-
-    /**
-     * Return the domain name from URL (without wwww.).
-     * @param url
-     * @return
-     * @throws URISyntaxException if url is not correctly formed
-     */
-    public static String getDomain(final String url) throws URISyntaxException {
-        URI uri = new URI(url);
-        String domain = uri.getHost();
-        if (domain.startsWith("www.")) {
-            return domain.substring(4);
-        }
-
-        return domain;
     }
 
     private Graph<Request> computeFusionGraph(
@@ -273,25 +248,20 @@ public class RequestHandler {
         HashMap<String, Node<Domain>> domains =
                 new HashMap<String, Node<Domain>>();
         for (Node<Request> node : merged_graph.getNodes()) {
-            try {
-                String domain_name = getDomain(node.value.getUrl());
+            String domain_name = node.value.getDomain();
 
-                Node<Domain> domain_node;
-                if (domains.containsKey(domain_name)) {
-                    domain_node = domains.get(domain_name);
+            Node<Domain> domain_node;
+            if (domains.containsKey(domain_name)) {
+                domain_node = domains.get(domain_name);
 
-                } else {
-                    domain_node =
-                        new Node<Domain>(domain_name, new Domain());
-                    domains.put(domain_name, domain_node);
-                }
-
-                domain_node.value.add(node);
-
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(RequestHandler.class.getName())
-                        .log(Level.SEVERE, null, ex);
+            } else {
+                domain_node =
+                    new Node<Domain>(domain_name, new Domain());
+                domains.put(domain_name, domain_node);
             }
+
+            domain_node.value.add(node);
+
         }
 
         return domains;

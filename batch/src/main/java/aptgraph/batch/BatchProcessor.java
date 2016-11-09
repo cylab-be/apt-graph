@@ -14,9 +14,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  *
@@ -116,6 +119,16 @@ public class BatchProcessor {
             throw new IllegalArgumentException("Regex did not match " + line);
         }
 
+        String thisdomain = null;
+
+        try {
+            thisdomain = computeDomain(match.group(8));
+
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(BatchProcessor.class.getName())
+                    .log(Level.SEVERE, null, ex);
+        }
+
         Request request = new Request(
                 Integer.parseInt(match.group(1)),
                 Integer.parseInt(match.group(2)),
@@ -125,11 +138,30 @@ public class BatchProcessor {
                 Integer.parseInt(match.group(6)),
                 match.group(7),
                 match.group(8),
+                thisdomain,
                 match.group(9),
                 match.group(10),
                 match.group(11));
 
         return request;
+    }
+
+
+    /**
+     * Return the domain name from URL (without wwww.).
+     * @param url
+     * @return
+     * @throws URISyntaxException if url is not correctly formed
+     */
+    private static String computeDomain(final String url)
+            throws URISyntaxException {
+        URI uri = new URI(url);
+        String domain = uri.getHost();
+        if (domain.startsWith("www.")) {
+            return domain.substring(4);
+        }
+
+        return domain;
     }
 
 }
