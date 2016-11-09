@@ -66,7 +66,31 @@ Exposes a json-rpc server that, based on user parameters, will:
 - **filter** the clustered graph
 - return the remaining nodes and edges
 
-## Implemented RPC
+## Implemented RPC's
+
+### analyze
+Analyze the graph:
+1. fusion of the features to create a single graph of requests
+2. clustering of requests by domain
+3. compute similarity between domains (currently: sum of similarities between requests)
+4. prune: remove edges between domains that have a similarity lower than a threshold
+5. cluster
+6. filter: keep only domains that are weakly connected to other domains
+
+```
+public final List<Graph<Domain>> analyze(
+            final double[] ordered_weights,
+            final double[] feature_weights,
+            final double prune_threshold,
+            final int max_cluster_size)
+```
+
+- *ordered_weights* and *feature_weights* are used at **step 1**
+- *prune_threshold* is used at **step 4**
+- *max_cluster_size* is used at **step 6**
+
+![](./analyze-rpc.png)
+
 ### dummy
 
 The **dummy** rpc returns a list of disconnected graphs (the clusters):
