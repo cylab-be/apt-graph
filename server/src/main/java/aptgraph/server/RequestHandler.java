@@ -98,65 +98,16 @@ public class RequestHandler {
             final double prune_threshold,
             final int max_cluster_size) {
 
-        int k = graphs.getFirst().getK();
+        Graph<Request> merged_graph =
+                computeFusionGraph(feature_ordered_weights, feature_weights);
 
-        // Feature Fusion
-        // Weighted average using parameter feature_weights
-        Graph<Request> merged_graph = new Graph<Request>(k);
-        for (Node node : graphs.getFirst().getNodes()) {
-            HashMap<Node, Double> all_neighbors = new HashMap<Node, Double>();
-
-            for (int i = 0; i < graphs.size(); i++) {
-                Graph<Request> feature_graph = graphs.get(i);
-                NeighborList feature_neighbors = feature_graph.get(node);
-
-                for (Neighbor feature_neighbor : feature_neighbors) {
-                    double new_similarity =
-                            feature_weights[i] * feature_neighbor.similarity;
-
-                    if (all_neighbors.containsKey(feature_neighbor.node)) {
-                        new_similarity +=
-                                all_neighbors.get(feature_neighbor.node);
-                    }
-
-                    all_neighbors.put(feature_neighbor.node, new_similarity);
-
-                }
-            }
-
-            NeighborList nl = new NeighborList(k);
-            for (Entry<Node, Double> entry : all_neighbors.entrySet()) {
-                nl.add(new Neighbor(entry.getKey(), entry.getValue()));
-            }
-
-            merged_graph.put(node, nl);
+        // The json-rpc request was probably canceled by the user
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
         }
 
-        // URL/Domain clustering
-        // Associate each domain_name (String) to a Node<Domain>
         HashMap<String, Node<Domain>> domains =
-                new HashMap<String, Node<Domain>>();
-        for (Node<Request> node : merged_graph.getNodes()) {
-            try {
-                String domain_name = getDomain(node.value.getUrl());
-
-                Node<Domain> domain_node;
-                if (domains.containsKey(domain_name)) {
-                    domain_node = domains.get(domain_name);
-
-                } else {
-                    domain_node =
-                        new Node<Domain>(domain_name, new Domain());
-                    domains.put(domain_name, domain_node);
-                }
-
-                domain_node.value.add(node);
-
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(RequestHandler.class.getName())
-                        .log(Level.SEVERE, null, ex);
-            }
-        }
+                computeDomainClustering(merged_graph);
 
         // Compute similarity between domains
         // A domain is (for now) a list of Node<Request>.
@@ -164,6 +115,12 @@ public class RequestHandler {
 
         // For each domain
         for (Entry<String, Node<Domain>> domain_entry : domains.entrySet()) {
+
+            // The json-rpc request was probably canceled by the user
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
+
             String domain_name = domain_entry.getKey();
             Node<Domain> domain_node = domain_entry.getValue();
 
@@ -219,10 +176,23 @@ public class RequestHandler {
         }
 
         // Prune & clustering
+        // The json-rpc request was probably canceled by the user
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
         domain_graph.prune(prune_threshold);
+
+        // The json-rpc request was probably canceled by the user
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
         ArrayList<Graph<Domain>> clusters = domain_graph.connectedComponents();
 
         // Filtering
+        // The json-rpc request was probably canceled by the user
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
         for (Graph<Domain> subgraph : clusters) {
             if (subgraph.size() < max_cluster_size) {
@@ -247,5 +217,83 @@ public class RequestHandler {
         }
 
         return domain;
+    }
+
+    private Graph<Request> computeFusionGraph(
+            final double[] feature_ordered_weights,
+            final double[] feature_weights) {
+
+        int k = graphs.getFirst().getK();
+
+        // Feature Fusion
+        // Weighted average using parameter feature_weights
+        Graph<Request> merged_graph = new Graph<Request>(k);
+        for (Node node : graphs.getFirst().getNodes()) {
+
+            // The json-rpc request was probably canceled by the user
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
+
+            HashMap<Node, Double> all_neighbors = new HashMap<Node, Double>();
+
+            for (int i = 0; i < graphs.size(); i++) {
+                Graph<Request> feature_graph = graphs.get(i);
+                NeighborList feature_neighbors = feature_graph.get(node);
+
+                for (Neighbor feature_neighbor : feature_neighbors) {
+                    double new_similarity =
+                            feature_weights[i] * feature_neighbor.similarity;
+
+                    if (all_neighbors.containsKey(feature_neighbor.node)) {
+                        new_similarity +=
+                                all_neighbors.get(feature_neighbor.node);
+                    }
+
+                    all_neighbors.put(feature_neighbor.node, new_similarity);
+
+                }
+            }
+
+            NeighborList nl = new NeighborList(k);
+            for (Entry<Node, Double> entry : all_neighbors.entrySet()) {
+                nl.add(new Neighbor(entry.getKey(), entry.getValue()));
+            }
+
+            merged_graph.put(node, nl);
+        }
+
+        return merged_graph;
+    }
+
+    private HashMap<String, Node<Domain>> computeDomainClustering(
+            final Graph<Request> merged_graph) {
+        // URL/Domain clustering
+        // Associate each domain_name (String) to a Node<Domain>
+        HashMap<String, Node<Domain>> domains =
+                new HashMap<String, Node<Domain>>();
+        for (Node<Request> node : merged_graph.getNodes()) {
+            try {
+                String domain_name = getDomain(node.value.getUrl());
+
+                Node<Domain> domain_node;
+                if (domains.containsKey(domain_name)) {
+                    domain_node = domains.get(domain_name);
+
+                } else {
+                    domain_node =
+                        new Node<Domain>(domain_name, new Domain());
+                    domains.put(domain_name, domain_node);
+                }
+
+                domain_node.value.add(node);
+
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(RequestHandler.class.getName())
+                        .log(Level.SEVERE, null, ex);
+            }
+        }
+
+        return domains;
     }
 }
