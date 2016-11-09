@@ -30,6 +30,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -81,16 +82,15 @@ public class Server {
         LOGGER.info("Reading graphs from disk...");
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(input_file));
-        Graph<Request> graph = (Graph<Request>) input.readObject();
+        LinkedList<Graph<Request>> graphs =
+                (LinkedList<Graph<Request>>) input.readObject();
         input.close();
 
-
-        LOGGER.info("Graph has " + graph.size() + " nodes");
-
+        LOGGER.info("Graph has " + graphs.size() + " features");
         LOGGER.info("Starting JSON-RPC server at http://"
                 + config.getServerHost()
                 + ":" + config.getServerPort());
-        RequestHandler request_handler = new RequestHandler(graph);
+        RequestHandler request_handler = new RequestHandler(graphs);
         JsonRpcServer jsonrpc_server = new JsonRpcServer(request_handler);
 
         QueuedThreadPool thread_pool = new QueuedThreadPool(
