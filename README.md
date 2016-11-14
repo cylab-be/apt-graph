@@ -70,6 +70,7 @@ Exposes a json-rpc server that, based on user parameters, will:
 
 ### analyze
 Analyze the graph:
+
 1. fusion of the features to create a single graph of requests
 2. clustering of requests by domain
 3. compute similarity between domains (currently: sum of similarities between requests)
