@@ -7,8 +7,6 @@ function draw_graph(json_data){
 			var url_regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
 			var id_matches = key.match(id_regex);
 			var url_matches = key.match(url_regex);
-			console.log(key);
-			console.log(url_matches);
 			var source_name = url_matches[0];
 			var source_id = id_matches[0];
 			var target, similarity;
@@ -49,31 +47,17 @@ function draw_graph(json_data){
 	var graph_div = document.getElementById("graph");
 	var width = window.innerWidth; 
 	var	height = window.innerHeight; 
-	var width_button = 200;
+	var width_button, height_panels = 200;
 	
 	var force = d3.layout.force()
 		.nodes(d3.values(nodes))
 		.links(links)
-		.size([width , height])
-		.linkDistance(500)
-		.charge(-150)
+		.size([width / 2 , height])
+		.linkDistance(400)
+		.charge(-300)
 		.on("tick", tick)
 		.start();
 
-/*	var buttons = d3.select("body").select("#container").select("#parent").select("#side_bar").append("svg")
-		//.attr("class", "container_buttons")
-//		.attr("width", width_button)
-		.attr("height", height)
-		.append("g");
-	var prune_button = buttons.append("rect")       // attach a rectangle
-		.attr("class", "button")
-//		.attr("x", 20)         // position the left of the rectangle
-	    .attr("y", 50)          // position the top of the rectangle
-		.attr("height", 50)    // set the height
-		.attr("width", 100)     // set the width
-		.attr("rx", 10)         // set the x corner curve radius
-		.attr("ry", 10);        // set the y corner curve radius
-*/
 	var svg = d3.select("body").select("#container").select("#parent").select("#graph").append("svg")
 		.attr("width", "100%")
 		.attr("height", height);
@@ -155,5 +139,4 @@ function draw_graph(json_data){
 			return "translate(" + d.x + "," + d.y + ")"; });
 	}
 
-	prune_button.on("click",function(){watchNode(focus);});
 }

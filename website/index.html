@@ -17,30 +17,92 @@
 
   <div class="container-fluid" id="container">
     <div class="row" id="parent">
-      <div class="col-md-2" id="side_bar">
-        <div class="btn-group-vertical">
-          <button type="button" class="btn btn-primary">Prune</button>
-          <button type="button" class="btn btn-primary">Apple</button>
-          <button type="button" class="btn btn-primary">Banana</button>
+      <div class="col-md-4" id="side_bar">
+        <div class="container-fluid" id="feature_fusion">
+          <h3><u>FEATURE FUSION</u></h3>
+          <h4>FEATURE WEIGHTS</h4>
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="tire" class="col-md-2 control-label">TIRE:</label>
+              <div class="col-md-4">
+                <input type="number" class="form-control" id="tire" placeholder="0.0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="url" class="col-md-2 control-label">URL:</label>
+              <div class="col-md-4">
+                <input type="number" class="form-control" id="url" placeholder="0.0">
+              </div>
+            </div>
+          </div>
+          <h4>ORDERED WEIGHTS</h4>
+          <div class="col-md-4">
+            <input type="number" class="form-control" id="ord_weights_low" placeholder="0.0">
+          </div>
+          <div class="col-md-4">
+            <input type="number" class="form-control" id="ord_weights_high" placeholder="0.0">
+          </div>
+        </div>
+        <div class="container-fluid" id="domain_fusion">
+          <h3><u>DOMAIN FUSION</u></h3>
+          .............................
+        </div>
+        <div class="container-fluid" id="domain_clustering">
+          <h3><u>DOMAIN CLUSTERING</u></h3>
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="prune_threshold" class="col-md-2 control-label">PRUNE THRESHOLD:</label>
+              <div class="col-md-4">
+                <input type="number" class="form-control" id="prune_threshold" placeholder="0.0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="max_cluster_size" class="col-md-2 control-label">MAX CLUSTER SIZE:</label>
+              <div class="col-md-4">
+                <input type="number" class="form-control" id="max_cluster_size" placeholder="0.0">
+              </div>
+            </div>
+          </div>
+        </div> 
+        <div class="container-fluid" id="buttons">
+          <button type="button" class="btn btn-primary" id="apply_button">Apply</button>
+          <button type="button" class="btn btn-default" id="cancel_button">Cancel</button>
         </div>
       </div>
-      <div class="col-md-10" id="graph"></div>
+      <div class="col-md-8" id="graph"></div>
+    </div>
+    <div class="panel-group" id="panel_group">
+      <div class="panel panel-default" id="panel_default_1">
+        <div class="panel-heading">Server Response Information</div>
+        <div class="panel-body" id="panel_body_1"><span style="color:green">Panel Content to come</span></div>
+      </div>
+      <div class="panel panel-default" id="panel_default_2">
+        <div class="panel-heading">Debugging Information</div>
+        <div class="panel-body" id="panel_body_2">Panel Content to come</div>
+      </div>
     </div>
   </div>
 
 
   <script>
     var json;
-	  var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
+	  var request = json_dummy_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
 	                           "method": "dummy",
 	                           "params": { },
 	                           "id": 123});
     request.onreadystatechange = function () {
 		  if (request.readyState == 4 && request.status == 200){
-			 json = JSON.parse(request.responseText);
-			 //console.log("Server Response: " + json.result);
-       draw_graph(json.result);
+        json = JSON.parse(request.responseText);
+        //console.log("Server Response: " + json.result);
+        draw_graph(json.result);
+        $("#panel_body_1 span").text('Request Status = 200');
+        $("#panel_body_1 span").css('color', 'green');       
 		  }
+      else {
+        $("#panel_body_1 span").text('Request Status = 400');
+        $("#panel_body_1 span").css('color', 'red');
+
+      }
 	  }
   </script>
 </body>
