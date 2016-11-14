@@ -1,4 +1,4 @@
-function json_dummy_post(url, jsonbody){
+function json_post(url, jsonbody){
 	// Sending and receiving data in JSON format using POST method
 	//
 	var request = new XMLHttpRequest();

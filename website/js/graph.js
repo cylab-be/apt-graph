@@ -7,6 +7,8 @@ function draw_graph(json_data){
 			var url_regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
 			var id_matches = key.match(id_regex);
 			var url_matches = key.match(url_regex);
+			//console.log(key);
+			//console.log(url_matches);
 			var source_name = url_matches[0];
 			var source_id = id_matches[0];
 			var target, similarity;
@@ -53,7 +55,7 @@ function draw_graph(json_data){
 		.nodes(d3.values(nodes))
 		.links(links)
 		.size([width / 2 , height])
-		.linkDistance(400)
+		.linkDistance(300)
 		.charge(-300)
 		.on("tick", tick)
 		.start();
