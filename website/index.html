@@ -19,7 +19,7 @@
     <div class="row" id="parent">
       <div class="col-md-4" id="side_bar">
         <div class="container-fluid" id="feature_fusion">
-          <h3><u>FEATURE FUSION</u></h3>
+          <h3><b>FEATURE FUSION</b></h3>
           <h4>FEATURE WEIGHTS</h4>
           <div class="form-horizontal">
             <div class="form-group">
@@ -44,11 +44,11 @@
           </div>
         </div>
         <div class="container-fluid" id="domain_fusion">
-          <h3><u>DOMAIN FUSION</u></h3>
+          <h3><b>DOMAIN FUSION</b></h3>
           .............................
         </div>
         <div class="container-fluid" id="domain_clustering">
-          <h3><u>DOMAIN CLUSTERING</u></h3>
+          <h3><b>DOMAIN CLUSTERING</b></h3>
           <div class="form-horizontal">
             <div class="form-group">
               <label for="prune_threshold" class="col-md-2 control-label">PRUNE THRESHOLD:</label>
@@ -101,7 +101,7 @@
                         "id": 123
                       };
       var request = json_post("http://127.0.0.1:8080" , jsonbody);
-      request.onreadystatechange = function () {
+/*      request.onreadystatechange = function () {
         if (request.readyState == 4 && request.status == 200){
           console.log("boop");
           json = JSON.parse(request.responseText);
@@ -115,7 +115,22 @@
           $("#panel_body_1 span").css('color', 'red');
 
         }
-      }
+      } */
+      request.addEventListener('load', function(){
+        if (request.readyState == 4 && request.status == 200){
+          console.log("boop");
+          json = JSON.parse(request.responseText);
+          //console.log("Server Response: " + json.result);
+          $("#panel_body_1 span").text('Request Status = ' + request.status + ' ' + request.statusText);
+          $("#panel_body_1 span").css('color', 'green');
+          draw_graph(json.result); 
+        }
+        else if (request.status != 400) {
+          $("#panel_body_1 span").text('Request Status Error = ' + request.status + ' ' + request.statusText);
+          $("#panel_body_1 span").css('color', 'red');
+
+        } 
+      });
     });
     $("#cancel_button").click(function(){
       location.reload();

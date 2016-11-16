@@ -8,4 +8,3 @@ function json_post(url, jsonbody){
 	request.send(body);
 	return request;
 }
-
