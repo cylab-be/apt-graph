@@ -74,23 +74,32 @@
     <div class="panel-group" id="panel_group">
       <div class="panel panel-default" id="panel_default_1">
         <div class="panel-heading">Server Response Information</div>
-        <div class="panel-body" id="panel_body_1"><span style="color:green">Panel Content to come</span></div>
+        <div class="panel-body" id="panel_body_1"><span style="color:black">Server response status</span></div>
       </div>
       <div class="panel panel-default" id="panel_default_2">
         <div class="panel-heading">Debugging Information</div>
-        <div class="panel-body" id="panel_body_2">Panel Content to come</div>
+        <div class="panel-body" id="panel_body_2">Debug:</div>
       </div>
     </div>
   </div>
 
 
   <script>
+    var json;
     $("#apply_button").click(function(){
-      var json;
-/*      var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
-                              "method": "dummy",
-                              "params": { },
-                              "id": 123}); */
+      if ($("#time").val() == 0 || $("#url").val()== 0 ||
+          $("#ord_weights_low").val() == 0 || $("#ord_weights_high").val() == 0 ||
+          $("#prune_threshold").val() == 0 || $("#max_cluster_size").val() == 0){
+            alert("Some of the parameter values are empty!");
+            return;
+      }
+      $("#panel_body_2").text('Debug! Graph options: ' 
+                                    + "Time: " + $("#time").val() + ', ' 
+                                    + "URL: " + $("#url").val() + ', '
+                                    + "Ordered Weight Low Bound: " + $("#ord_weights_low").val() + ', '
+                                    + "Ordered Weight High Bound: " + $("#ord_weights_high").val() + ', '
+                                    + "Prune Threshold: " + $("#prune_threshold").val() + ', '
+                                    + "Max Cluster Size: " + $("#max_cluster_size").val());
       var jsonbody = {"jsonrpc": "2.0",
                         "method": "analyze",
                         "params": [
@@ -101,24 +110,12 @@
                         "id": 123
                       };
       var request = json_post("http://127.0.0.1:8080" , jsonbody);
-/*      request.onreadystatechange = function () {
-        if (request.readyState == 4 && request.status == 200){
-          console.log("boop");
-          json = JSON.parse(request.responseText);
-          //console.log("Server Response: " + json.result);
-          draw_graph(json.result);
-          $("#panel_body_1 span").text('Request Status = 200');
-          $("#panel_body_1 span").css('color', 'green');       
-        }
-        else if (request.status == 400) {
-          $("#panel_body_1 span").text('Request Status Error = 400');
-          $("#panel_body_1 span").css('color', 'red');
-
-        }
-      } */
+      /*      var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
+                              "method": "dummy",
+                              "params": { },
+                              "id": 123}); */
       request.addEventListener('load', function(){
         if (request.readyState == 4 && request.status == 200){
-          console.log("boop");
           json = JSON.parse(request.responseText);
           //console.log("Server Response: " + json.result);
           $("#panel_body_1 span").text('Request Status = ' + request.status + ' ' + request.statusText);
@@ -135,7 +132,5 @@
     $("#cancel_button").click(function(){
       location.reload();
     })
-
-
   </script>
 </body>
