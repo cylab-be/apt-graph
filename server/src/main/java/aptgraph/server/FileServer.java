@@ -23,6 +23,7 @@
  */
 package aptgraph.server;
 
+import java.util.logging.Logger;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -35,12 +36,17 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
  */
 public class FileServer {
 
+    private static final Logger LOGGER
+            = Logger.getLogger(FileServer.class.getName());
+
     /**
      * Start the file server (blocking).
      *
      * @throws Exception if server cannot start
      */
     public final void start() throws Exception {
+        LOGGER.info("Starting web interface at http://localhost:8000");
+
         Server server = new Server(8000);
 
         ResourceHandler resource_handler = new ResourceHandler();
