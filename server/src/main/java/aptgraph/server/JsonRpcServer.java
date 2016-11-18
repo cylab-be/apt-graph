@@ -24,7 +24,6 @@
 package aptgraph.server;
 
 import aptgraph.core.Request;
-import com.googlecode.jsonrpc4j.JsonRpcServer;
 import info.debatty.java.graphs.Graph;
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -42,10 +41,10 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
  *
  * @author Thibault Debatty
  */
-public class Server {
+public class JsonRpcServer {
 
     private static final Logger LOGGER
-            = Logger.getLogger(Server.class.getName());
+            = Logger.getLogger(JsonRpcServer.class.getName());
 
     private volatile org.eclipse.jetty.server.Server http_server;
     private Config config;
@@ -56,7 +55,7 @@ public class Server {
      *
      * @param input_file
      */
-    public Server(final InputStream input_file) {
+    public JsonRpcServer(final InputStream input_file) {
         config = new Config();
         this.input_file = input_file;
     }
@@ -91,7 +90,8 @@ public class Server {
                 + config.getServerHost()
                 + ":" + config.getServerPort());
         RequestHandler request_handler = new RequestHandler(graphs);
-        JsonRpcServer jsonrpc_server = new JsonRpcServer(request_handler);
+        com.googlecode.jsonrpc4j.JsonRpcServer jsonrpc_server =
+                new com.googlecode.jsonrpc4j.JsonRpcServer(request_handler);
 
         QueuedThreadPool thread_pool = new QueuedThreadPool(
                 config.getMaxThreads(),
@@ -111,6 +111,26 @@ public class Server {
         http_server.setHandler(new JettyHandler(jsonrpc_server));
 
         http_server.start();
+    }
+
+    /**
+     * Start the server in a separate thread and return immediately.
+     */
+    public final void startInBackground() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    start();
+
+                } catch (ClassNotFoundException ex) {
+                    LOGGER.log(Level.SEVERE, "Class not found", ex);
+
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE, "Exception", ex);
+                }
+            }
+        }).start();
     }
 
     /**

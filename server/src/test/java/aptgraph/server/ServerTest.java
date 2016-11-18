@@ -42,7 +42,7 @@ public class ServerTest extends TestCase {
      */
     public final void testStart() throws InterruptedException, Exception {
         System.out.println("start");
-        final Server server = new Server(
+        final JsonRpcServer server = new JsonRpcServer(
                 getClass().getResourceAsStream("/dummy_graph.ser"));
 
         Config conf = new Config();

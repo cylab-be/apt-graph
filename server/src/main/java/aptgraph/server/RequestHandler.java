@@ -131,8 +131,7 @@ public class RequestHandler {
                     Request target_request = (Request) neighbor.node.value;
 
                     // Find the corresponding domain name
-                    String other_domain_name =
-                            target_request.getDomain();
+                    String other_domain_name = target_request.getDomain();
                     if (other_domain_name.equals(domain_name)) {
                         continue;
                     }
