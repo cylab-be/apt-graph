@@ -25,22 +25,22 @@
             <div class="form-group">
               <label for="tire" class="col-md-2 control-label">TIME:</label>
               <div class="col-md-4">
-                <input type="number" class="form-control" id="time" placeholder="0.0">
+                <input type="number" class="form-control" id="time" value="1.0" style="width: 100px;">
               </div>
             </div>
             <div class="form-group">
               <label for="url" class="col-md-2 control-label">URL:</label>
               <div class="col-md-4">
-                <input type="number" class="form-control" id="url" placeholder="0.0">
+                <input type="number" class="form-control" id="url" value="1.0" style="width: 100px;">
               </div>
             </div>
           </div>
           <h4>ORDERED WEIGHTS</h4>
-          <div class="col-md-4">
-            <input type="number" class="form-control" id="ord_weights_low" placeholder="0.0">
+          <div class="col-md-2">
+            <input type="number" class="form-control" id="ord_weights_low" value="0.8" style="width: 100px;">
           </div>
-          <div class="col-md-4">
-            <input type="number" class="form-control" id="ord_weights_high" placeholder="0.0">
+          <div class="col-md-2">
+            <input type="number" class="form-control" id="ord_weights_high" value="0.2" style="width: 100px;">
           </div>
         </div>
         <div class="container-fluid" id="domain_fusion">
@@ -53,13 +53,13 @@
             <div class="form-group">
               <label for="prune_threshold" class="col-md-2 control-label">PRUNE THRESHOLD:</label>
               <div class="col-md-4">
-                <input type="number" class="form-control" id="prune_threshold" placeholder="0.0">
+                <input type="number" class="form-control" id="prune_threshold" value="10" style="width: 100px;">
               </div>
             </div>
             <div class="form-group">
               <label for="max_cluster_size" class="col-md-2 control-label">MAX CLUSTER SIZE:</label>
               <div class="col-md-4">
-                <input type="number" class="form-control" id="max_cluster_size" placeholder="0.0">
+                <input type="number" class="form-control" id="max_cluster_size" value="100" style="width: 100px;">
               </div>
             </div>
           </div>
@@ -87,7 +87,7 @@
   <script>
     var json;
     $("#apply_button").click(function(){
-      if ($("#time").val() == 0 || $("#url").val()== 0 ||
+     /* if ($("#time").val() == 0 || $("#url").val()== 0 ||
           $("#ord_weights_low").val() == 0 || $("#ord_weights_high").val() == 0 ||
           $("#prune_threshold").val() == 0 || $("#max_cluster_size").val() == 0){
             alert("Some of the parameter values are empty!");
@@ -109,11 +109,11 @@
                         $("#max_cluster_size").val()],
                         "id": 123
                       };
-      var request = json_post("http://127.0.0.1:8080" , jsonbody);
-      /*      var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
+      var request = json_post("http://127.0.0.1:8080" , jsonbody); */
+      var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
                               "method": "dummy",
                               "params": { },
-                              "id": 123}); */
+                              "id": 123});
       request.addEventListener('load', function(){
         if (request.readyState == 4 && request.status == 200){
           json = JSON.parse(request.responseText);

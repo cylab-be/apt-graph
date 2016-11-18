@@ -60,9 +60,12 @@ function draw_graph(json_data){
 		.on("tick", tick)
 		.start();
 
+	// remove if anything was already drawn on the screen
+	d3.select("body").select("#container").select("#parent").select("#graph").select("svg").remove();
+	// draw new graph
 	var svg = d3.select("body").select("#container").select("#parent").select("#graph").append("svg")
 		.attr("width", "100%")
-		.attr("height", height);
+		.attr("height", height - height_panels);
 	
 	// build the arrow.
 	svg.append("svg:defs").selectAll("marker")
