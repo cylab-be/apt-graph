@@ -54,7 +54,7 @@ function draw_graph(json_data){
 	var force = d3.layout.force()
 		.nodes(d3.values(nodes))
 		.links(links)
-		.size([width / 2 , height])
+		.size([width / 2 , height / 1.5])
 		.linkDistance(300)
 		.charge(-300)
 		.on("tick", tick)
@@ -125,6 +125,9 @@ function draw_graph(json_data){
 		.attr("font-size", "10xp")
 		.text(function(d) { return d.name[0]; });
 	
+
+	resize();
+  	d3.select(window).on("resize", resize);
 	// add the curvy lines
 	function tick() {
 		path.attr("d", function(d) {
@@ -142,6 +145,12 @@ function draw_graph(json_data){
 		node
 			.attr("transform", function(d) { 
 			return "translate(" + d.x + "," + d.y + ")"; });
+	}
+
+	function resize(){
+		width = window.innerWidth, height = window.innerHeight;
+		svg.attr("width", width).attr("height", height - height_panels);
+		force.size([width / 2, height / 1.5]).resume();
 	}
 
 }
