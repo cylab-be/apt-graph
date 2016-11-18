@@ -87,7 +87,7 @@
   <script>
     var json;
     $("#apply_button").click(function(){
-     if ($("#time").val() == 0 || $("#url").val()== 0 ||
+    /* if ($("#time").val() == 0 || $("#url").val()== 0 ||
           $("#ord_weights_low").val() == 0 || $("#ord_weights_high").val() == 0 ||
           $("#prune_threshold").val() == 0 || $("#max_cluster_size").val() == 0){
             alert("Some of the parameter values are empty!");
@@ -109,11 +109,11 @@
                         $("#max_cluster_size").val()],
                         "id": 123
                       };
-      var request = json_post("http://127.0.0.1:8080" , jsonbody);
-      /*var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
+      var request = json_post("http://127.0.0.1:8080" , jsonbody); */
+      var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
                               "method": "dummy",
                               "params": { },
-                              "id": 123}); */
+                              "id": 123}); 
       request.addEventListener('load', function(){
         if (request.readyState == 4 && request.status == 200){
           json = JSON.parse(request.responseText);
