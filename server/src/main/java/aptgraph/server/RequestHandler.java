@@ -28,7 +28,6 @@ import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
-import info.debatty.java.graphs.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -102,7 +101,7 @@ public class RequestHandler {
             return null;
         }
 
-        HashMap<String, Node<Domain>> domains =
+        HashMap<String, Domain> domains =
                 computeDomainClustering(merged_graph);
 
         // Compute similarity between domains
@@ -110,7 +109,7 @@ public class RequestHandler {
         Graph<Domain> domain_graph = new Graph<Domain>(Integer.MAX_VALUE);
 
         // For each domain
-        for (Entry<String, Node<Domain>> domain_entry : domains.entrySet()) {
+        for (Entry<String, Domain> domain_entry : domains.entrySet()) {
 
             // The json-rpc request was probably canceled by the user
             if (Thread.currentThread().isInterrupted()) {
@@ -118,17 +117,19 @@ public class RequestHandler {
             }
 
             String domain_name = domain_entry.getKey();
-            Node<Domain> domain_node = domain_entry.getValue();
+            Domain domain_node = domain_entry.getValue();
 
-            HashMap<Node<Domain>, Double> other_domains_sim =
-                    new HashMap<Node<Domain>, Double>();
+            HashMap<Domain, Double> other_domains_sim =
+                    new HashMap<Domain, Double>();
 
             // For each request in this domain
-            for (Node request_node : domain_entry.getValue().value) {
+            for (Request request_node : domain_entry.getValue()) {
 
                 // Check each neighbor
-                for (Neighbor neighbor : merged_graph.get(request_node)) {
-                    Request target_request = (Request) neighbor.node.value;
+                NeighborList neighbors =
+                        merged_graph.getNeighbors(request_node);
+                for (Neighbor<Request> neighbor : neighbors) {
+                    Request target_request = neighbor.node;
 
                     // Find the corresponding domain name
                     String other_domain_name = target_request.getDomain();
@@ -136,8 +137,7 @@ public class RequestHandler {
                         continue;
                     }
 
-                    Node<Domain> other_domain =
-                            domains.get(other_domain_name);
+                    Domain other_domain = domains.get(other_domain_name);
                     double new_similarity = neighbor.similarity;
                     if (other_domains_sim.containsKey(other_domain)) {
                         new_similarity +=
@@ -152,7 +152,7 @@ public class RequestHandler {
 
             NeighborList this_domain_neighbors =
                     new NeighborList(Integer.MAX_VALUE);
-            for (Entry<Node<Domain>, Double> other_domain_entry
+            for (Entry<Domain, Double> other_domain_entry
                     : other_domains_sim.entrySet()) {
                 this_domain_neighbors.add(new Neighbor(
                         other_domain_entry.getKey(),
@@ -202,20 +202,22 @@ public class RequestHandler {
         // Feature Fusion
         // Weighted average using parameter feature_weights
         Graph<Request> merged_graph = new Graph<Request>(k);
-        for (Node node : graphs.getFirst().getNodes()) {
+        for (Request node : graphs.getFirst().getNodes()) {
 
             // The json-rpc request was probably canceled by the user
             if (Thread.currentThread().isInterrupted()) {
                 return null;
             }
 
-            HashMap<Node, Double> all_neighbors = new HashMap<Node, Double>();
+            HashMap<Request, Double> all_neighbors =
+                    new HashMap<Request, Double>();
 
             for (int i = 0; i < graphs.size(); i++) {
                 Graph<Request> feature_graph = graphs.get(i);
-                NeighborList feature_neighbors = feature_graph.get(node);
+                NeighborList feature_neighbors =
+                        feature_graph.getNeighbors(node);
 
-                for (Neighbor feature_neighbor : feature_neighbors) {
+                for (Neighbor<Request> feature_neighbor : feature_neighbors) {
                     double new_similarity =
                             feature_weights[i] * feature_neighbor.similarity;
 
@@ -230,7 +232,7 @@ public class RequestHandler {
             }
 
             NeighborList nl = new NeighborList(k);
-            for (Entry<Node, Double> entry : all_neighbors.entrySet()) {
+            for (Entry<Request, Double> entry : all_neighbors.entrySet()) {
                 nl.add(new Neighbor(entry.getKey(), entry.getValue()));
             }
 
@@ -240,26 +242,25 @@ public class RequestHandler {
         return merged_graph;
     }
 
-    private HashMap<String, Node<Domain>> computeDomainClustering(
+    private HashMap<String, Domain> computeDomainClustering(
             final Graph<Request> merged_graph) {
         // URL/Domain clustering
         // Associate each domain_name (String) to a Node<Domain>
-        HashMap<String, Node<Domain>> domains =
-                new HashMap<String, Node<Domain>>();
-        for (Node<Request> node : merged_graph.getNodes()) {
-            String domain_name = node.value.getDomain();
+        HashMap<String, Domain> domains =
+                new HashMap<String, Domain>();
+        for (Request node : merged_graph.getNodes()) {
+            String domain_name = node.getDomain();
 
-            Node<Domain> domain_node;
+            Domain domain_node;
             if (domains.containsKey(domain_name)) {
                 domain_node = domains.get(domain_name);
 
             } else {
-                domain_node =
-                    new Node<Domain>(domain_name, new Domain());
+                domain_node = new Domain();
                 domains.put(domain_name, domain_node);
             }
 
-            domain_node.value.add(node);
+            domain_node.add(node);
 
         }
 

@@ -24,13 +24,12 @@
 package aptgraph.server;
 
 import aptgraph.core.Request;
-import info.debatty.java.graphs.Node;
 import java.util.LinkedList;
 
 /**
  *
  * @author Thibault Debatty
  */
-public class Domain extends LinkedList<Node<Request>> {
+public class Domain extends LinkedList<Request> {
 
 }

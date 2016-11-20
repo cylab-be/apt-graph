@@ -4,7 +4,6 @@ import aptgraph.core.Request;
 import aptgraph.core.TimeSimilarity;
 import aptgraph.core.URLSimilarity;
 import info.debatty.java.graphs.Graph;
-import info.debatty.java.graphs.Node;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -59,24 +58,16 @@ public class BatchProcessor {
         LOGGER.info("Read and parse input file...");
         LinkedList<Request> requests = parseFile(input_file);
 
-        LOGGER.info("Found " + requests.size() + " requests...");
-        LinkedList<Node<Request>> nodes = new LinkedList<Node<Request>>();
-        int i = 0;
-        for (Request r : requests) {
-            nodes.add(new Node<Request>(String.valueOf(i), r));
-            i++;
-        }
-
         LOGGER.info("Build the time based graph...");
         ThreadedNNDescent<Request> nndes_time =
                 new ThreadedNNDescent<Request>();
         nndes_time.setSimilarity(new TimeSimilarity());
-        Graph<Request> time_graph = nndes_time.computeGraph(nodes);
+        Graph<Request> time_graph = nndes_time.computeGraph(requests);
 
         LOGGER.info("Build the URL based graph...");
         ThreadedNNDescent<Request> nndes_url = new ThreadedNNDescent<Request>();
         nndes_url.setSimilarity(new URLSimilarity());
-        Graph<Request> url_graph = nndes_url.computeGraph(nodes);
+        Graph<Request> url_graph = nndes_url.computeGraph(requests);
 
         //List of graphs
         LinkedList<Graph> graphs = new LinkedList<Graph>();
