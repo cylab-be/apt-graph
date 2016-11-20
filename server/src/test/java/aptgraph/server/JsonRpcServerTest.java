@@ -32,7 +32,7 @@ import junit.framework.TestCase;
  *
  * @author Thibault Debatty
  */
-public class ServerTest extends TestCase {
+public class JsonRpcServerTest extends TestCase {
 
     private static final int STARTUP_DELAY = 5000;
     private volatile Exception server_thread_ex = null;
@@ -58,11 +58,11 @@ public class ServerTest extends TestCase {
                 try {
                     server.start();
                 } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(ServerTest.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(JsonRpcServerTest.class.getName()).log(Level.SEVERE, null, ex);
                     server_thread_ex = ex;
 
                 } catch (Exception ex) {
-                    Logger.getLogger(ServerTest.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(JsonRpcServerTest.class.getName()).log(Level.SEVERE, null, ex);
                     server_thread_ex = ex;
                 }
             }

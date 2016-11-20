@@ -24,6 +24,8 @@
 package aptgraph.server;
 
 import aptgraph.core.Request;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import info.debatty.java.graphs.Graph;
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -89,9 +91,20 @@ public class JsonRpcServer {
         LOGGER.info("Starting JSON-RPC server at http://"
                 + config.getServerHost()
                 + ":" + config.getServerPort());
+
         RequestHandler request_handler = new RequestHandler(graphs);
+
+
+        ObjectMapper object_mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Graph.class, new GraphSerializer());
+        object_mapper.registerModule(module);
+
         com.googlecode.jsonrpc4j.JsonRpcServer jsonrpc_server =
-                new com.googlecode.jsonrpc4j.JsonRpcServer(request_handler);
+                new com.googlecode.jsonrpc4j.JsonRpcServer(
+                        object_mapper,
+                        request_handler);
+
 
         QueuedThreadPool thread_pool = new QueuedThreadPool(
                 config.getMaxThreads(),
