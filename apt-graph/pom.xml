@@ -10,5 +10,6 @@
         <module>../batch</module>
         <module>../core</module>
         <module>../server</module>
+        <module>../integration</module>
     </modules>
 </project>

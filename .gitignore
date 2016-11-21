@@ -105,3 +105,5 @@ hs_err_pid*
 /core/target/
 /apt-graph/target/
 /server/nbproject/
+/integration/nbproject/
+/integration/target/
