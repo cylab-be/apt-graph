@@ -12,6 +12,7 @@ HTTP graph modeling for APT detection.
 - **core** : contains classes used by the batch processor and the server (Request, etc.).
 - **batch** : contains the batch processor
 - **server** : contains the json-rpc server and interactive fusion engine
+- **integration** : check that batch processor and server work smootly together
 - **apt-graph** : parent module, allows to build all modules at once...
 
 ## Usage
@@ -24,7 +25,7 @@ git pull
 cd apt-graph
 mvn clean install
 
-# to run the batch processor to build the graph
+# to run the batch processor and build the graph
 cd ../batch
 ./analyze.sh -i <proxy log file> -o <graph file>
 
@@ -36,7 +37,8 @@ cd ../batch
 cd ../server
 ./start.sh -i <graph file>
 
-# by default, the server is available at http://127.0.0.1:8080
+# by default, the web interface is available at http://127.0.0.1:8000
+# and the json-rpc server is at http://127.0.0.1:8080
 
 # There is a dummy graph file in folder src/test/resources
 # so you can make tests with
@@ -50,7 +52,7 @@ cd ../server
 - build one **requests k-nn graph** for each feature (time, url similarity, etc.)
 - stores the graphs in a database
 
-### UI
+### website
 javascript UI that allows the user to choose:
 - parameters for aggregating **request graphs** into **URL k-nn graphs**
 - parameters for aggregating feature graphs into a single **combined graph** (simple version uses weighted average, a more evolved version might implement OWA or WOWA)
@@ -58,7 +60,7 @@ javascript UI that allows the user to choose:
 - maximum cluster size for filtering resulting clusters
 
 ### Server
-Exposes a json-rpc server that, based on user parameters, will:
+Starts a web server to server the website UI, and a json-rpc server that, based on user parameters, will:
 - compute the **URL graphs**
 - compute the **combined graph**
 - **prune** the combined graph
@@ -91,6 +93,14 @@ public final List<Graph<Domain>> analyze(
 - *max_cluster_size* is used at **step 6**
 
 ![](./analyze-rpc.png)
+
+The result is an array of Graph of Domain. Each Graph has two fields:
+* nodes : the list of domains, where each domain has:
+  - a name
+  - a list of requests to this domain
+* neighbors : the neighbors of each domain
+  - it's a hash map, where the key is the name of the domain and the value is the list of neighbors
+  - each neighbor mentions the name and the similarity of the neighbor
 
 ### dummy
 
