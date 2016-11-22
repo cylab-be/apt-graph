@@ -1,40 +1,37 @@
 function draw_graph(json_data){
 	var data = json_data;
-	var links = [];
+	var links = []; // dict = {source: , target: , value: ,}
 	for (var n= 0; n < data.length; n++){
-		for (var key in data[n].hashMap){
-			var id_regex = /\d+/g;
-			var url_regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
-			var id_matches = key.match(id_regex);
-			var url_matches = key.match(url_regex);
-			//console.log(key);
-			//console.log(url_matches);
-			var source_name = url_matches[0];
-			var source_id = id_matches[0];
-			var target, similarity;
-			var value = data[n].hashMap[key];
-			if (value.length == 0){
-				target = [source_id, source_name];
-				similarity = 0;
-				links.push({"source": [source_id, source_name], "target": target, "value": similarity});
+		var cluster_nodes = data[n].nodes;
+		var neighbors = data[n].neighbors;
+		for (var i= 0; i < cluster_nodes.length; i++){
+			var node = cluster_nodes[i];
+			var name = node.name;
+			var requests = node.requests;
+			var node_neighbors = neighbors[name];
+			if (node_neighbors.length == 0){
+				var similarity = 0;
+				links.push({"source": [name, requests], "target": [name, requests], "value": similarity});
 			} else {
-				for (var m= 0; m < value.length; m++){
-					target = [value[m].node.id, value[m].node.value.url];
-					similarity = value[m].similarity;
-					links.push({"source": [source_id, source_name], "target": target, "value": similarity});
+				for (var m= 0; m < node_neighbors.length; m++){
+					var neighbor = node_neighbors[m];
+					var source = [name, requests];
+					for (var t = 0; t < cluster_nodes.length; t++){
+						if (cluster_nodes[t].name == neighbor.node){
+							var target = [cluster_nodes[t].name, cluster_nodes[t].requests];
+							var similarity = neighbor.similarity;
+							break;
+						}
+					}
+					links.push({"source": source, "target": target, "value": similarity});
 				}
 			}
+
 		}
 	}
-	//console.log(links);
+//	console.log(links);
 	var nodes = {};
-	
-	function findLinkToTarget(name){
-		for (var n= 0; n < links.length; n++){
-			
-		}
-	}
-	
+		
 	// Compute the distinct nodes from the links.
 	links.forEach(function(link) {
 		link.source = nodes[link.source] || 
@@ -44,17 +41,19 @@ function draw_graph(json_data){
 		link.value = +link.value;
 	});
 	
-	//console.log(nodes);
+//	console.log(nodes);
 	
 	var graph_div = document.getElementById("graph");
 	var width = window.innerWidth; 
 	var	height = window.innerHeight; 
 	var width_button, height_panels = 200;
+	var side_bar_height = document.getElementById('side_bar').clientHeight;
+	var graph_width = document.getElementById('graph').clientWidth;
 	
 	var force = d3.layout.force()
 		.nodes(d3.values(nodes))
 		.links(links)
-		.size([width / 2 , height / 1.5])
+		.size([width / 2 , height/ 1.5])
 		.linkDistance(300)
 		.charge(-300)
 		.on("tick", tick)
@@ -63,9 +62,10 @@ function draw_graph(json_data){
 	// remove if anything was already drawn on the screen
 	d3.select("body").select("#container").select("#parent").select("#graph").select("svg").remove();
 	// draw new graph
+
 	var svg = d3.select("body").select("#container").select("#parent").select("#graph").append("svg")
-		.attr("width", "100%")
-		.attr("height", height - height_panels);
+		.attr("width", graph_width)
+		.attr("height", side_bar_height);
 	
 	// build the arrow.
 	svg.append("svg:defs").selectAll("marker")
@@ -97,21 +97,25 @@ function draw_graph(json_data){
 		.data(force.nodes())
 	.enter().append("g")
 		.attr("class", "node")
-		.on("mouseover", function(d) {
+		.on("click", function(d) {
 			var g = d3.select(this); // The node
 			// The class is used to remove the additional text later
-			var target = nodes[d.name];
-			var info = g.append('text')
-				.classed('info', true)
-				.attr('x', 20)
-				.attr('y', 10)
-				.attr("font-size","30px")
-				.text(function(d) { return d.name[1]; });
+			console.log(d3.select(this).select('text.info'));
+			if (d3.select(this).select('text.info')[0][0] == null){
+				var info = g.append('text')
+					.classed('info', true)
+					.attr('x', 20)
+					.attr('y', 10)
+					.attr("font-size","30px")
+					.text(function(d) { return ""; });
+			} else {
+				d3.select(this).select('text.info').remove();	
+			}
 		})
-		.on("mouseout", function() {
+/*		.on("mouseout", function() {
 			// Remove the info text on mouse out.
 			d3.select(this).select('text.info').remove();
-		})
+		})*/
 		.call(force.drag);
 	
 	// add the nodes
@@ -148,9 +152,24 @@ function draw_graph(json_data){
 	}
 
 	function resize(){
-		width = window.innerWidth, height = window.innerHeight;
-		svg.attr("width", width).attr("height", height - height_panels);
+		var side_bar_height = document.getElementById('side_bar').clientHeight;
+		var graph_width = document.getElementById('graph').clientWidth;
+		svg.attr("width", graph_width).attr("height", side_bar_height);
 		force.size([width / 2, height / 1.5]).resume();
 	}
 
+}
+
+// Returns a list of all nodes under the root.
+function flatten(root) {
+  var nodes = [], i = 0;
+
+  function recurse(node) {
+    if (node.children) node.children.forEach(recurse);
+    if (!node.id) node.id = ++i;
+    nodes.push(node);
+  }
+
+  recurse(root);
+  return nodes;
 }

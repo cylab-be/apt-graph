@@ -36,3 +36,13 @@ text {
 .container_buttons {
     float: left;
 }
+
+.footer {
+  position: static;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 210px;
+  background-color: #f5f5f5;
+  z-index: 0;
+}

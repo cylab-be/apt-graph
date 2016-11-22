@@ -14,6 +14,7 @@
   <script src="js/bootstrap.min.js"></script>
   <script src="js/graph.js"></script>
   <script src="js/json_methods.js"></script>
+  <script src="js/change_visibility.js"></script>
 
   <div class="container-fluid" id="container">
     <div class="row" id="parent">
@@ -71,6 +72,8 @@
       </div>
       <div class="col-md-8" id="graph"></div>
     </div>
+  </div>
+  <footer class="footer">
     <div class="panel-group" id="panel_group">
       <div class="panel panel-default" id="panel_default_1">
         <div class="panel-heading">Server Response Information</div>
@@ -81,13 +84,20 @@
         <div class="panel-body" id="panel_body_2">Debug:</div>
       </div>
     </div>
-  </div>
+  </footer>
+
+  
 
 
   <script>
     var json;
+
+    function refresh(){
+      location.reload();
+    }
+
     $("#apply_button").click(function(){
-    /* if ($("#time").val() == 0 || $("#url").val()== 0 ||
+     if ($("#time").val() == 0 || $("#url").val()== 0 ||
           $("#ord_weights_low").val() == 0 || $("#ord_weights_high").val() == 0 ||
           $("#prune_threshold").val() == 0 || $("#max_cluster_size").val() == 0){
             alert("Some of the parameter values are empty!");
@@ -109,11 +119,7 @@
                         $("#max_cluster_size").val()],
                         "id": 123
                       };
-      var request = json_post("http://127.0.0.1:8080" , jsonbody); */
-      var request = json_post("http://127.0.0.1:8080" , {"jsonrpc": "2.0",
-                              "method": "dummy",
-                              "params": { },
-                              "id": 123}); 
+      var request = json_post("http://127.0.0.1:8080" , jsonbody); 
       request.addEventListener('load', function(){
         if (request.readyState == 4 && request.status == 200){
           json = JSON.parse(request.responseText);
