@@ -24,18 +24,11 @@
 package aptgraph.integration;
 
 import aptgraph.batch.BatchProcessor;
-import aptgraph.core.Request;
 import aptgraph.server.JsonRpcServer;
-import aptgraph.server.RequestHandler;
-import info.debatty.java.graphs.Graph;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.TestCase;

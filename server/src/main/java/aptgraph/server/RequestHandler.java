@@ -104,8 +104,8 @@ public class RequestHandler {
         HashMap<String, Domain> domains =
                 computeDomainClustering(merged_graph);
 
-        // Compute similarity between domains
-        // A domain is (for now) a list of Node<Request>.
+        // Compute similarity between domains and build domain graph
+        // A domain is (for now) a list of Request.
         Graph<Domain> domain_graph = new Graph<Domain>(Integer.MAX_VALUE);
 
         // For each domain
@@ -257,6 +257,7 @@ public class RequestHandler {
 
             } else {
                 domain_node = new Domain();
+                domain_node.setName(domain_name);
                 domains.put(domain_name, domain_node);
             }
 

@@ -23,38 +23,49 @@
  */
 package aptgraph.server;
 
-import aptgraph.core.Request;
-import java.util.LinkedList;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import java.io.IOException;
 
 /**
  *
  * @author Thibault Debatty
  */
-public class Domain extends LinkedList<Request> {
-    private String name = "";
+public class DomainSerializer extends StdSerializer<Domain> {
 
     /**
-     * Domain name.
-     * @return
+     * Default.
      */
-    public final String getName() {
-        return name;
+    public DomainSerializer() {
+        this(null);
     }
 
     /**
-     * Set domain name.
-     * @param name
+     * Default.
+     * @param type
      */
-    public final void setName(final String name) {
-        this.name = name;
+    public DomainSerializer(final Class<Domain> type) {
+        super(type);
     }
 
     /**
-     * Return domain name.
-     * @return
+     * Serialize a Domain.
+     * @param domain
+     * @param jgen
+     * @param provider
+     * @throws IOException
      */
     @Override
-    public final String toString() {
-        return name;
+    public final void serialize(final Domain domain,
+            final JsonGenerator jgen,
+            final SerializerProvider provider) throws IOException {
+
+        jgen.writeStartObject();
+        jgen.writeStringField("name", domain.getName());
+        jgen.writeObjectField("requests", domain.toArray());
+        jgen.writeEndObject();
+
     }
+
 }

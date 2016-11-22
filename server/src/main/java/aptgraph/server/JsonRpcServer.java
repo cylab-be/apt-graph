@@ -27,6 +27,7 @@ import aptgraph.core.Request;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import info.debatty.java.graphs.Graph;
+import info.debatty.java.graphs.Neighbor;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,6 +99,8 @@ public class JsonRpcServer {
         ObjectMapper object_mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addSerializer(Graph.class, new GraphSerializer());
+        module.addSerializer(Domain.class, new DomainSerializer());
+        module.addSerializer(Neighbor.class, new NeighborSerializer());
         object_mapper.registerModule(module);
 
         com.googlecode.jsonrpc4j.JsonRpcServer jsonrpc_server =

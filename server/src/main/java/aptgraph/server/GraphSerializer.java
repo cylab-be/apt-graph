@@ -44,10 +44,10 @@ public class GraphSerializer extends StdSerializer<Graph> {
 
     /**
      * Default.
-     * @param graph
+     * @param type
      */
-    public GraphSerializer(final Class<Graph> graph) {
-        super(graph);
+    public GraphSerializer(final Class<Graph> type) {
+        super(type);
     }
 
     /**
@@ -63,7 +63,10 @@ public class GraphSerializer extends StdSerializer<Graph> {
             final JsonGenerator jgen,
             final SerializerProvider provider) throws IOException {
 
-        jgen.writeObject(graph.getHashMap());
+        jgen.writeStartObject();
+        jgen.writeObjectField("nodes", graph.getNodes());
+        jgen.writeObjectField("neighbors", graph.getHashMap());
+        jgen.writeEndObject();
     }
 
 }
