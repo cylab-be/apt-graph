@@ -68,7 +68,7 @@ function draw_graph(json_data){
 		.attr("height", side_bar_height);
 	
 	// build the arrow.
-	svg.append("svg:defs").selectAll("marker")
+/*	svg.append("svg:defs").selectAll("marker")
 		.data(["end"])      // Different link/path types can be defined here
 	.enter().append("svg:marker")    // This section adds in the arrows
 		.attr("id", String)
@@ -79,18 +79,18 @@ function draw_graph(json_data){
 		.attr("markerHeight", 6)
 		.attr("orient", "auto")
 	.append("svg:path")
-		.attr("d", "M0,-5L10,0L0,5");
+		.attr("d", "M0,-5L10,0L0,5");*/
 	
 	// add the links and the arrows
 	var path = svg.append("svg:g").selectAll("path")
 		.data(force.links())
 	.enter().append("svg:path")
 	//    .attr("class", function(d) { return "link " + d.type; })
-		.attr("class", "link")
-		.attr("marker-end", function(d) {if (d.value == 0){
+		.attr("class", "link");
+/*		.attr("marker-end", function(d) {if (d.value == 0){
 											return "";
 										} else {
-											return "url(#end)"}});
+											return "url(#end)"}});*/
 	
 	// define the nodes
 	var node = svg.selectAll(".node")
