@@ -38,7 +38,7 @@ text {
 }
 
 .footer {
-  position: static;
+  position: relative;
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */

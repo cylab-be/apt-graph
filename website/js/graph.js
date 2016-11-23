@@ -154,7 +154,7 @@ function draw_graph(json_data){
 	function resize(){
 		var side_bar_height = document.getElementById('side_bar').clientHeight;
 		var graph_width = document.getElementById('graph').clientWidth;
-		svg.attr("width", graph_width).attr("height", side_bar_height);
+		svg.attr("width", graph_width).attr("height", height - 210);
 		force.size([width / 2, height / 1.5]).resume();
 	}
 
