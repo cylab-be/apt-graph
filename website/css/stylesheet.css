@@ -1,11 +1,13 @@
 path.link {
   fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
+/*  stroke: #666;*/
+  stroke: darkgrey;
+  stroke-width: 2.5px;
 }
 
 circle {
-  fill: #ccc;
+/*  fill: #ccc;*/
+  fill: darkgreen;
   stroke: #fff;
   stroke-width: 1.5px;
 }
@@ -14,19 +16,6 @@ text {
   fill: #000;
   font: sans-serif;
   pointer-events: none;
-}
-
-.button {
-    fill: grey; /* Green */
-    border: 10xp;
-    stroke-width: 10xp;
-}
-
-.button-text {
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
 }
 
 .container_graph {
@@ -42,7 +31,7 @@ text {
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: 210px;
+  height: 100px;
   background-color: #f5f5f5;
   z-index: 0;
 }

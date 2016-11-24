@@ -46,7 +46,7 @@ function draw_graph(json_data){
 	var graph_div = document.getElementById("graph");
 	var width = window.innerWidth; 
 	var	height = window.innerHeight; 
-	var width_button, height_panels = 200;
+	var width_button, height_panels = 150;
 	var side_bar_height = document.getElementById('side_bar').clientHeight;
 	var graph_width = document.getElementById('graph').clientWidth;
 	
@@ -54,8 +54,8 @@ function draw_graph(json_data){
 		.nodes(d3.values(nodes))
 		.links(links)
 		.size([width / 2 , height/ 1.5])
-		.linkDistance(300)
-		.charge(-300)
+		.linkDistance(100)
+		.charge(-500)
 		.on("tick", tick)
 		.start();
 
@@ -68,29 +68,56 @@ function draw_graph(json_data){
 		.attr("height", side_bar_height);
 	
 	// build the arrow.
-/*	svg.append("svg:defs").selectAll("marker")
+	svg.append("svg:defs").selectAll("marker")
 		.data(["end"])      // Different link/path types can be defined here
 	.enter().append("svg:marker")    // This section adds in the arrows
 		.attr("id", String)
 		.attr("viewBox", "0 -5 10 10")
 		.attr("refX", 15)
 		.attr("refY", -1.5)
+		.attr("fill", "darkgrey")
 		.attr("markerWidth", 6)
 		.attr("markerHeight", 6)
 		.attr("orient", "auto")
 	.append("svg:path")
-		.attr("d", "M0,-5L10,0L0,5");*/
+		.attr("d", "M0,-5L10,0L0,5");
 	
 	// add the links and the arrows
+	var path_index = 0
 	var path = svg.append("svg:g").selectAll("path")
 		.data(force.links())
 	.enter().append("svg:path")
-	//    .attr("class", function(d) { return "link " + d.type; })
-		.attr("class", "link");
-/*		.attr("marker-end", function(d) {if (d.value == 0){
+	    .attr("class", function(d) { return "link " + d.type; })
+		.attr("class", "link")
+		.attr("id", function(){
+			path_index = path_index + 1;
+			return path_index;
+		} )
+		.on("mouseover", function(d){
+			var g = d3.select(this); // The node
+			console.log(g);
+			// The class is used to remove the additional text later
+//			if (d3.select(this).select('text.info')[0][0] == null){
+			var info = g.append('text')
+				.classed('info', true)
+//				.attr('x', 20)
+//				.attr('y', 10)
+				.attr("font-size","30px")
+				.append("textPath")
+        		.attr("xlink:href", function (d,i) {
+					var path_id = g[0][0].id;
+					return path_id; })
+				.text(function(d) { 
+					return d.value; });
+		})
+		.on("mouseout", function() {
+		// Remove the info text on mouse out.
+			//d3.select(this).select('text.info').remove();
+		})
+		.attr("marker-end", function(d) {if (d.value == 0){
 											return "";
 										} else {
-											return "url(#end)"}});*/
+											return "url(#end)"}});
 	
 	// define the nodes
 	var node = svg.selectAll(".node")
@@ -100,14 +127,13 @@ function draw_graph(json_data){
 		.on("click", function(d) {
 			var g = d3.select(this); // The node
 			// The class is used to remove the additional text later
-			console.log(d3.select(this).select('text.info'));
 			if (d3.select(this).select('text.info')[0][0] == null){
 				var info = g.append('text')
 					.classed('info', true)
 					.attr('x', 20)
 					.attr('y', 10)
 					.attr("font-size","30px")
-					.text(function(d) { return ""; });
+					.text(function(d) { console.log(d); });
 			} else {
 				d3.select(this).select('text.info').remove();	
 			}
@@ -120,7 +146,8 @@ function draw_graph(json_data){
 	
 	// add the nodes
 	node.append("circle")
-		.attr("r", 5);
+		.attr("r", function(d){
+			return 5});
 	
 	// add the text 
 	node.append("text")
@@ -154,10 +181,15 @@ function draw_graph(json_data){
 	function resize(){
 		var side_bar_height = document.getElementById('side_bar').clientHeight;
 		var graph_width = document.getElementById('graph').clientWidth;
-		svg.attr("width", graph_width).attr("height", height - 210);
+		svg.attr("width", graph_width).attr("height", height - height_panels);
 		force.size([width / 2, height / 1.5]).resume();
 	}
 
+}
+
+//Get the distance to use between nodes depending on the screen size
+function getOptimalDistance(sreenHeight){
+	
 }
 
 // Returns a list of all nodes under the root.

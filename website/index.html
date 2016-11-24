@@ -20,7 +20,7 @@
     <div class="row" id="parent">
       <div class="col-md-4" id="side_bar">
         <div class="container-fluid" id="feature_fusion">
-          <h3><b>FEATURE FUSION</b></h3>
+          <h3>FEATURE FUSION</h3>
           <h4>FEATURE WEIGHTS</h4>
           <div class="form-horizontal">
             <div class="form-group">
@@ -45,11 +45,11 @@
           </div>
         </div>
         <div class="container-fluid" id="domain_fusion">
-          <h3><b>DOMAIN FUSION</b></h3>
+          <h3>DOMAIN FUSION</h3>
           .............................
         </div>
         <div class="container-fluid" id="domain_clustering">
-          <h3><b>DOMAIN CLUSTERING</b></h3>
+          <h3>DOMAIN CLUSTERING</h3>
           <div class="form-horizontal">
             <div class="form-group">
               <label for="prune_threshold" class="col-md-2 control-label" style="width: 100px;">PRUNE THRESHOLD:</label>
@@ -75,13 +75,9 @@
   </div>
   <footer class="footer">
     <div class="panel-group" id="panel_group">
-      <div class="panel panel-default" id="panel_default_1">
-        <div class="panel-heading">Server Response Information</div>
-        <div class="panel-body" id="panel_body_1"><span style="color:black">Server response status</span></div>
-      </div>
-      <div class="panel panel-default" id="panel_default_2">
-        <div class="panel-heading">Debugging Information</div>
-        <div class="panel-body" id="panel_body_2">Debug:</div>
+      <div class="panel panel-default" id="panel_default">
+        <div class="panel-heading" id="panel_head">Server Response</div>
+        <div class="panel-body" id="panel_body">Debug</div>
       </div>
     </div>
   </footer>
@@ -95,7 +91,7 @@
     function refresh(){
       location.reload();
     }
-
+    
     $("#apply_button").click(function(){
      if ($("#time").val() == 0 || $("#url").val()== 0 ||
           $("#ord_weights_low").val() == 0 || $("#ord_weights_high").val() == 0 ||
@@ -103,13 +99,6 @@
             alert("Some of the parameter values are empty!");
             return;
       }
-      $("#panel_body_2").text('Debug! Graph options: ' 
-                                    + "Time: " + $("#time").val() + ', ' 
-                                    + "URL: " + $("#url").val() + ', '
-                                    + "Ordered Weight Low Bound: " + $("#ord_weights_low").val() + ', '
-                                    + "Ordered Weight High Bound: " + $("#ord_weights_high").val() + ', '
-                                    + "Prune Threshold: " + $("#prune_threshold").val() + ', '
-                                    + "Max Cluster Size: " + $("#max_cluster_size").val());
       var jsonbody = {"jsonrpc": "2.0",
                         "method": "analyze",
                         "params": [
@@ -124,13 +113,15 @@
         if (request.readyState == 4 && request.status == 200){
           json = JSON.parse(request.responseText);
           //console.log("Server Response: " + json.result);
-          $("#panel_body_1 span").text('Request Status = ' + request.status + ' ' + request.statusText);
-          $("#panel_body_1 span").css('color', 'green');
+          $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
+          $("#panel_head").css('color', 'green');
+          $("#panel_body").text("Server Response: " + json.result.length + " Clusters");
           draw_graph(json.result); 
         }
         else if (request.status != 400) {
-          $("#panel_body_1 span").text('Request Status Error = ' + request.status + ' ' + request.statusText);
-          $("#panel_body_1 span").css('color', 'red');
+          $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
+          $("#panel_head").css('color', 'red');
+          $("#panel_body").text("Server Response: " + json.result.length + " Clusters");
 
         } 
       });
