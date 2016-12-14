@@ -1,16 +1,28 @@
 module.exports = function(grunt) {
-  //Do grunt-related things here
-  grunt.initConfig({
-    git_deploy: {
-      your_target: {
-        options: {
-          url: 'https://github.com/RUCD/apt-graph.git'
+ 
+    grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
+        jshint: {
+            all: ['Gruntfile.js', 'js/graph.js']
         },
-        src: '.'
-      },
-    },
-  })
-  grunt.loadNpmTasks('grunt-git-deploy');
-  grunt.registerTask('default', ['git_deploy']);
-
+        jscs: {
+            src: "js/graph.js"        
+        },
+        clean: {
+            js: ['*.min.js']
+        },
+        githooks: {
+            all: {
+              'pre-commit': 'default' 
+            }       
+        }
+    });
+    
+    grunt.loadNpmTasks('grunt-jscs');
+    grunt.loadNpmTasks('grunt-githooks');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+ 
+    grunt.registerTask('default', ['clean', 'jshint', 'jscs']);
+ 
 };
