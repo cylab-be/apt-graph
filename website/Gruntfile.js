@@ -25,12 +25,19 @@ module.exports = function(grunt) {
               },
               src: ['*.html']
             }
+          },
+          jscs: {
+              src: "js/*.js",
+              options: {
+                  "preset": "google"
+              }
           }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks("gruntify-eslint");
     grunt.loadNpmTasks('grunt-htmlhint');
+    grunt.loadNpmTasks("grunt-jscs");
 
-    grunt.registerTask('default', ['eslint', 'jshint', 'htmlhint']); 
+    grunt.registerTask('default', ['eslint', 'jshint', 'htmlhint', 'jscs']); 
 };
