@@ -1,16 +1,17 @@
 function draw_graph(json_data){
 	var data = json_data;
 	var links = []; // dict = {source: , target: , value: ,}
+	var similarity, target;
 	for (var n= 0; n < data.length; n++){
 		var cluster_nodes = data[n].nodes;
 		var neighbors = data[n].neighbors;
 		for (var i= 0; i < cluster_nodes.length; i++){
-			var node = cluster_nodes[i];
-			var name = node.name;
-			var requests = node.requests;
+			var current_node = cluster_nodes[i];
+			var name = current_node.name;
+			var requests = current_node.requests;
 			var node_neighbors = neighbors[name];
 			if (node_neighbors.length === 0){
-				var similarity = 0;
+				similarity = 0;
 				links.push({"source": [name, requests], "target": [name, requests], "value": similarity});
 			} else {
 				for (var m= 0; m < node_neighbors.length; m++){
@@ -18,8 +19,8 @@ function draw_graph(json_data){
 					var source = [name, requests];
 					for (var t = 0; t < cluster_nodes.length; t++){
 						if (cluster_nodes[t].name === neighbor.node){
-							var target = [cluster_nodes[t].name, cluster_nodes[t].requests];
-							var similarity = neighbor.similarity;
+							target = [cluster_nodes[t].name, cluster_nodes[t].requests];
+							similarity = neighbor.similarity;
 							break;
 						}
 					}
