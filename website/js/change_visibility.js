@@ -1,11 +1,11 @@
-function hide (elements) {
+function hide(elements) {
   elements = elements.length ? elements : [elements];
   for (var index = 0; index < elements.length; index++) {
     elements[index].style.display = 'none';
   }
 }
 
-function show (elements, specifiedDisplay) {
+function show(elements, specifiedDisplay) {
   var computedDisplay, element, index;
 
   elements = elements.length ? elements : [elements];
@@ -17,7 +17,7 @@ function show (elements, specifiedDisplay) {
     computedDisplay = window.getComputedStyle(element, null).getPropertyValue('display');
 
     if (computedDisplay === 'none') {
-        element.style.display = specifiedDisplay || 'block';
+      element.style.display = specifiedDisplay || 'block';
     }
   }
 }
@@ -40,7 +40,7 @@ function toggle(elements, specifiedDisplay) {
       element.style.display = 'none';
     }
   }
-  function isElementHidden (element) {
+  function isElementHidden(element) {
     return window.getComputedStyle(element, null).getPropertyValue('display') === 'none';
   }
 }
