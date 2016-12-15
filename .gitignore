@@ -1,6 +1,8 @@
 
 # Created by https://www.gitignore.io/api/java,macos,intellij
 
+website/node_modules
+
 ### macOS ###
 *.DS_Store
 .AppleDouble

@@ -17,7 +17,7 @@ function draw_graph(json_data){
 					var neighbor = node_neighbors[m];
 					var source = [name, requests];
 					for (var t = 0; t < cluster_nodes.length; t++){
-						if (cluster_nodes[t].name == neighbor.node){
+						if (cluster_nodes[t].name === neighbor.node){
 							var target = [cluster_nodes[t].name, cluster_nodes[t].requests];
 							var similarity = neighbor.similarity;
 							break;
