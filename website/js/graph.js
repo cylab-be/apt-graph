@@ -9,7 +9,7 @@ function draw_graph(json_data){
 			var name = node.name;
 			var requests = node.requests;
 			var node_neighbors = neighbors[name];
-			if (node_neighbors.length == 0){
+			if (node_neighbors.length === 0){
 				var similarity = 0;
 				links.push({"source": [name, requests], "target": [name, requests], "value": similarity});
 			} else {
@@ -17,7 +17,7 @@ function draw_graph(json_data){
 					var neighbor = node_neighbors[m];
 					var source = [name, requests];
 					for (var t = 0; t < cluster_nodes.length; t++){
-						if (cluster_nodes[t].name == neighbor.node){
+						if (cluster_nodes[t].name === neighbor.node){
 							var target = [cluster_nodes[t].name, cluster_nodes[t].requests];
 							var similarity = neighbor.similarity;
 							break;
@@ -83,7 +83,7 @@ function draw_graph(json_data){
 		.attr("d", "M0,-5L10,0L0,5");
 	
 	// add the links and the arrows
-	var path_index = 0
+	var path_index = 0;
 	var path = svg.append("svg:g").selectAll("path")
 		.data(force.links())
 	.enter().append("svg:path")
@@ -114,10 +114,10 @@ function draw_graph(json_data){
 		// Remove the info text on mouse out.
 			//d3.select(this).select('text.info').remove();
 		})
-		.attr("marker-end", function(d) {if (d.value == 0){
+		.attr("marker-end", function(d) {if (d.value === 0){
 											return "";
 										} else {
-											return "url(#end)"}});
+											return "url(#end)";}});
 	
 	// define the nodes
 	var node = svg.selectAll(".node")
@@ -127,7 +127,7 @@ function draw_graph(json_data){
 		.on("click", function(d) {
 			var g = d3.select(this); // The node
 			// The class is used to remove the additional text later
-			if (d3.select(this).select('text.info')[0][0] == null){
+			if (d3.select(this).select('text.info')[0][0] === null){
 				var info = g.append('text')
 					.classed('info', true)
 					.attr('x', 20)
@@ -147,7 +147,7 @@ function draw_graph(json_data){
 	// add the nodes
 	node.append("circle")
 		.attr("r", function(d){
-			return 5});
+			return 5;});
 	
 	// add the text 
 	node.append("text")

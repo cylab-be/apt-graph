@@ -14,12 +14,7 @@
   },
   "devDependencies": {
     "grunt": "^1.0.1",
-    "grunt-contrib-clean": "^0.6.0",
-    "grunt-contrib-jshint": "^1.1.0",
-    "grunt-git-deploy": "^0.3.1",
-    "grunt-githooks": "^0.6.0",
-    "grunt-jscs": "^3.0.1",
-    "grunt-jscs-checker": "^0.8.1"
+    "grunt-contrib-jshint": "^1.1.0"
   },
   "keywords": [
     "javascript",
