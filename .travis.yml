@@ -1,13 +1,12 @@
 language: java
-node_js:
-  - "6.9.2"
-
-before_script:
-  - npm install grunt-cli -g
+# node_js v0.10 comes pre-installed in every travis-ci box...
 
 install:
   - cd apt-graph && mvn --quiet install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip=true
   - cd ../website && npm install
+  
+before_script:
+  - npm install grunt-cli -g
 
 script:
   - cd ../apt-graph && mvn clean install -Dmaven.javadoc.skip=true -Dgpg.skip=true
