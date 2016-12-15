@@ -14,7 +14,8 @@
   },
   "devDependencies": {
     "grunt": "^1.0.1",
-    "grunt-contrib-jshint": "^1.1.0"
+    "grunt-contrib-jshint": "^1.1.0",
+    "gruntify-eslint": "^3.1.0"
   },
   "keywords": [
     "javascript",
