@@ -12,7 +12,16 @@ module.exports = function(grunt) {
         htmlhint: {
             html1: {
               options: {
-                'tag-pair': true
+                "tagname-lowercase": true,
+                "attr-lowercase": true,
+                "attr-value-double-quotes": true,
+                "doctype-first": true,
+                "tag-pair": true,
+                "spec-char-escape": true,
+                "id-unique": true,
+                "src-not-empty": true,
+                "attr-no-duplication": true,
+                "title-require": true
               },
               src: ['*.html']
             }
