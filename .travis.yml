@@ -1,5 +1,8 @@
 language: java
-# node_js v0.10 comes pre-installed in every travis-ci box...
+
+# node_js comes pre-installed in every travis-ci box...
+env:
+  - TRAVIS_NODE_VERSION="4"
 
 install:
   - cd apt-graph && mvn --quiet install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip=true
