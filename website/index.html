@@ -93,9 +93,9 @@
     }
     
     $("#apply_button").click(function(){
-     if ($("#time").val() == 0 || $("#url").val()== 0 ||
-          $("#ord_weights_low").val() == 0 || $("#ord_weights_high").val() == 0 ||
-          $("#prune_threshold").val() == 0 || $("#max_cluster_size").val() == 0){
+     if ( !$("#time").val() || !$("#url").val() ||
+          !$("#ord_weights_low").val() || !$("#ord_weights_high").val() ||
+          !$("#prune_threshold").val() || !$("#max_cluster_size").val()){
             alert("Some of the parameter values are empty!");
             return;
       }
