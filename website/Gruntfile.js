@@ -39,5 +39,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-htmlhint');
     grunt.loadNpmTasks("grunt-jscs");
 
-    grunt.registerTask('default', ['jshint', 'htmlhint', 'jscs']); 
+    grunt.registerTask('default', ['jshint', 'eslint', 'htmlhint', 'jscs']); 
 };
