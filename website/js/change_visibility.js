@@ -6,7 +6,9 @@ function hide(elements) {
 }
 
 function show(elements, specifiedDisplay) {
-  var computedDisplay, element, index;
+  var computedDisplay;
+  var element;
+  var index;
 
   elements = elements.length ? elements : [elements];
   for (index = 0; index < elements.length; index++) {
@@ -14,7 +16,8 @@ function show(elements, specifiedDisplay) {
 
     // Remove the element's inline display styling
     element.style.display = '';
-    computedDisplay = window.getComputedStyle(element, null).getPropertyValue('display');
+    computedDisplay = window.getComputedStyle(element, null)
+                                    .getPropertyValue('display');
 
     if (computedDisplay === 'none') {
       element.style.display = specifiedDisplay || 'block';
@@ -23,7 +26,8 @@ function show(elements, specifiedDisplay) {
 }
 
 function toggle(elements, specifiedDisplay) {
-  var element, index;
+  var element;
+  var index;
 
   elements = elements.length ? elements : [elements];
   for (index = 0; index < elements.length; index++) {
@@ -41,6 +45,7 @@ function toggle(elements, specifiedDisplay) {
     }
   }
   function isElementHidden(element) {
-    return window.getComputedStyle(element, null).getPropertyValue('display') === 'none';
+    return window.getComputedStyle(element, null)
+                                  .getPropertyValue('display') === 'none';
   }
 }
