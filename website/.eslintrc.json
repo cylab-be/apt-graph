@@ -9,6 +9,6 @@
         "no-unused-vars": [2, {"vars": "local", "args": "after-used"}]    
     },
     "globals": {
-        "d3": true    
+        "d3": true   
     }
 }

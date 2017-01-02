@@ -1,3 +1,4 @@
+// jscs:disable
 function json_post(url, jsonbody) {
 	// Sending and receiving data in JSON format using POST method
 	//

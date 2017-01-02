@@ -1,3 +1,4 @@
+// jscs:disable
 function draw_graph(json_data) {
 	var data = json_data;
 	var links = []; // dict = {source: , target: , value: ,}
