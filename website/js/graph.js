@@ -1,16 +1,17 @@
 function draw_graph(json_data) {
 	var data = json_data;
 	var links = []; // dict = {source: , target: , value: ,}
-	var similarity, target;
-	for (var n = 0; n < data.length; n++){
+	var similarity;
+	var target;
+	for (var n = 0; n < data.length; n++) {
 		var cluster_nodes = data[n].nodes;
 		var neighbors = data[n].neighbors;
-		for (var i= 0; i < cluster_nodes.length; i++) {
+		for (var i = 0; i < cluster_nodes.length; i++) {
 			var current_node = cluster_nodes[i];
 			var name = current_node.name;
 			var requests = current_node.requests;
 			var node_neighbors = neighbors[name];
-			if (node_neighbors.length === 0){
+			if (node_neighbors.length === 0) {
 				similarity = 0;
 				links.push({"source": [name, requests], "target": [name, requests], "value": similarity});
 			} else {
@@ -44,10 +45,9 @@ function draw_graph(json_data) {
 
 	//	console.log(nodes);
 
-	var graph_div = document.getElementById("graph");
 	var width = window.innerWidth; 
 	var	height = window.innerHeight; 
-	var width_button, height_panels = 150;
+	var height_panels = 150;
 	var side_bar_height = document.getElementById('side_bar').clientHeight;
 	var graph_width = document.getElementById('graph').clientWidth;
 
@@ -96,7 +96,6 @@ function draw_graph(json_data) {
 		} )
 		.on("mouseover", function(d){
 			var g = d3.select(this); // The node
-			console.log(g);
 			// The class is used to remove the additional text later
 	//			if (d3.select(this).select('text.info')[0][0] == null){
 			var info = g.append('text')
@@ -131,10 +130,10 @@ function draw_graph(json_data) {
 			if (d3.select(this).select('text.info')[0][0] === null){
 				var info = g.append('text')
 					.classed('info', true)
-					.attr('x', 20)
-					.attr('y', 10)
+					.attr('x', 0)
+					.attr('y', -10)
 					.attr("font-size","30px")
-					.text(function(d) { console.log(d); });
+					.text(function(d) { return d.name[0]; });
 			} else {
 				d3.select(this).select('text.info').remove();	
 			}
@@ -180,17 +179,11 @@ function draw_graph(json_data) {
 	}
 
 	function resize(){
-		var side_bar_height = document.getElementById('side_bar').clientHeight;
 		var graph_width = document.getElementById('graph').clientWidth;
 		svg.attr("width", graph_width).attr("height", height - height_panels);
 		force.size([width / 2, height / 1.5]).resume();
 	}
 
-}
-
-//Get the distance to use between nodes depending on the screen size
-function getOptimalDistance(sreenHeight) {
-	
 }
 
 // Returns a list of all nodes under the root.

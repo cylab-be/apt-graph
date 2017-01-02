@@ -4,5 +4,11 @@
     "ecmaFeatures": {},
     "env": {
         "browser": true
+    },
+    "rules": {
+        "no-unused-vars": [2, {"vars": "local", "args": "after-used"}]    
+    },
+    "globals": {
+        "d3": true    
     }
 }
