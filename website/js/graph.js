@@ -83,7 +83,7 @@ function draw_graph(json_data) {
 		.attr("orient", "auto")
 	.append("svg:path")
 		.attr("d", "M0,-5L10,0L0,5");
-
+/*eslint-disable no-unused-vars*/
 	// add the links and the arrows
 	var path_index = 0;
 	var path = svg.append("svg:g").selectAll("path")
@@ -149,7 +149,7 @@ function draw_graph(json_data) {
 	node.append("circle")
 		.attr("r", function(d){
 			return 5;});
-
+/*eslint-enable no-unused-vars*/
 	// add the text 
 	node.append("text")
 		.attr("x", 12)
