@@ -30,6 +30,7 @@ public class BatchProcessor {
             BatchProcessor.class.getName());
 
     // Regex to use for the full match of the squid log
+    // IPv4 only
     private static final String REGEX
             = "^(\\d+)\\.\\d+\\s*(\\d+)\\s"
             + "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
