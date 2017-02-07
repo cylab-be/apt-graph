@@ -17,10 +17,15 @@ public class URLSimilarity
      * @return
      */
     public final double similarity(final Request r1, final Request r2) {
-        if (r1.getUrl().equals(r2.getUrl()))  {
-            return 0;
-        } else {
-            return 1;
+        double counter = 0.0;
+        for (int i = 0; i <= Math.min(r1.getUrl().length(),
+                r2.getUrl().length()) - 1; i++) {
+            if (r1.getUrl().charAt(i) == r2.getUrl().charAt(i)) {
+                counter++;
+            } else {
+                break;
+            }
         }
+        return 2 * counter / (r1.getUrl().length() + r2.getUrl().length());
     }
 }
