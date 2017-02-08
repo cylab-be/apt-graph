@@ -11,7 +11,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public class Request implements Serializable {
-    private final int time;
+    private final double time;
     private final int elapsed;
     private final String client;
     private final String code;
@@ -41,7 +41,7 @@ public class Request implements Serializable {
      * @param type
      */
     public Request(
-            final int time,
+            final double time,
             final int elapsed,
             final String client,
             final String code,
@@ -74,7 +74,7 @@ public class Request implements Serializable {
      * Unix Timestamp as UTC seconds with a millisecond resolution.
      * @return
      */
-    public final int getTime() {
+    public final double getTime() {
         return time;
     }
 
@@ -168,7 +168,7 @@ public class Request implements Serializable {
 
     @Override
     public final String toString() {
-        return time + "\t" + url + " " + client;
+        return time + " " + url + " " + client;
     }
 
 }

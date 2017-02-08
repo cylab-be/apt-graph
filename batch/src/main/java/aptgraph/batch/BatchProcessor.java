@@ -32,7 +32,7 @@ public class BatchProcessor {
     // Regex to use for the full match of the squid log
     // IPv4 only
     private static final String REGEX
-            = "^(\\d+)\\.\\d+\\s*(\\d+)\\s"
+            = "^(\\d+\\.\\d+)\\s*(\\d+)\\s"
             + "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
             + "(\\S+)\\/(\\d{3})\\s(\\d+)\\s(\\S+)\\s(\\S+)\\s\\-\\s(\\S+)\\/"
             + "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s(\\S+).*$";
@@ -122,7 +122,7 @@ public class BatchProcessor {
         }
 
         Request request = new Request(
-                Integer.parseInt(match.group(1)),
+                Double.parseDouble(match.group(1)),
                 Integer.parseInt(match.group(2)),
                 match.group(3),
                 match.group(4),
