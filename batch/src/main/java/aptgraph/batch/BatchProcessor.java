@@ -30,12 +30,11 @@ public class BatchProcessor {
             BatchProcessor.class.getName());
 
     // Regex to use for the full match of the squid log
-    // IPv4 only
     private static final String REGEX
             = "^(\\d+\\.\\d+)\\s*(\\d+)\\s"
-            + "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s"
+            + "([^\\s]+)\\s"
             + "(\\S+)\\/(\\d{3})\\s(\\d+)\\s(\\S+)\\s(\\S+)\\s\\-\\s(\\S+)\\/"
-            + "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s(\\S+).*$";
+            + "([^\\s]+)\\s(\\S+).*$";
 
     private final Pattern pattern;
 
@@ -147,12 +146,17 @@ public class BatchProcessor {
      */
     private static String computeDomain(final String url)
             throws URISyntaxException {
-        URI uri = new URI(url);
+        String url_temp = url;
+        if (!url.startsWith("http://") && !url.startsWith("https://")
+                && url.endsWith(":443")) {
+         url_temp = "https://" + url;
+        }
+        URI uri = new URI(url_temp);
         String domain = uri.getHost();
         if (domain.startsWith("www.")) {
             return domain.substring(4);
         }
-
+        
         return domain;
     }
 
