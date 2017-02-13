@@ -55,6 +55,9 @@ public class BatchProcessor {
             final InputStream input_file, final FileOutputStream output_file)
             throws IOException {
 
+        // Choice of the k of the k-NN Graph
+        int myk = 20;
+
         LOGGER.info("Read and parse input file...");
         LinkedList<Request> requests = parseFile(input_file);
 
@@ -62,11 +65,13 @@ public class BatchProcessor {
         ThreadedNNDescent<Request> nndes_time =
                 new ThreadedNNDescent<Request>();
         nndes_time.setSimilarity(new TimeSimilarity());
+        nndes_time.setK(myk);
         Graph<Request> time_graph = nndes_time.computeGraph(requests);
 
         LOGGER.info("Build the URL based graph...");
         ThreadedNNDescent<Request> nndes_url = new ThreadedNNDescent<Request>();
         nndes_url.setSimilarity(new URLSimilarity());
+        nndes_url.setK(myk);
         Graph<Request> url_graph = nndes_url.computeGraph(requests);
 
         //List of graphs
@@ -156,7 +161,7 @@ public class BatchProcessor {
         if (domain.startsWith("www.")) {
             return domain.substring(4);
         }
-        
+
         return domain;
     }
 
