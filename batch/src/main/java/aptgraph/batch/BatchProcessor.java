@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 /**
  *
@@ -56,34 +57,57 @@ public class BatchProcessor {
             throws IOException {
 
         // Choice of the k of the k-NN Graph
-        int myk = 20;
+        int myk = 3;
 
+        // Parsing of the log file
         LOGGER.info("Read and parse input file...");
-        LinkedList<Request> requests = parseFile(input_file);
 
-        LOGGER.info("Build the time based graph...");
-        ThreadedNNDescent<Request> nndes_time =
-                new ThreadedNNDescent<Request>();
-        nndes_time.setSimilarity(new TimeSimilarity());
-        nndes_time.setK(myk);
-        Graph<Request> time_graph = nndes_time.computeGraph(requests);
+        // Split of the log file by users
+        LinkedList<Request> requests_temp = parseFile(input_file);
+        HashMap<String, LinkedList<Request>> user_requests =
+                computeUserLog(requests_temp);
 
-        LOGGER.info("Build the URL based graph...");
-        ThreadedNNDescent<Request> nndes_url = new ThreadedNNDescent<Request>();
-        nndes_url.setSimilarity(new URLSimilarity());
-        nndes_url.setK(myk);
-        Graph<Request> url_graph = nndes_url.computeGraph(requests);
+        // Build graphs for each user
+        HashMap<String, LinkedList<Graph>> user_graphs =
+                new HashMap<String, LinkedList<Graph>>();
+        for (HashMap.Entry<String, LinkedList<Request>> entry
+                : user_requests.entrySet()) {
+            String user = entry.getKey();
+            LinkedList<Request> requests = entry.getValue();
 
-        //List of graphs
-        LinkedList<Graph> graphs = new LinkedList<Graph>();
-        graphs.add(time_graph);
-        graphs.add(url_graph);
+            LOGGER.log(Level.INFO,
+                    "Build the time based graph for user {0} ...", user);
+            ThreadedNNDescent<Request> nndes_time =
+                    new ThreadedNNDescent<Request>();
+            nndes_time.setSimilarity(new TimeSimilarity());
+            nndes_time.setK(myk);
+            Graph<Request> time_graph = nndes_time.computeGraph(requests);
+
+            LOGGER.log(Level.INFO,
+                    "Build the URL based graph for user {0} ...", user);
+            ThreadedNNDescent<Request> nndes_url =
+                    new ThreadedNNDescent<Request>();
+            nndes_url.setSimilarity(new URLSimilarity());
+            nndes_url.setK(myk);
+            Graph<Request> url_graph = nndes_url.computeGraph(requests);
+
+            // List of graphs
+            LinkedList<Graph> graphs = new LinkedList<Graph>();
+            graphs.add(time_graph);
+            graphs.add(url_graph);
+
+            // Store of the list of graphs for one user
+            user_graphs.put(user, graphs);
+        }
+
+        System.out.println(user_graphs);
 
         LOGGER.info("Save graphs to disk...");
         ObjectOutputStream output_time = new ObjectOutputStream(
                 new BufferedOutputStream(output_file));
-        output_time.writeObject(graphs);
+        output_time.writeObject(user_graphs);
         output_time.close();
+
     }
 
     /**
@@ -140,6 +164,33 @@ public class BatchProcessor {
                 match.group(11));
 
         return request;
+    }
+
+    /** Associate each user (String) to his requests (LinkedList<Request>).
+     * @param requests_temp : LinkedList<Request> of the raw log file
+     * @return user_requests : HashMap<String, LinkedList<Request>
+     * of the log file sorted by user
+     */
+    private HashMap<String, LinkedList<Request>> computeUserLog(
+        final LinkedList<Request> requests_temp) {
+        HashMap<String, LinkedList<Request>> user_requests =
+                new HashMap<String, LinkedList<Request>>();
+        for (Request req : requests_temp) {
+            String user = req.getClient();
+
+            LinkedList<Request> requests;
+            if (user_requests.containsKey(user)) {
+                requests = user_requests.get(user);
+
+            } else {
+                requests = new LinkedList<Request>();
+                user_requests.put(user, requests);
+            }
+
+            requests.add(req);
+
+        }
+        return user_requests;
     }
 
 
