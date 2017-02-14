@@ -39,18 +39,17 @@ public class BatchProcessorTest extends TestCase {
         File temp_file = File.createTempFile("tempfile", ".tmp");
 
         BatchProcessor processor = new BatchProcessor();
-        LinkedList<Graph> original_graphs = processor.computeGraphs(
+        HashMap<String, LinkedList<Graph<Request>>> original_user_graphs =
+                processor.computeGraphs(
                 getClass().getResourceAsStream("/1000_http_requests.txt"));
-        processor.saveGraphs(original_graphs, new FileOutputStream(temp_file));
+        processor.saveGraphs(original_user_graphs,
+                new FileOutputStream(temp_file));
 
         ObjectInputStream ois = new ObjectInputStream(
                 new FileInputStream(temp_file));
-        LinkedList<Graph<Request>> deserialized_graphs
-                = (LinkedList<Graph<Request>>) ois.readObject();
+        HashMap<String, LinkedList<Graph<Request>>> deserialized_user_graphs
+                = (HashMap<String, LinkedList<Graph<Request>>>) ois.readObject();
 
-        Graph<Request> original_graph = original_graphs.getFirst();
-        Graph<Request> deserialized_graph = deserialized_graphs.getFirst();
-
-        assertEquals(original_graph, deserialized_graph);
+        assertEquals(original_user_graphs, deserialized_user_graphs);
     }
 }
