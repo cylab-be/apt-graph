@@ -90,8 +90,8 @@ public class RequestHandler {
      * @return
      */
     public final List<Graph<Domain>> analyze(
-            final double[] feature_ordered_weights,
             final double[] feature_weights,
+            final double[] feature_ordered_weights,
             final double prune_threshold,
             final int max_cluster_size) {
 
