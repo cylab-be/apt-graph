@@ -93,16 +93,33 @@ public class RequestHandler {
             final double prune_threshold,
             final int max_cluster_size) {
 
+        // Verify the sum of the weights
+        double sum_feature_weights = 0;
+        for (double d : feature_weights) {
+            sum_feature_weights += d;
+        }
+        double sum_ordered_weights = 0;
+        for (double d : feature_ordered_weights) {
+            sum_ordered_weights += d;
+        }
+        if (sum_feature_weights != 1 || sum_ordered_weights != 1) {
+            System.out.println("Error with weights");
+            return null;
+        }
+
+        // Fusion of the features (Graph of Requests)
         Graph<Request> merged_graph =
-                computeFusionGraph(feature_ordered_weights, feature_weights);
+                computeFusionFeatures(feature_ordered_weights, feature_weights);
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
             return null;
         }
 
+        // From Graph of Requests to HashMap of Domains
+        // (it contains every requests of a specific domain, for each domain)
         HashMap<String, Domain> domains =
-                computeDomainClustering(merged_graph);
+                computeDomainGraph(merged_graph);
 
         // Compute similarity between domains and build domain graph
         // A domain is (for now) a list of Request.
@@ -123,7 +140,7 @@ public class RequestHandler {
                     new HashMap<Domain, Double>();
 
             // For each request in this domain
-            for (Request request_node : domain_entry.getValue()) {
+            for (Request request_node : domain_node) {
 
                 // Check each neighbor
                 NeighborList neighbors =
@@ -144,9 +161,7 @@ public class RequestHandler {
                                 other_domains_sim.get(other_domain);
                     }
 
-                    other_domains_sim.put(
-                            other_domain,
-                            new_similarity);
+                    other_domains_sim.put(other_domain, new_similarity);
                 }
             }
 
@@ -159,9 +174,7 @@ public class RequestHandler {
                         other_domain_entry.getValue()));
             }
 
-            domain_graph.put(
-                    domain_node,
-                    this_domain_neighbors);
+            domain_graph.put(domain_node, this_domain_neighbors);
 
         }
 
@@ -193,7 +206,7 @@ public class RequestHandler {
         return filtered;
     }
 
-    private Graph<Request> computeFusionGraph(
+    private Graph<Request> computeFusionFeatures(
             final double[] feature_ordered_weights,
             final double[] feature_weights) {
 
@@ -242,7 +255,7 @@ public class RequestHandler {
         return merged_graph;
     }
 
-    private HashMap<String, Domain> computeDomainClustering(
+    private HashMap<String, Domain> computeDomainGraph(
             final Graph<Request> merged_graph) {
         // URL/Domain clustering
         // Associate each domain_name (String) to a Node<Domain>
