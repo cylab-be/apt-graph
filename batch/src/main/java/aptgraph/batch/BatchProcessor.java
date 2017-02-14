@@ -55,35 +55,9 @@ public class BatchProcessor {
             final InputStream input_file, final FileOutputStream output_file)
             throws IOException {
 
-        // Choice of the k of the k-NN Graph
-        int myk = 20;
+        LinkedList<Graph> graphs = computeGraphs(input_file);
 
-        LOGGER.info("Read and parse input file...");
-        LinkedList<Request> requests = parseFile(input_file);
-
-        LOGGER.info("Build the time based graph...");
-        ThreadedNNDescent<Request> nndes_time =
-                new ThreadedNNDescent<Request>();
-        nndes_time.setSimilarity(new TimeSimilarity());
-        nndes_time.setK(myk);
-        Graph<Request> time_graph = nndes_time.computeGraph(requests);
-
-        LOGGER.info("Build the URL based graph...");
-        ThreadedNNDescent<Request> nndes_url = new ThreadedNNDescent<Request>();
-        nndes_url.setSimilarity(new URLSimilarity());
-        nndes_url.setK(myk);
-        Graph<Request> url_graph = nndes_url.computeGraph(requests);
-
-        //List of graphs
-        LinkedList<Graph> graphs = new LinkedList<Graph>();
-        graphs.add(time_graph);
-        graphs.add(url_graph);
-
-        LOGGER.info("Save graphs to disk...");
-        ObjectOutputStream output_time = new ObjectOutputStream(
-                new BufferedOutputStream(output_file));
-        output_time.writeObject(graphs);
-        output_time.close();
+        saveGraphs(graphs, output_file);
     }
 
     /**
@@ -101,7 +75,12 @@ public class BatchProcessor {
         String line = null;
 
         while ((line = in.readLine()) != null) {
-            requests.add(parseLine(line));
+            try {
+                requests.add(parseLine(line));
+
+            } catch (IllegalArgumentException ex) {
+                System.err.println(ex.getMessage());
+            }
         }
 
         return requests;
@@ -126,7 +105,7 @@ public class BatchProcessor {
         }
 
         Request request = new Request(
-                Double.parseDouble(match.group(1)),
+                (long) (Double.parseDouble(match.group(1)) * 1000),
                 Integer.parseInt(match.group(2)),
                 match.group(3),
                 match.group(4),
@@ -165,4 +144,44 @@ public class BatchProcessor {
         return domain;
     }
 
+    final LinkedList<Graph> computeGraphs(final InputStream input_file)
+            throws IOException {
+        // Choice of the k of the k-NN Graph
+        int k = 20;
+
+        LOGGER.info("Read and parse input file...");
+        LinkedList<Request> requests = parseFile(input_file);
+
+        LOGGER.info("Build the time based graph...");
+        ThreadedNNDescent<Request> nndes_time =
+                new ThreadedNNDescent<Request>();
+        nndes_time.setSimilarity(new TimeSimilarity());
+        nndes_time.setK(k);
+        Graph<Request> time_graph = nndes_time.computeGraph(requests);
+
+        LOGGER.info("Build the URL based graph...");
+        ThreadedNNDescent<Request> nndes_url = new ThreadedNNDescent<Request>();
+        nndes_url.setSimilarity(new URLSimilarity());
+        nndes_url.setK(k);
+        Graph<Request> url_graph = nndes_url.computeGraph(requests);
+
+        //List of graphs
+        LinkedList<Graph> graphs = new LinkedList<Graph>();
+        graphs.add(time_graph);
+        graphs.add(url_graph);
+
+        return graphs;
+    }
+
+    final void saveGraphs(
+            final LinkedList<Graph> graphs, final FileOutputStream output_file)
+            throws IOException {
+
+        LOGGER.info("Save graphs to disk...");
+        ObjectOutputStream output = new ObjectOutputStream(
+                new BufferedOutputStream(output_file));
+        output.writeObject(graphs);
+        output.close();
+        output_file.close();
+    }
 }

@@ -11,7 +11,10 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public class Request implements Serializable {
-    private final double time;
+    /**
+     * Request time in ms.
+     */
+    private final long time;
     private final int elapsed;
     private final String client;
     private final String code;
@@ -41,7 +44,7 @@ public class Request implements Serializable {
      * @param type
      */
     public Request(
-            final double time,
+            final long time,
             final int elapsed,
             final String client,
             final String code,
@@ -68,13 +71,11 @@ public class Request implements Serializable {
         this.type = type;
     }
 
-
-
     /**
      * Unix Timestamp as UTC seconds with a millisecond resolution.
      * @return
      */
-    public final double getTime() {
+    public final long getTime() {
         return time;
     }
 
@@ -171,4 +172,33 @@ public class Request implements Serializable {
         return time + " " + url + " " + client;
     }
 
+    @Override
+    public final int hashCode() {
+        int hash = 3;
+        hash = 29 * hash + (int) (this.time ^ (this.time >>> 32));
+        hash = 29 * hash + (this.client != null ? this.client.hashCode() : 0);
+        hash = 29 * hash + (this.url != null ? this.url.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Request other = (Request) obj;
+        if (this.time != other.time) {
+            return false;
+        }
+        if (!this.client.equals(other.client)) {
+            return false;
+        }
+        if (!this.url.equals(other.url)) {
+            return false;
+        }
+        return true;
+    }
 }
