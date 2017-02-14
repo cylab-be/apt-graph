@@ -29,6 +29,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import junit.framework.TestCase;
 
@@ -48,11 +49,11 @@ public class RequestHandlerTest extends TestCase {
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
-        LinkedList<Graph<Request>> graphs =
-                (LinkedList<Graph<Request>>) input.readObject();
+        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
+              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
-
-        RequestHandler handler = new RequestHandler(graphs);
+        
+        RequestHandler handler = new RequestHandler(user_graphs);
         handler.test();
     }
 
@@ -66,11 +67,11 @@ public class RequestHandlerTest extends TestCase {
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
-        LinkedList<Graph<Request>> graphs =
-                (LinkedList<Graph<Request>>) input.readObject();
+        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
+              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(graphs);
+        RequestHandler handler = new RequestHandler(user_graphs);
         handler.dummy();
     }
 
@@ -84,11 +85,11 @@ public class RequestHandlerTest extends TestCase {
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
-        LinkedList<Graph<Request>> graphs =
-                (LinkedList<Graph<Request>>) input.readObject();
+        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
+              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(graphs);
+        RequestHandler handler = new RequestHandler(user_graphs);
         handler.analyze(new double[]{1.0, 1.0}, new double[]{1.0, 0.2}, 10, 10);
     }
 

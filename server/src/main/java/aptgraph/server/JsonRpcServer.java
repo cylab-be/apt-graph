@@ -32,6 +32,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
@@ -84,16 +85,19 @@ public class JsonRpcServer {
         LOGGER.info("Reading graphs from disk...");
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(input_file));
-        LinkedList<Graph<Request>> graphs =
-                (LinkedList<Graph<Request>>) input.readObject();
+        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
+              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        LOGGER.info("Graph has " + graphs.size() + " features");
-        LOGGER.info("Starting JSON-RPC server at http://"
-                + config.getServerHost()
-                + ":" + config.getServerPort());
+        HashMap.Entry<String, LinkedList<Graph<Request>>> entry_set =
+                user_graphs.entrySet().iterator().next();
+        String first_key = entry_set.getKey();
+        LOGGER.log(Level.INFO, "Graph has {0} features",
+                user_graphs.get(first_key).size());
+        LOGGER.log(Level.INFO, "Starting JSON-RPC server at http://{0}:{1}",
+                new Object[]{config.getServerHost(), config.getServerPort()});
 
-        RequestHandler request_handler = new RequestHandler(graphs);
+        RequestHandler request_handler = new RequestHandler(user_graphs);
 
 
         ObjectMapper object_mapper = new ObjectMapper();

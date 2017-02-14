@@ -39,10 +39,12 @@ import java.util.Map.Entry;
  * @author Thibault Debatty
  */
 public class RequestHandler {
-    private final LinkedList<Graph<Request>> graphs;
+    private final HashMap<String,
+            LinkedList<Graph<Request>>> user_graphs;
 
-    RequestHandler(final LinkedList<Graph<Request>> graphs) {
-        this.graphs = graphs;
+    RequestHandler(final HashMap<String,
+            LinkedList<Graph<Request>>> user_graphs) {
+        this.user_graphs = user_graphs;
     }
 
     /**
@@ -58,7 +60,7 @@ public class RequestHandler {
      * @return
      */
     public final List<Graph<Request>> dummy() {
-        Graph<Request> graph = graphs.getFirst();
+        Graph<Request> graph = user_graphs.get("219.253.194.242").getFirst();
 
         // Feature Fusion
 
@@ -93,6 +95,10 @@ public class RequestHandler {
             final double prune_threshold,
             final int max_cluster_size) {
 
+        // Choice of the user
+        String user = "219.253.194.242";
+        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+
         // Verify the sum of the weights
         double sum_feature_weights = 0;
         for (double d : feature_weights) {
@@ -109,7 +115,8 @@ public class RequestHandler {
 
         // Fusion of the features (Graph of Requests)
         Graph<Request> merged_graph =
-                computeFusionFeatures(feature_ordered_weights, feature_weights);
+                computeFusionFeatures(graphs,
+                        feature_ordered_weights, feature_weights);
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
@@ -207,6 +214,7 @@ public class RequestHandler {
     }
 
     private Graph<Request> computeFusionFeatures(
+            final LinkedList<Graph<Request>> graphs,
             final double[] feature_ordered_weights,
             final double[] feature_weights) {
 

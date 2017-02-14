@@ -100,8 +100,6 @@ public class BatchProcessor {
             user_graphs.put(user, graphs);
         }
 
-        System.out.println(user_graphs);
-
         LOGGER.info("Save graphs to disk...");
         ObjectOutputStream output_time = new ObjectOutputStream(
                 new BufferedOutputStream(output_file));
