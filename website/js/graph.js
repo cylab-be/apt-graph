@@ -55,9 +55,9 @@ function draw_graph(json_data) {
 	var force = d3.layout.force()
 		.nodes(d3.values(nodes))
 		.links(links)
-		.size([width / 2 , height/ 1.5])
+		.size([width / 2 , height/ 1.2])
 		.linkDistance(100)
-		.charge(-500)
+		.charge(-300)
 		.on("tick", tick)
 		.start();
 
@@ -182,7 +182,7 @@ function draw_graph(json_data) {
 	function resize(){
 		var graph_width = document.getElementById('graph').clientWidth;
 		svg.attr("width", graph_width).attr("height", height - height_panels);
-		force.size([width / 2, height / 1.5]).resume();
+		force.size([width / 2, height / 1.2]).resume();
 	}
 
 }

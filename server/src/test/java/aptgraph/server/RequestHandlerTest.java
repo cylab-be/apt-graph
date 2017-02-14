@@ -90,7 +90,6 @@ public class RequestHandlerTest extends TestCase {
         input.close();
 
         RequestHandler handler = new RequestHandler(user_graphs);
-        handler.analyze(new double[]{1.0, 1.0}, new double[]{1.0, 0.2}, 10, 10);
+        handler.analyze(new double[]{1.0, 1.0}, new double[]{1.0, 0.2}, 10.0, 10);
     }
-
 }
