@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -100,7 +101,7 @@ public class RequestHandler {
         // START user selection
         // List of the user
         LinkedList<String> users = new LinkedList<String>();
-        for (HashMap.Entry<String, LinkedList<Graph<Request>>> entry_set
+        for (Map.Entry<String, LinkedList<Graph<Request>>> entry_set
                 : user_graphs.entrySet()) {
             String key = entry_set.getKey();
             users.add(key);

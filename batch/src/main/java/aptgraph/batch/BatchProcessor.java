@@ -31,6 +31,8 @@ public class BatchProcessor {
     private static final Logger LOGGER = Logger.getLogger(
             BatchProcessor.class.getName());
 
+    private static final int DEFAULT_K = 20;
+
     // Regex to use for the full match of the squid log
     private static final String REGEX
             = "^(\\d+\\.\\d+)\\s*(\\d+)\\s"
@@ -39,6 +41,7 @@ public class BatchProcessor {
             + "([^\\s]+)\\s(\\S+).*$";
 
     private final Pattern pattern;
+    private int k = DEFAULT_K;
 
     /**
      *
@@ -176,8 +179,6 @@ public class BatchProcessor {
 
     final HashMap<String, LinkedList<Graph<Request>>> computeGraphs(
             final InputStream input_file) throws IOException {
-        // Choice of the k of the k-NN Graph
-        int myk = 3;
 
         // Parsing of the log file
         LOGGER.info("Read and parse input file...");
@@ -200,7 +201,7 @@ public class BatchProcessor {
             ThreadedNNDescent<Request> nndes_time =
                     new ThreadedNNDescent<Request>();
             nndes_time.setSimilarity(new TimeSimilarity());
-            nndes_time.setK(myk);
+            nndes_time.setK(k);
             Graph<Request> time_graph = nndes_time.computeGraph(requests);
 
             LOGGER.log(Level.INFO,
@@ -208,7 +209,7 @@ public class BatchProcessor {
             ThreadedNNDescent<Request> nndes_url =
                     new ThreadedNNDescent<Request>();
             nndes_url.setSimilarity(new URLSimilarity());
-            nndes_url.setK(myk);
+            nndes_url.setK(k);
             Graph<Request> url_graph = nndes_url.computeGraph(requests);
 
             // List of graphs
@@ -235,5 +236,13 @@ public class BatchProcessor {
         output.writeObject(user_graphs);
         output.close();
         output_file.close();
+    }
+
+    /**
+     * Set the value for k (useful for testing).
+     * @param k
+     */
+    public final void setK(final int k) {
+        this.k = k;
     }
 }

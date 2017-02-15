@@ -2,7 +2,6 @@ package aptgraph.batch;
 
 import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
-import info.debatty.java.graphs.NeighborList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,7 +20,7 @@ public class BatchProcessorTest extends TestCase {
     /**
      * Test of analyze method, of class BatchProcessor.
      *
-     * @throws java.io.IOException if the input file is not found
+     * @throws IOException if the input file is not found
      */
     public final void testAnalyze() throws IOException {
         System.out.println("Test batch server with 1000 reqs");
@@ -34,7 +33,14 @@ public class BatchProcessorTest extends TestCase {
 
     }
 
-    public final void testSerialize() throws IOException, ClassNotFoundException {
+    /**
+     * Test that a graph is correctly (de)serialized.
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public final void testSerialize()
+            throws IOException, ClassNotFoundException {
+
         System.out.println("Test serialization with 1000 reqs");
         File temp_file = File.createTempFile("tempfile", ".tmp");
 
@@ -48,8 +54,22 @@ public class BatchProcessorTest extends TestCase {
         ObjectInputStream ois = new ObjectInputStream(
                 new FileInputStream(temp_file));
         HashMap<String, LinkedList<Graph<Request>>> deserialized_user_graphs
-                = (HashMap<String, LinkedList<Graph<Request>>>) ois.readObject();
+                = (HashMap<String, LinkedList<Graph<Request>>>)
+                ois.readObject();
 
         assertEquals(original_user_graphs, deserialized_user_graphs);
+    }
+
+    public final void testGraph() throws IOException {
+
+        int k = 5;
+
+        BatchProcessor processor = new BatchProcessor();
+        processor.setK(k);
+        HashMap<String, LinkedList<Graph<Request>>> original_user_graphs =
+                processor.computeGraphs(
+                getClass().getResourceAsStream("/simple.txt"));
+
+        
     }
 }
