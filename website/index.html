@@ -109,7 +109,8 @@
       var jsonbody = {"jsonrpc": "2.0",
                         "method": "analyze",
                         "params": [
-                        [$("#time").val(), $("#url").val()],
+                        "127.0.0.1",
+                        [$("#time").val(),$("#children_time").val(), $("#url").val()],
                         [$("#ord_weights_high").val(), $("#ord_weights_low").val()],
                         $("#prune_threshold").val(),
                         $("#max_cluster_size").val()],
