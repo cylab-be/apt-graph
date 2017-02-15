@@ -95,8 +95,18 @@ public class RequestHandler {
             final double prune_threshold,
             final int max_cluster_size) {
 
-        // Choice of the user
-        String user = "219.253.194.242";
+
+        // List of the user
+        LinkedList<String> users = new LinkedList<String>();
+        for (HashMap.Entry<String, LinkedList<Graph<Request>>> entry_set
+                : user_graphs.entrySet()) {
+            String key = entry_set.getKey();
+            users.add(key);
+        }
+        System.out.println("List of user : " + users);
+
+        // Choice of the user (need to be choosed on the web page)
+        String user = users.getFirst();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
 
         // Verify the sum of the weights
