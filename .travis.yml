@@ -17,6 +17,7 @@ script:
   - cd ../website && grunt
 
 notifications:
+  slack: cylab-be:M5jzMsOQnkiwUgOgZkmgxjCi
   email:
     recipients:
       - thibault.debatty@gmail.com
