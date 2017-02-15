@@ -84,7 +84,7 @@ public class RequestHandler {
 
     /**
      *
-     * @param user
+     * @param user_temp
      * @param feature_ordered_weights
      * @param prune_threshold
      * @param feature_weights
