@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -89,7 +90,7 @@ public class JsonRpcServer {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        HashMap.Entry<String, LinkedList<Graph<Request>>> entry_set =
+        Map.Entry<String, LinkedList<Graph<Request>>> entry_set =
                 user_graphs.entrySet().iterator().next();
         String first_key = entry_set.getKey();
         LOGGER.log(Level.INFO, "Graph has {0} features",

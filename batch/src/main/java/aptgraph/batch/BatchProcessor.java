@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -189,7 +190,7 @@ public class BatchProcessor {
         // Build graphs for each user
         HashMap<String, LinkedList<Graph<Request>>> user_graphs =
                 new HashMap<String, LinkedList<Graph<Request>>>();
-        for (HashMap.Entry<String, LinkedList<Request>> entry
+        for (Map.Entry<String, LinkedList<Request>> entry
                 : user_requests.entrySet()) {
             String user = entry.getKey();
             LinkedList<Request> requests = entry.getValue();
