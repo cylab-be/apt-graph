@@ -2,6 +2,7 @@ package aptgraph.batch;
 
 import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
+import info.debatty.java.graphs.NeighborList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -60,16 +61,32 @@ public class BatchProcessorTest extends TestCase {
         assertEquals(original_user_graphs, deserialized_user_graphs);
     }
 
+    /**
+     * Test graph building.
+     * @throws IOException
+     */
     public final void testGraph() throws IOException {
 
         int k = 5;
+        int trials = 10;
 
-        BatchProcessor processor = new BatchProcessor();
-        processor.setK(k);
-        HashMap<String, LinkedList<Graph<Request>>> original_user_graphs =
-                processor.computeGraphs(
-                getClass().getResourceAsStream("/simple.txt"));
+        for (int i = 0; i < trials; i++) {
 
-        
+            BatchProcessor processor = new BatchProcessor();
+            processor.setK(k);
+            HashMap<String, LinkedList<Graph<Request>>> user_graphs =
+                    processor.computeGraphs(
+                    getClass().getResourceAsStream("/simple.txt"));
+
+            for (LinkedList<Graph<Request>> graphs : user_graphs.values()) {
+                for (Graph<Request> graph : graphs) {
+                    for (Request req : graph.getNodes()) {
+                        NeighborList neighbors = graph.getNeighbors(req);
+                        System.out.println(neighbors);
+                        assertEquals(k, neighbors.size());
+                    }
+                }
+            }
+        }
     }
 }
