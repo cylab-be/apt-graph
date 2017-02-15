@@ -198,6 +198,8 @@ public class RequestHandler {
 
         }
 
+        System.out.println("\n\ndomain_graph = " + domain_graph);
+
         // Prune & clustering
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
@@ -205,11 +207,15 @@ public class RequestHandler {
         }
         domain_graph.prune(prune_threshold);
 
+        System.out.println("\n\ndomain_graph (after prune) = " + domain_graph);
+
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
             return null;
         }
         ArrayList<Graph<Domain>> clusters = domain_graph.connectedComponents();
+
+        System.out.println("\n\nclusters = " + clusters);
 
         // Filtering
         // The json-rpc request was probably canceled by the user
@@ -223,6 +229,7 @@ public class RequestHandler {
             }
         }
 
+        System.out.println("\n\nfiltered = " + filtered);
         System.out.println("Found " + filtered.size() + " clusters");
         return filtered;
     }

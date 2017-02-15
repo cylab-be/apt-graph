@@ -23,18 +23,24 @@
           <h3>CHOICE OF USER</h3>
           .............................
         </div>
-        <div class="container-fluid" id="choice_user">
+        <div class="container-fluid" id="feature_fusion">
           <h3>FEATURE FUSION</h3>
           <h4>FEATURE WEIGHTS</h4>
           <div class="form-horizontal">
             <div class="form-group">
-              <label for="time" class="col-md-2 control-label" style="width: 50px;">TIME:</label>
+              <label for="time" class="col-md-2 control-label" style="width: 150px;">TIME:</label>
               <div class="col-md-4">
                 <input type="number" step="0.1" class="form-control" id="time" value="1" style="width: 100px;">
               </div>
             </div>
             <div class="form-group">
-              <label for="url" class="col-md-2 control-label" style="width: 50px;">URL:</label>
+              <label for="children_time" class="col-md-2 control-label" style="width: 150px;"> CHILDREN TIME:</label>
+              <div class="col-md-4">
+                <input type="number" step="0.1" class="form-control" id="children_time" value="0" style="width: 100px;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="url" class="col-md-2 control-label" style="width: 150px;">URL:</label>
               <div class="col-md-4">
                 <input type="number" step="0.1" class="form-control" id="url" value="0" style="width: 100px;">
               </div>
@@ -58,7 +64,7 @@
             <div class="form-group">
               <label for="prune_threshold" class="col-md-4 control-label" style="text-align: left;">PRUNE THRESHOLD:</label>
               <div class="col-md-4">
-                <input type="number" step="0.1" class="form-control" id="prune_threshold" value="0" style="width: 100px;">
+                <input type="number" step="0.1" class="form-control" id="prune_threshold" value="0.1" style="width: 100px;">
               </div>
             </div>
             <div class="form-group">
