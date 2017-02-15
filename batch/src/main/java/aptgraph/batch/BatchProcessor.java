@@ -2,7 +2,6 @@ package aptgraph.batch;
 
 import aptgraph.core.Request;
 import aptgraph.core.TimeSimilarity;
-import aptgraph.core.ChildrenTimeSimilarity;
 import aptgraph.core.URLSimilarity;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
@@ -203,15 +202,6 @@ public class BatchProcessor {
             Graph<Request> time_graph = nndes_time.computeGraph(requests);
 
             LOGGER.log(Level.INFO,
-                  "Build the children time based graph for user {0} ...", user);
-            ThreadedNNDescent<Request> nndes_children_time =
-                    new ThreadedNNDescent<Request>();
-            nndes_children_time.setSimilarity(new ChildrenTimeSimilarity());
-            nndes_children_time.setK(myk);
-            Graph<Request> children_time_graph =
-                    nndes_children_time.computeGraph(requests);
-
-            LOGGER.log(Level.INFO,
                     "Build the URL based graph for user {0} ...", user);
             ThreadedNNDescent<Request> nndes_url =
                     new ThreadedNNDescent<Request>();
@@ -223,7 +213,6 @@ public class BatchProcessor {
             LinkedList<Graph<Request>> graphs =
                     new LinkedList<Graph<Request>>();
             graphs.add(time_graph);
-            graphs.add(children_time_graph);
             graphs.add(url_graph);
 
             // Store of the list of graphs for one user

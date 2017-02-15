@@ -28,19 +28,13 @@
           <h4>FEATURE WEIGHTS</h4>
           <div class="form-horizontal">
             <div class="form-group">
-              <label for="time" class="col-md-2 control-label" style="width: 150px;">TIME:</label>
+              <label for="time" class="col-md-2 control-label" style="width: 50px;">TIME:</label>
               <div class="col-md-4">
                 <input type="number" step="0.1" class="form-control" id="time" value="1" style="width: 100px;">
               </div>
             </div>
             <div class="form-group">
-              <label for="children_time" class="col-md-2 control-label" style="width: 150px;"> CHILDREN TIME:</label>
-              <div class="col-md-4">
-                <input type="number" step="0.1" class="form-control" id="children_time" value="0" style="width: 100px;">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="url" class="col-md-2 control-label" style="width: 150px;">URL:</label>
+              <label for="url" class="col-md-2 control-label" style="width: 50px;">URL:</label>
               <div class="col-md-4">
                 <input type="number" step="0.1" class="form-control" id="url" value="0" style="width: 100px;">
               </div>
@@ -116,7 +110,7 @@
                         "method": "analyze",
                         "params": [
                         "127.0.0.1",
-                        [$("#time").val(),$("#children_time").val(), $("#url").val()],
+                        [$("#time").val(), $("#url").val()],
                         [$("#ord_weights_high").val(), $("#ord_weights_low").val()],
                         $("#prune_threshold").val(),
                         $("#max_cluster_size").val()],
