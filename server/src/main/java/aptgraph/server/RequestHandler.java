@@ -179,7 +179,7 @@ public class RequestHandler {
         return filtered;
     }
 
-    private Graph<Request> computeFusionFeatures(
+    final Graph<Request> computeFusionFeatures(
             final LinkedList<Graph<Request>> graphs,
             final double[] feature_ordered_weights,
             final double[] feature_weights) {
@@ -229,7 +229,7 @@ public class RequestHandler {
         return merged_graph;
     }
 
-    private HashMap<String, Domain> computeDomainGraph(
+    final HashMap<String, Domain> computeDomainGraph(
             final Graph<Request> merged_graph) {
         // URL/Domain clustering
         // Associate each domain_name (String) to a Node<Domain>
@@ -255,7 +255,7 @@ public class RequestHandler {
         return domains;
     }
 
-    private Graph<Domain> computeSimilarityDomain(
+    final Graph<Domain> computeSimilarityDomain(
             final Graph<Request> merged_graph,
             final HashMap<String, Domain> domains) {
         // A domain is (for now) a list of Request.
