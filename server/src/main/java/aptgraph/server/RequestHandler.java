@@ -143,80 +143,31 @@ public class RequestHandler {
                 computeDomainGraph(merged_graph);
 
         // Compute similarity between domains and build domain graph
-        // A domain is (for now) a list of Request.
-        Graph<Domain> domain_graph = new Graph<Domain>(Integer.MAX_VALUE);
+        Graph<Domain> domain_graph =
+                computeSimilarityDomain(merged_graph, domains);
 
-        // For each domain
-        for (Entry<String, Domain> domain_entry : domains.entrySet()) {
-
-            // The json-rpc request was probably canceled by the user
-            if (Thread.currentThread().isInterrupted()) {
-                return null;
-            }
-
-            String domain_name = domain_entry.getKey();
-            Domain domain_node = domain_entry.getValue();
-
-            HashMap<Domain, Double> other_domains_sim =
-                    new HashMap<Domain, Double>();
-
-            // For each request in this domain
-            for (Request request_node : domain_node) {
-
-                // Check each neighbor
-                NeighborList neighbors =
-                        merged_graph.getNeighbors(request_node);
-                for (Neighbor<Request> neighbor : neighbors) {
-                    Request target_request = neighbor.node;
-
-                    // Find the corresponding domain name
-                    String other_domain_name = target_request.getDomain();
-                    if (other_domain_name.equals(domain_name)) {
-                        continue;
-                    }
-
-                    Domain other_domain = domains.get(other_domain_name);
-                    double new_similarity = neighbor.similarity;
-                    if (other_domains_sim.containsKey(other_domain)) {
-                        new_similarity +=
-                                other_domains_sim.get(other_domain);
-                    }
-
-                    other_domains_sim.put(other_domain, new_similarity);
-                }
-            }
-
-            NeighborList this_domain_neighbors =
-                    new NeighborList(1000);
-            for (Entry<Domain, Double> other_domain_entry
-                    : other_domains_sim.entrySet()) {
-                this_domain_neighbors.add(new Neighbor(
-                        other_domain_entry.getKey(),
-                        other_domain_entry.getValue()));
-            }
-
-            domain_graph.put(domain_node, this_domain_neighbors);
-
-        }
-
-        // Prune & clustering
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
             return null;
         }
+
+        // Prune
         domain_graph.prune(prune_threshold);
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
             return null;
         }
+
+        // Clustering
         ArrayList<Graph<Domain>> clusters = domain_graph.connectedComponents();
 
-        // Filtering
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
             return null;
         }
+
+        // Filtering
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
         for (Graph<Domain> subgraph : clusters) {
             if (subgraph.size() < max_cluster_size) {
@@ -302,5 +253,66 @@ public class RequestHandler {
         }
 
         return domains;
+    }
+
+    private Graph<Domain> computeSimilarityDomain(
+            final Graph<Request> merged_graph,
+            final HashMap<String, Domain> domains) {
+        // A domain is (for now) a list of Request.
+        Graph<Domain> domain_graph = new Graph<Domain>(Integer.MAX_VALUE);
+
+        // For each domain
+        for (Entry<String, Domain> domain_entry : domains.entrySet()) {
+
+            // The json-rpc request was probably canceled by the user
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
+
+            String domain_name = domain_entry.getKey();
+            Domain domain_node = domain_entry.getValue();
+
+            HashMap<Domain, Double> other_domains_sim =
+                    new HashMap<Domain, Double>();
+
+            // For each request in this domain
+            for (Request request_node : domain_node) {
+
+                // Check each neighbor
+                NeighborList neighbors =
+                        merged_graph.getNeighbors(request_node);
+                for (Neighbor<Request> neighbor : neighbors) {
+                    Request target_request = neighbor.node;
+
+                    // Find the corresponding domain name
+                    String other_domain_name = target_request.getDomain();
+                    if (other_domain_name.equals(domain_name)) {
+                        continue;
+                    }
+
+                    Domain other_domain = domains.get(other_domain_name);
+                    double new_similarity = neighbor.similarity;
+                    if (other_domains_sim.containsKey(other_domain)) {
+                        new_similarity +=
+                                other_domains_sim.get(other_domain);
+                    }
+
+                    other_domains_sim.put(other_domain, new_similarity);
+                }
+            }
+
+            NeighborList this_domain_neighbors =
+                    new NeighborList(1000);
+            for (Entry<Domain, Double> other_domain_entry
+                    : other_domains_sim.entrySet()) {
+                this_domain_neighbors.add(new Neighbor(
+                        other_domain_entry.getKey(),
+                        other_domain_entry.getValue()));
+            }
+
+            domain_graph.put(domain_node, this_domain_neighbors);
+
+        }
+        return domain_graph;
     }
 }
