@@ -32,7 +32,6 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import junit.framework.TestCase;
 
 /**
@@ -54,7 +53,7 @@ public class RequestHandlerTest extends TestCase {
         HashMap<String, LinkedList<Graph<Request>>> user_graphs =
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
-        
+
         RequestHandler handler = new RequestHandler(user_graphs);
         handler.test();
     }
@@ -99,7 +98,7 @@ public class RequestHandlerTest extends TestCase {
     /**
      * Test of the integrity of domains during fusion of features
      * @throws IOException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
     public void testIntegrityFusionFeatures()
             throws IOException, ClassNotFoundException {
@@ -141,7 +140,7 @@ public class RequestHandlerTest extends TestCase {
     /**
      * Test of the integrity of domains during computation of domains
      * @throws IOException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
     public void testIntegrityComputeDomains()
             throws IOException, ClassNotFoundException {
@@ -184,7 +183,7 @@ public class RequestHandlerTest extends TestCase {
     /**
      * Test of the integrity of domains during computation of domain similarity
      * @throws IOException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
     public void testIntegrityDomainSimilarity()
             throws IOException, ClassNotFoundException {
@@ -221,14 +220,14 @@ public class RequestHandlerTest extends TestCase {
                 break;
             }
         }
-        
+
         assertTrue(indicator);
     }
 
     /**
      * Test of the integrity of domains during pruning
      * @throws IOException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
     public void testIntegrityDomainPruning()
             throws IOException, ClassNotFoundException {
@@ -267,14 +266,14 @@ public class RequestHandlerTest extends TestCase {
                 break;
             }
         }
-        
+
         assertTrue(indicator);
     }
-    
+
     /**
      * Test of the integrity of domains during clustering
      * @throws IOException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
     public void testIntegrityDomainCluster()
             throws IOException, ClassNotFoundException {
@@ -305,21 +304,17 @@ public class RequestHandlerTest extends TestCase {
         // Test
         System.out.println("After prune = " + domain_graph.getNodes());
         System.out.println("Clusters = " + clusters);
-        boolean indicator = false;
+        boolean found_node = false;
         for (Domain dom : domain_graph.getNodes()) {
-            indicator = false;
+            found_node = false;
             for (Graph<Domain> graph : clusters) {
-                indicator = graph.containsKey(dom);
-                if (indicator) {
+                found_node = graph.containsKey(dom);
+                if (found_node) {
                     break;
                 }
             }
-            if (!indicator) {
-                System.out.println("FAIL !");
-                break;
-            }
+
+            assertTrue(found_node);
         }
-        
-         assertTrue(indicator);
     }
 }
