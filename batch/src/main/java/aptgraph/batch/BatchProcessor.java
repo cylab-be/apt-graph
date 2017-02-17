@@ -182,9 +182,9 @@ public class BatchProcessor {
 
         // Parsing of the log file
         LOGGER.info("Read and parse input file...");
+        LinkedList<Request> requests_temp = parseFile(input_file);
 
         // Split of the log file by users
-        LinkedList<Request> requests_temp = parseFile(input_file);
         HashMap<String, LinkedList<Request>> user_requests =
                 computeUserLog(requests_temp);
 
