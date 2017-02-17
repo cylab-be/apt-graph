@@ -29,7 +29,10 @@ import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -175,6 +178,7 @@ public class RequestHandler {
             }
         }
 
+        showRankingList(filtered);
         System.out.println("Found " + filtered.size() + " clusters");
         return filtered;
     }
@@ -314,5 +318,52 @@ public class RequestHandler {
 
         }
         return domain_graph;
+    }
+
+    /**
+     * Print of the ranking list.
+     * @param filtered
+     */
+    private void showRankingList(final LinkedList<Graph<Domain>> filtered) {
+        HashMap<Domain, Integer> index = new HashMap<Domain, Integer>();
+
+        for (Graph<Domain> graph : filtered) {
+            for (Domain dom : graph.getNodes()) {
+                if (!index.containsKey(dom)) {
+                    index.put(dom, graph.getNeighbors(dom).size());
+                }
+            }
+        }
+        Map<Domain, Integer> ranking = sortByValue(index);
+        System.out.println("Ranking List =");
+        for (Map.Entry<Domain, Integer> entry : ranking.entrySet()) {
+            System.out.println(entry.getValue() + " : " + entry.getKey());
+        }
+    }
+
+    /**
+     * Sorting function (source : https://stackoverflow.com/questions/109383/
+     * sort-a-mapkey-value-by-values-java).
+     * @param <K>
+     * @param <V>
+     * @param map
+     * @return
+     */
+    public static <K, V extends Comparable<? super V>> Map<K, V>
+        sortByValue(final Map<K, V> map) {
+        List<Map.Entry<K, V>> list =
+            new LinkedList<Map.Entry<K, V>>(map.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            public int compare(final Map.Entry<K, V> o1,
+                    final Map.Entry<K, V> o2) {
+                return (o1.getValue()).compareTo(o2.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<K, V>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 }
