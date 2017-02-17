@@ -127,6 +127,9 @@ public class RequestHandler {
             return null;
         }
 
+        // Selection of the temporal children only
+        graphs = childrenSelection(graphs);
+
         // Fusion of the features (Graph of Requests)
         Graph<Request> merged_graph =
                 computeFusionFeatures(graphs,
@@ -314,5 +317,34 @@ public class RequestHandler {
 
         }
         return domain_graph;
+    }
+
+    /**
+     * Select only the temporal children.
+     * @param graphs
+     * @return graphs
+     */
+    private LinkedList<Graph<Request>> childrenSelection(
+            final LinkedList<Graph<Request>> graphs) {
+        Graph<Request> time_graph = graphs.getFirst();
+        Graph<Request> time_graph_new = new Graph<Request>();
+        for (Request req : time_graph.getNodes()) {
+            NeighborList neighbors_new = new NeighborList(1000);
+            NeighborList neighbors = time_graph.getNeighbors(req);
+            for (Neighbor<Request> neighbor : neighbors) {
+                if (req.getTime() < neighbor.node.getTime()) {
+                    neighbors_new.add(neighbor);
+                }
+            }
+            time_graph_new.put(req, neighbors_new);
+        }
+        LinkedList<Graph<Request>> graphs_new =
+                new LinkedList<Graph<Request>>();
+        graphs_new.add(time_graph_new);
+        // Add up all others features
+        for (int i = 1; i < graphs.size(); i++) {
+            graphs_new.add(graphs.get(i));
+        }
+        return graphs_new;
     }
 }
