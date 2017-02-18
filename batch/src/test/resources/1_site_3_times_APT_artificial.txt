@@ -37,7 +37,7 @@
 1486934255.566     20 127.0.0.1 TCP_MISS/200 4081 GET http://ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojo/parser.js? - HIER_DIRECT/2a00:1450:400e:804::200a text/javascript
 1486934255.567     18 127.0.0.1 TCP_MISS/200 1010 GET http://static.tijd.be/s2014/js/site/modules/homepage-blocks.js? - HIER_DIRECT/2a02:26f0:60:3b6::2286 text/javascript
 1486934255.568     19 127.0.0.1 TCP_MISS/200 4604 GET http://static.tijd.be/s2014/js/site/modules/realtime/base.js? - HIER_DIRECT/2a02:26f0:60:3b6::2286 text/javascript
-1486934255.572  14001 127.0.0.1 TCP_MISS/503 4142 GET http://apt.findme/ - HIER_NONE/- text/html
+1486934255.572  14001 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1486934255.577     28 127.0.0.1 TCP_MISS/200 1273 GET http://static.tijd.be/s2014/js/site/modules/realtime/homepage-barometer.js? - HIER_DIRECT/2a02:26f0:60:3b6::2286 text/javascript
 1486934255.578     75 127.0.0.1 TCP_MISS/200 1603 GET http://static.tijd.be/s2014/js/site/modules/DropdownDojo.js? - HIER_DIRECT/2a02:26f0:60:3b6::2286 text/javascript
 1486934255.578     30 127.0.0.1 TCP_MISS/200 1178 GET http://static.tijd.be/s2014/js/site/modules/realtime/inline-ticker.js? - HIER_DIRECT/2a02:26f0:60:3b6::2286 text/javascript
@@ -302,7 +302,7 @@
 1586934256.036     48 127.0.0.1 TCP_MISS/200 1536 GET http://ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojo/date/stamp.js? - HIER_DIRECT/2a00:1450:400e:804::200a text/javascript
 1586934256.036     45 127.0.0.1 TCP_MISS/200 1472 GET http://ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojo/NodeList-traverse.js? - HIER_DIRECT/2a00:1450:400e:804::200a text/javascript
 1586934256.041     51 127.0.0.1 TCP_MISS/200 1742 GET http://ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojox//fx/_base.js? - HIER_DIRECT/2a00:1450:400e:804::200a text/javascript
-1586934256.054  14001 127.0.0.1 TCP_MISS/503 4142 GET http://apt.findme/ - HIER_NONE/- text/html
+1586934256.054  14001 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1586934256.057     25 127.0.0.1 TCP_MISS/200 1136 GET http://static.tijd.be/s2014/js/site/modules/nls/nl/res.js? - HIER_DIRECT/2a02:26f0:60:3b6::2286 text/javascript
 1586934256.075     20 127.0.0.1 TCP_MISS/200 3509 GET http://ajax.googleapis.com/ajax/libs/dojo/1.10.3/dijit//_WidgetBase.js? - HIER_DIRECT/2a00:1450:400e:804::200a text/javascript
 1586934256.075     21 127.0.0.1 TCP_MISS/200 2350 GET http://ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojo/touch.js? - HIER_DIRECT/2a00:1450:400e:804::200a text/javascript
@@ -567,7 +567,7 @@
 1686934256.965    291 127.0.0.1 TCP_MISS/200 835 POST http://clients1.google.com/ocsp - HIER_DIRECT/2a00:1450:400e:804::200e application/ocsp-response
 1686934257.003    397 127.0.0.1 TCP_TUNNEL/200 4232 CONNECT www.google.be:443 - HIER_DIRECT/2a00:1450:4009:809::2003 -
 1686934266.333   1056 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
-1686934266.339  14001 127.0.0.1 TCP_MISS/503 4142 GET http://apt.findme/ - HIER_NONE/- text/html
+1686934266.339  14001 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1686934270.241  14856 127.0.0.1 TCP_MISS/200 20347 GET http://pool-mediafin.adhese.com/tag/tag.js - HIER_DIRECT/37.72.160.15 application/javascript
 1686934270.293     47 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
 1686934270.293     47 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response

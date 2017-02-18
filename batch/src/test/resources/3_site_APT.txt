@@ -35,7 +35,7 @@
 1486907911.000     41 127.0.0.1 TCP_MISS/200 835 POST http://clients1.google.com/ocsp - HIER_DIRECT/2a00:1450:400e:807::200e application/ocsp-response
 1486907911.020    200 127.0.0.1 TCP_MISS/200 2778 GET http://optimized-by.rubiconproject.com/a/13682/64368/448688-57.js? - HIER_DIRECT/213.19.162.21 text/javascript
 1486907913.909     31 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
-1486907924.749  14001 127.0.0.1 TCP_MISS/503 4142 GET http://apt.findme/ - HIER_NONE/- text/html
+1486907924.749  14001 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1486907924.800  14053 127.0.0.1 TCP_MISS/200 29608 GET http://pagead2.googlesyndication.com/pagead/osd.js - HIER_DIRECT/2a00:1450:400e:806::2002 text/javascript
 1486907924.816     39 127.0.0.1 TCP_MISS/200 1836 POST http://gp.symcd.com/ - HIER_DIRECT/2a02:26f0:60:28b::201a application/ocsp-response
 1486907924.910     38 127.0.0.1 TCP_MISS/200 8908 GET http://tap2-cdn.rubiconproject.com/partner/scripts/rubicon/emily.html? - HIER_DIRECT/62.4.254.239 text/html
@@ -413,7 +413,7 @@
 1486908236.774     27 127.0.0.1 TCP_MISS/200 969 POST http://www.standaard.be/account/getidentity? - HIER_DIRECT/185.43.124.6 application/json
 1486908236.784     66 127.0.0.1 TCP_MISS/200 24192 GET http://cdn1.adhese.be/pool/lib/154466_2nd.jpg - HIER_DIRECT/185.43.124.16 image/jpeg
 1486908236.821     59 127.0.0.1 TCP_MISS/200 930 POST http://ocsp.comodoca.com/ - HIER_DIRECT/2a02:1788:2fd::b2ff:5301 application/ocsp-response
-1486908236.834     37 127.0.0.1 TCP_MISS/503 4142 GET http://apt.findme/ - HIER_NONE/- text/html
+1486908236.834     37 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1486908236.839    118 127.0.0.1 TCP_TUNNEL/200 5707 CONNECT adhese.standaard.be:443 - HIER_DIRECT/185.43.126.7 -
 1486908236.860     22 127.0.0.1 TCP_MISS/200 963 GET http://gabe.hit.gemius.pl/_1486908236837/rexdot.js? - HIER_DIRECT/178.32.206.33 application/x-javascript
 1486908237.077     13 127.0.0.1 TCP_MISS/200 6425 GET http://www.jobat.be/img/tickers/logoJobat_small.jpg - HIER_DIRECT/185.43.124.139 image/jpeg
@@ -978,7 +978,7 @@
 1486908550.125     21 127.0.0.1 TCP_MISS/200 17934 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/170203194341-restricted-maasai-tanzania-wildlife-warriors-10-medium-tease.jpg - HIER_DIRECT/2a02:26f0:5d:28b::9a2 image/jpeg
 1486908550.129     44 127.0.0.1 TCP_MISS/200 1154 GET http://z.cdn.cnn.com/ads/cnni/cnni_homepage.js - HIER_DIRECT/2a02:26f0:5d:292::9a2 application/x-javascript
 1486908550.245     13 127.0.0.1 TCP_MISS/200 429 GET http://data.cnn.com/jsonp/breaking_news/international.json? - HIER_DIRECT/2a02:26f0:60:298::9a2 application/javascript
-1486908550.319     12 127.0.0.1 TCP_MISS/503 4142 GET http://apt.findme/ - HIER_NONE/- text/html
+1486908550.319     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1486908550.422    146 127.0.0.1 TCP_MISS/302 665 GET http://secure-us.imrworldwide.com/cgi-bin/m? - HIER_DIRECT/138.108.96.100 -
 1486908550.466     21 127.0.0.1 TCP_MISS/200 19710 GET http://cdn.livefyre.com/libs/Livefyre/v1.1.1/builds/310/Livefyre.min.js - HIER_DIRECT/54.192.196.56 application/javascript
 1486908550.489     43 127.0.0.1 TCP_MISS/200 47805 GET http://cdn.gigya.com/js/gigya.js? - HIER_DIRECT/62.4.254.136 text/javascript
