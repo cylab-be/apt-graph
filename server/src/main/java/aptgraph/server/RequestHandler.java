@@ -337,7 +337,8 @@ public class RequestHandler {
         Map<Domain, Integer> ranking = sortByValue(index);
         System.out.println("Ranking List =");
         for (Map.Entry<Domain, Integer> entry : ranking.entrySet()) {
-            System.out.println(entry.getValue() + " : " + entry.getKey());
+            System.out.println("    " + entry.getValue()
+                    + " : " + entry.getKey());
         }
     }
 
