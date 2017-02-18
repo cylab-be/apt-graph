@@ -152,6 +152,7 @@ public class RequestHandler {
         }
 
         // Prune
+        showSimilaritiesInfo(domain_graph, prune_threshold);
         domain_graph.prune(prune_threshold);
 
         // The json-rpc request was probably canceled by the user
@@ -168,6 +169,7 @@ public class RequestHandler {
         }
 
         // Filtering
+        showClusterSizeInfo(clusters, max_cluster_size);
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
         for (Graph<Domain> subgraph : clusters) {
             if (subgraph.size() < max_cluster_size) {
@@ -314,5 +316,87 @@ public class RequestHandler {
 
         }
         return domain_graph;
+    }
+
+    /**
+     * Show statistical information of Similarities.
+     * @param domain_graph
+     * @param prune_threshold
+     */
+    private void showSimilaritiesInfo(final Graph<Domain> domain_graph,
+            final Double prune_threshold) {
+        ArrayList<Double> similarities = new ArrayList<Double>();
+        for (Domain dom : domain_graph.getNodes()) {
+            NeighborList neighbors = domain_graph.getNeighbors(dom);
+            for (Neighbor<Domain> neighbor : neighbors) {
+                similarities.add(neighbor.similarity);
+            }
+        }
+        double mean = getMean(similarities);
+        double variance = getVariance(similarities);
+        double z = getZ(similarities, prune_threshold);
+        System.out.println("Similarities : ");
+        System.out.println("    Mean = " + mean);
+        System.out.println("    Variance = " + variance);
+        System.out.println("    z = " + z);
+    }
+
+    /**
+     * Show statistical information of Cluster Sizes.
+     * @param clusters
+     * @param max_cluster_size
+     */
+    private void showClusterSizeInfo(final ArrayList<Graph<Domain>> clusters,
+            final int max_cluster_size) {
+        ArrayList<Double> cluster_sizes = new ArrayList<Double>();
+        for (Graph<Domain> subgraph : clusters) {
+            cluster_sizes.add((double) subgraph.size());
+        }
+        double mean = getMean(cluster_sizes);
+        double variance = getVariance(cluster_sizes);
+        double z = getZ(cluster_sizes, (double) max_cluster_size);
+        System.out.println("Cluster Size : ");
+        System.out.println("    Mean = " + mean);
+        System.out.println("    Variance = " + variance);
+        System.out.println("    z = " + z);
+    }
+
+    /**
+     * Compute the mean of an ArrayList<Double>.
+     * @param list
+     * @return mean
+     */
+    private double getMean(final ArrayList<Double> list) {
+            double sum = 0.0;
+            for (double i : list) {
+                sum += i;
+            }
+            return sum / list.size();
+    }
+
+    /**
+     * Compute the variance of an ArrayList<Double>.
+     * @param list
+     * @return variance
+     */
+    private double getVariance(final ArrayList<Double> list) {
+        double mean = getMean(list);
+        double sum = 0.0;
+        for (double i :list) {
+            sum += (i - mean) * (i - mean);
+        }
+        return sum / list.size();
+    }
+
+    /**
+     * Compute the z score of a value.
+     * @param list
+     * @param value
+     * @return z
+     */
+    private double getZ(final ArrayList<Double> list, final Double value) {
+        double mean = getMean(list);
+        double variance = getVariance(list);
+        return (value - mean) / Math.sqrt(variance);
     }
 }
