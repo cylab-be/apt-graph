@@ -335,10 +335,11 @@ public class RequestHandler {
             }
         }
         Map<Domain, Integer> ranking = sortByValue(index);
-        System.out.println("Ranking List =");
+        System.out.println("Ranking List #Neighbors(#Requests) =");
         for (Map.Entry<Domain, Integer> entry : ranking.entrySet()) {
             System.out.println("    " + entry.getValue()
-                    + " : " + entry.getKey());
+                    + "(" + entry.getKey().size()
+                    + ") : " + entry.getKey());
         }
     }
 
