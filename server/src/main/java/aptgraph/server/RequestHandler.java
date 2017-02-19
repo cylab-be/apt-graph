@@ -135,6 +135,9 @@ public class RequestHandler {
                 computeFusionFeatures(graphs,
                         feature_ordered_weights, feature_weights);
 
+        // Selection of the temporal children only
+        merged_graph = childrenSelection(merged_graph);
+
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
             return null;
@@ -320,6 +323,27 @@ public class RequestHandler {
 
         }
         return domain_graph;
+    }
+
+    /**
+     * Select only the temporal children.
+     * @param graph
+     * @return graph
+     */
+    private Graph<Request> childrenSelection(
+            final Graph<Request> graph) {
+        Graph<Request> graph_new = new Graph<Request>();
+        for (Request req : graph.getNodes()) {
+            NeighborList neighbors_new = new NeighborList(1000);
+            NeighborList neighbors = graph.getNeighbors(req);
+            for (Neighbor<Request> neighbor : neighbors) {
+                if (req.getTime() < neighbor.node.getTime()) {
+                    neighbors_new.add(neighbor);
+                }
+            }
+            graph_new.put(req, neighbors_new);
+        }
+        return graph_new;
     }
 
     /**
