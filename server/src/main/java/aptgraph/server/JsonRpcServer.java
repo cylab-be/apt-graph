@@ -95,6 +95,8 @@ public class JsonRpcServer {
         String first_key = entry_set.getKey();
         LOGGER.log(Level.INFO, "Graph has {0} features",
                 user_graphs.get(first_key).size());
+        LOGGER.log(Level.INFO, "k-NN Graph : k = {0}",
+                user_graphs.get(first_key).getFirst().getK());
         LOGGER.log(Level.INFO, "Starting JSON-RPC server at http://{0}:{1}",
                 new Object[]{config.getServerHost(), config.getServerPort()});
 
