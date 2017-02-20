@@ -1,0 +1,5 @@
+By default :
+
+- Figure are taken with pruning threshold equal to the mean value of similarities. If not, it is specified in the name of the figure.
+
+- k = 10. If not, it is specified in the name of the figure.
