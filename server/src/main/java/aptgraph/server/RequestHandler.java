@@ -337,7 +337,7 @@ public class RequestHandler {
             NeighborList neighbors_new = new NeighborList(1000);
             NeighborList neighbors = graph.getNeighbors(req);
             for (Neighbor<Request> neighbor : neighbors) {
-                if (req.getTime() < neighbor.node.getTime()) {
+                if (req.getTime() <= neighbor.node.getTime()) {
                     neighbors_new.add(neighbor);
                 }
             }
@@ -361,7 +361,7 @@ public class RequestHandler {
             }
         }
         Map<Domain, Integer> ranking = sortByValue(index);
-        System.out.println("Ranking List #Neighbors(#Requests) =");
+        System.out.println("Ranking List #Children(#Requests) =");
         for (Map.Entry<Domain, Integer> entry : ranking.entrySet()) {
             System.out.println("    " + entry.getValue()
                     + "(" + entry.getKey().size()
