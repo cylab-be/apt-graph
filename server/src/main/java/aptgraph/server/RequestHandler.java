@@ -28,6 +28,10 @@ import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,6 +41,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -45,10 +51,13 @@ import java.util.Map.Entry;
 public class RequestHandler {
     private final HashMap<String,
             LinkedList<Graph<Request>>> user_graphs;
+    private final InputStream hosts_file;
 
     RequestHandler(final HashMap<String,
-            LinkedList<Graph<Request>>> user_graphs) {
+            LinkedList<Graph<Request>>> user_graphs,
+            final InputStream hosts_file) {
         this.user_graphs = user_graphs;
+        this.hosts_file = hosts_file;
     }
 
     /**
@@ -151,6 +160,13 @@ public class RequestHandler {
         // Compute similarity between domains and build domain graph
         Graph<Domain> domain_graph =
                 computeSimilarityDomain(merged_graph, domains);
+
+        // White listing
+        // START PROBLEM
+        domain_graph.fastRemove(domain_graph.first());
+        System.out.println("SUCCES");
+        // STOP PROBLEM
+//        domain_graph = whiteListing(domain_graph);
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
@@ -475,5 +491,32 @@ public class RequestHandler {
         double mean = getMean(list);
         double variance = getVariance(list);
         return (value - mean) / Math.sqrt(variance);
+    }
+
+    /**
+     * White List unwanted domains.
+     * @param domain_graph
+     * @return domain_graph
+     */
+    private Graph<Domain> whiteListing(final Graph<Domain> domain_graph) {
+        Graph<Domain> domain_graph_new = domain_graph;
+        LinkedList<String> whitelist = new LinkedList<String>();
+        try {
+            BufferedReader br = new BufferedReader(
+                new InputStreamReader(hosts_file, "UTF-8"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                whitelist.add(line);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(RequestHandler.class.getName())
+                    .log(Level.SEVERE, null, ex);
+        }
+        for (Domain dom : domain_graph_new.getNodes()) {
+            if (whitelist.contains(dom.toString())) {
+                domain_graph_new.fastRemove(dom);
+            }
+        }
+        return domain_graph_new;
     }
 }

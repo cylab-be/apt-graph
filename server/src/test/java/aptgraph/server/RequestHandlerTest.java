@@ -42,11 +42,15 @@ public class RequestHandlerTest extends TestCase {
 
     /**
      * Test of test method, of class RequestHandler.
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
      */
     public void testTest() throws IOException, ClassNotFoundException {
         System.out.println("test");
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
+        InputStream hosts_file = getClass()
+                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -54,17 +58,21 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
         handler.test();
     }
 
     /**
      * Test of dummy method, of class RequestHandler.
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
      */
     public void testDummy() throws IOException, ClassNotFoundException {
         System.out.println("dummy");
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
+        InputStream hosts_file = getClass()
+                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -72,17 +80,21 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
         handler.dummy();
     }
 
     /**
      * Test of analyze method, of class RequestHandler.
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
      */
     public void testAnalyze() throws IOException, ClassNotFoundException {
         System.out.println("analyze");
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
+        InputStream hosts_file = getClass()
+                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -90,7 +102,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
         handler.analyze("127.0.0.1", new double[]{0.7, 0.3},
                 new double[]{0.8, 0.2}, 10.0, 10);
     }
@@ -106,6 +118,8 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
+        InputStream hosts_file = getClass()
+                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -113,7 +127,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
@@ -148,6 +162,8 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
+        InputStream hosts_file = getClass()
+                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -155,7 +171,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
@@ -191,6 +207,8 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
+        InputStream hosts_file = getClass()
+                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -198,7 +216,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
@@ -235,6 +253,8 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
+        InputStream hosts_file = getClass()
+                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -242,7 +262,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
@@ -281,6 +301,8 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
+        InputStream hosts_file = getClass()
+                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -288,7 +310,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
