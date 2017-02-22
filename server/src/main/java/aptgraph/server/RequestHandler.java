@@ -164,11 +164,6 @@ public class RequestHandler {
         Graph<Domain> domain_graph =
                 computeSimilarityDomain(merged_graph, domains);
 
-        // White listing
-        if (whitelist_bool) {
-            domain_graph = whiteListing(domain_graph);
-        }
-
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
             return null;
@@ -198,6 +193,11 @@ public class RequestHandler {
             if (subgraph.size() < max_cluster_size) {
                 filtered.add(subgraph);
             }
+        }
+
+        // White listing
+        if (whitelist_bool) {
+            filtered = whiteListing(filtered);
         }
 
         showRankingList(filtered);
@@ -499,8 +499,10 @@ public class RequestHandler {
      * @param domain_graph
      * @return domain_graph
      */
-    final Graph<Domain> whiteListing(final Graph<Domain> domain_graph) {
-        Graph<Domain> domain_graph_new = domain_graph;
+    final LinkedList<Graph<Domain>>
+         whiteListing(final LinkedList<Graph<Domain>> filtered) {
+        LinkedList<Graph<Domain>> filtered_new = filtered;
+
         List<String> whitelist = new ArrayList<String>();
         LinkedList<Domain> whitelisted = new LinkedList<Domain>();
         try {
@@ -510,19 +512,25 @@ public class RequestHandler {
             Logger.getLogger(RequestHandler.class.getName())
                     .log(Level.SEVERE, null, ex);
         }
-        Iterator<Domain> iterator = domain_graph_new.getNodes().iterator();
-        while (iterator.hasNext()) {
-            Domain dom = iterator.next();
-            if (whitelist.contains(dom.toString())) {
-                whitelisted.add(dom);
+
+        Iterator<Graph<Domain>> iterator_1 = filtered_new.iterator();
+        while (iterator_1.hasNext()) {
+            Graph<Domain> domain_graph = iterator_1.next();
+            Iterator<Domain> iterator_2 = domain_graph.getNodes().iterator();
+            while (iterator_2.hasNext()) {
+                Domain dom = iterator_2.next();
+                if (whitelist.contains(dom.toString())) {
+                    whitelisted.add(dom);
+                }
+            }
+            for (Domain dom : whitelisted) {
+                remove(domain_graph, dom);
             }
         }
-        for (Domain dom : whitelisted) {
-            remove(domain_graph_new, dom);
-        }
+
         System.out.println("Number of white listed domains = "
                 + whitelisted.size());
-        return domain_graph_new;
+        return filtered_new;
     }
 
     /**

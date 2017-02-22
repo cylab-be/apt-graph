@@ -387,9 +387,17 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeDomainGraph(merged_graph);
         Graph<Domain> domain_graph =
                 handler.computeSimilarityDomain(merged_graph, domains);
+        ArrayList<Graph<Domain>> clusters = domain_graph.connectedComponents();
+        LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
+        for (Graph<Domain> subgraph : clusters) {
+            if (subgraph.size() < 100) {
+                filtered.add(subgraph);
+            }
+        }
         
         // Test 
-        Graph<Domain> domain_graph_new = domain_graph;
+        LinkedList<Graph<Domain>> filtered_new = filtered;
+        Graph<Domain> domain_graph_new = filtered_new.getFirst();
         Domain domain_node_1 = new Domain();
         Domain domain_node_2 = new Domain();
         for (Domain dom : domain_graph_new.getNodes()) {
@@ -401,9 +409,10 @@ public class RequestHandlerTest extends TestCase {
             }
         }
 
-        domain_graph_new = handler.whiteListing(domain_graph_new);
+        filtered_new = handler.whiteListing(filtered);
+        Graph<Domain> domain_graph_new_bis = filtered_new.getFirst();
 
-        assertFalse(domain_graph_new.containsKey(domain_node_1));
-        assertFalse(domain_graph_new.containsKey(domain_node_2));
+        assertFalse(domain_graph_new_bis.containsKey(domain_node_1));
+        assertFalse(domain_graph_new_bis.containsKey(domain_node_2));
     }
 }
