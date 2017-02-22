@@ -50,7 +50,14 @@
         </div>
         <div class="container-fluid" id="domain_fusion">
           <h3>DOMAIN FUSION</h3>
-          .............................
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="whitelist" class="col-md-2 control-label" style="text-align: left; width: 150px;">WHITE LISTING</label>
+              <div class="col-md-4">
+                <input type="checkbox" id="whitelist" value="" checked>
+              </div>
+            </div>
+          </div>  
         </div>
         <div class="container-fluid" id="domain_clustering">
           <h3>DOMAIN CLUSTERING</h3>
@@ -58,7 +65,7 @@
             <div class="form-group">
               <label for="prune_threshold" class="col-md-4 control-label" style="text-align: left;">PRUNE THRESHOLD:</label>
               <div class="col-md-4">
-                <input type="number" step="0.01" class="form-control" id="prune_threshold" value="0.5" style="width: 100px;">
+                <input type="number" step="0.01" class="form-control" id="prune_threshold" value="0.25" style="width: 100px;">
               </div>
             </div>
             <div class="form-group">
@@ -113,7 +120,8 @@
                         [$("#time").val(), $("#url").val()],
                         [$("#ord_weights_high").val(), $("#ord_weights_low").val()],
                         $("#prune_threshold").val(),
-                        $("#max_cluster_size").val()],
+                        $("#max_cluster_size").val(),
+                        whitelist.checked],
                         "id": 123
                       };
       var request = json_post("http://127.0.0.1:8080" , jsonbody); 

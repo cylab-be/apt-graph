@@ -102,6 +102,7 @@ public class RequestHandler {
      * @param prune_threshold
      * @param feature_weights
      * @param max_cluster_size
+     * @param whitelist_value
      * @return
      */
     public final List<Graph<Domain>> analyze(
@@ -109,7 +110,8 @@ public class RequestHandler {
             final double[] feature_weights,
             final double[] feature_ordered_weights,
             final double prune_threshold,
-            final int max_cluster_size) {
+            final int max_cluster_size,
+            final boolean whitelist_bool) {
 
         // START user selection
         // List of the user
@@ -163,7 +165,9 @@ public class RequestHandler {
                 computeSimilarityDomain(merged_graph, domains);
 
         // White listing
-        domain_graph = whiteListing(domain_graph);
+        if (whitelist_bool) {
+            domain_graph = whiteListing(domain_graph);
+        }
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
