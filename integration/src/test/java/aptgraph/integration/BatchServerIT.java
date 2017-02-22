@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.TestCase;
@@ -55,10 +54,8 @@ public class BatchServerIT extends TestCase {
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
                 new FileOutputStream(temp_file));
 
-        InputStream hosts_file = getClass()
-                .getResourceAsStream("/hosts_test");
         final JsonRpcServer server = new JsonRpcServer(
-                new FileInputStream(temp_file),hosts_file);
+                new FileInputStream(temp_file));
 
         // Start the server in a separate thread, so we can wait and stop it
         // from the main thread...

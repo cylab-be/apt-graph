@@ -54,19 +54,15 @@ public class JsonRpcServer {
     private volatile org.eclipse.jetty.server.Server http_server;
     private Config config;
     private final InputStream input_file;
-    private final InputStream hosts_file;
 
     /**
      * Instantiate a server with default configuration.
      *
      * @param input_file
-     * @param hosts_file
      */
-    public JsonRpcServer(final InputStream input_file,
-            final InputStream hosts_file) {
+    public JsonRpcServer(final InputStream input_file) {
         config = new Config();
         this.input_file = input_file;
-        this.hosts_file = hosts_file;
     }
 
     /**
@@ -105,7 +101,7 @@ public class JsonRpcServer {
                 new Object[]{config.getServerHost(), config.getServerPort()});
 
         RequestHandler request_handler =
-                new RequestHandler(user_graphs, hosts_file);
+                new RequestHandler(user_graphs);
 
 
         ObjectMapper object_mapper = new ObjectMapper();

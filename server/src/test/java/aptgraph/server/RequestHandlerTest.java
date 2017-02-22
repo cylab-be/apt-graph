@@ -49,8 +49,6 @@ public class RequestHandlerTest extends TestCase {
         System.out.println("test");
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
-        InputStream hosts_file = getClass()
-                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -58,7 +56,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
+        RequestHandler handler = new RequestHandler(user_graphs);
         handler.test();
     }
 
@@ -71,8 +69,6 @@ public class RequestHandlerTest extends TestCase {
         System.out.println("dummy");
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
-        InputStream hosts_file = getClass()
-                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -80,7 +76,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
+        RequestHandler handler = new RequestHandler(user_graphs);
         handler.dummy();
     }
 
@@ -93,8 +89,6 @@ public class RequestHandlerTest extends TestCase {
         System.out.println("analyze");
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
-        InputStream hosts_file = getClass()
-                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -102,7 +96,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
+        RequestHandler handler = new RequestHandler(user_graphs);
         handler.analyze("127.0.0.1", new double[]{0.7, 0.3},
                 new double[]{0.8, 0.2}, 10.0, 10);
     }
@@ -118,8 +112,6 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
-        InputStream hosts_file = getClass()
-                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -127,7 +119,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
+        RequestHandler handler = new RequestHandler(user_graphs);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
@@ -162,8 +154,6 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
-        InputStream hosts_file = getClass()
-                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -171,7 +161,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
+        RequestHandler handler = new RequestHandler(user_graphs);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
@@ -207,8 +197,6 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
-        InputStream hosts_file = getClass()
-                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -216,7 +204,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
+        RequestHandler handler = new RequestHandler(user_graphs);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
@@ -253,8 +241,6 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
-        InputStream hosts_file = getClass()
-                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -262,7 +248,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
+        RequestHandler handler = new RequestHandler(user_graphs);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
@@ -301,8 +287,6 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         InputStream graph_stream =
                 getClass().getResourceAsStream("/dummy_graph.ser");
-        InputStream hosts_file = getClass()
-                .getResourceAsStream("/hosts_test");
 
         ObjectInputStream input = new ObjectInputStream(
                 new BufferedInputStream(graph_stream));
@@ -310,7 +294,7 @@ public class RequestHandlerTest extends TestCase {
               (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
         input.close();
 
-        RequestHandler handler = new RequestHandler(user_graphs, hosts_file);
+        RequestHandler handler = new RequestHandler(user_graphs);
         String user = user_graphs.keySet().iterator().next();
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
@@ -338,5 +322,88 @@ public class RequestHandlerTest extends TestCase {
 
             assertTrue(found_node);
         }
+    }
+
+    /**
+     * Test the effectiveness of the suppression of a node in a graph.
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
+     */
+    public void testRemove()
+            throws IOException, ClassNotFoundException {
+        System.out.println("Test : remove");
+        // Creation of the data
+        InputStream graph_stream =
+                getClass().getResourceAsStream("/dummy_graph.ser");
+
+        ObjectInputStream input = new ObjectInputStream(
+                new BufferedInputStream(graph_stream));
+        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
+              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
+        input.close();
+
+        RequestHandler handler = new RequestHandler(user_graphs);
+        String user = user_graphs.keySet().iterator().next();
+        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        Graph<Request> merged_graph =
+                handler.computeFusionFeatures(graphs,
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
+        HashMap<String, Domain> domains =
+                handler.computeDomainGraph(merged_graph);
+        Graph<Domain> domain_graph =
+                handler.computeSimilarityDomain(merged_graph, domains);
+        
+        // Test 
+        Domain first_node = domain_graph.first();
+        RequestHandler.remove(domain_graph, first_node);
+        assertFalse(domain_graph.containsKey(first_node));
+    }
+
+    /**
+     * Test the effectiveness of the white listing of some node.
+     * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
+     */
+    public void testWhiteListing()
+            throws IOException, ClassNotFoundException {
+        System.out.println("Test : white listing");
+        // Creation of the data
+        InputStream graph_stream =
+                getClass().getResourceAsStream("/dummy_graph_whitelist.ser");
+
+        ObjectInputStream input = new ObjectInputStream(
+                new BufferedInputStream(graph_stream));
+        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
+              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
+        input.close();
+
+        RequestHandler handler = new RequestHandler(user_graphs);
+        String user = user_graphs.keySet().iterator().next();
+        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        Graph<Request> merged_graph =
+                handler.computeFusionFeatures(graphs,
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
+        HashMap<String, Domain> domains =
+                handler.computeDomainGraph(merged_graph);
+        Graph<Domain> domain_graph =
+                handler.computeSimilarityDomain(merged_graph, domains);
+        
+        // Test 
+        Graph<Domain> domain_graph_new = domain_graph;
+        Domain domain_node_1 = new Domain();
+        Domain domain_node_2 = new Domain();
+        for (Domain dom : domain_graph_new.getNodes()) {
+            if (dom.toString().equals("cdn.optimizely.com")) {
+                domain_node_1 = dom;
+            }
+            if (dom.toString().equals("ad.doubleclick.net")) {
+                domain_node_2 = dom;
+            }
+        }
+
+        domain_graph_new = handler.whiteListing(domain_graph_new);
+
+        assertFalse(domain_graph_new.containsKey(domain_node_1));
+        assertFalse(domain_graph_new.containsKey(domain_node_2));
     }
 }

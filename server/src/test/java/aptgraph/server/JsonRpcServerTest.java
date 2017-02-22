@@ -43,8 +43,7 @@ public class JsonRpcServerTest extends TestCase {
     public final void testStart() throws InterruptedException, Exception {
         System.out.println("start");
         final JsonRpcServer server = new JsonRpcServer(
-                getClass().getResourceAsStream("/dummy_graph.ser"),
-                getClass().getResourceAsStream("/hosts_test"));
+                getClass().getResourceAsStream("/dummy_graph.ser"));
 
         Config conf = new Config();
         conf.setServerPort(12345);

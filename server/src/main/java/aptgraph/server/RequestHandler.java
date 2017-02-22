@@ -28,10 +28,7 @@ import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,6 +41,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -52,14 +53,13 @@ import java.util.logging.Logger;
 public class RequestHandler {
     private final HashMap<String,
             LinkedList<Graph<Request>>> user_graphs;
-    private final InputStream hosts_file;
 
     RequestHandler(final HashMap<String,
-            LinkedList<Graph<Request>>> user_graphs,
-            final InputStream hosts_file) {
+            LinkedList<Graph<Request>>> user_graphs) {
         this.user_graphs = user_graphs;
-        this.hosts_file = hosts_file;
     }
+
+    private static final Path PATH = Paths.get("./src/main/resources/hosts");
 
     /**
      * A test json-rpc call, with no argument, that should return "hello".
@@ -163,11 +163,7 @@ public class RequestHandler {
                 computeSimilarityDomain(merged_graph, domains);
 
         // White listing
-        // START PROBLEM
-        remove(domain_graph, domain_graph.first());
-        System.out.println("SUCCES");
-        // STOP PROBLEM
-        // domain_graph = whiteListing(domain_graph);
+        domain_graph = whiteListing(domain_graph);
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
@@ -499,50 +495,61 @@ public class RequestHandler {
      * @param domain_graph
      * @return domain_graph
      */
-    private Graph<Domain> whiteListing(final Graph<Domain> domain_graph) {
+    final Graph<Domain> whiteListing(final Graph<Domain> domain_graph) {
         Graph<Domain> domain_graph_new = domain_graph;
-        LinkedList<String> whitelist = new LinkedList<String>();
+        List<String> whitelist = new ArrayList<String>();
+        LinkedList<Domain> whitelisted = new LinkedList<Domain>();
         try {
-            BufferedReader br = new BufferedReader(
-                new InputStreamReader(hosts_file, "UTF-8"));
-            String line;
-            while ((line = br.readLine()) != null) {
-                whitelist.add(line);
-            }
+            whitelist =
+                    Files.readAllLines(PATH, StandardCharsets.UTF_8);
         } catch (IOException ex) {
             Logger.getLogger(RequestHandler.class.getName())
                     .log(Level.SEVERE, null, ex);
         }
-        for (Domain dom : domain_graph_new.getNodes()) {
+        Iterator<Domain> iterator = domain_graph_new.getNodes().iterator();
+        while (iterator.hasNext()) {
+            Domain dom = iterator.next();
             if (whitelist.contains(dom.toString())) {
-                domain_graph_new.fastRemove(dom);
+                whitelisted.add(dom);
             }
         }
+        for (Domain dom : whitelisted) {
+            remove(domain_graph_new, dom);
+        }
+        System.out.println("Number of white listed domains = "
+                + whitelisted.size());
         return domain_graph_new;
     }
 
-    static <U> void remove(Graph<U> graph, U node) {
+    /**
+     * Remove a node from a given graph (and update graph).
+     * @param <U>
+     * @param graph
+     * @param node
+     */
+    static <U> void remove(final Graph<U> graph, final U node) {
         HashMap<U, NeighborList> map = graph.getHashMap();
 
-        // Supprime le node
+        // Delete the node
         map.remove(node);
 
-        // Maintenant il faut supprimer les edges invalides
-        // sinon on risque des erreurs "NullPointerException"
-        for (Map.Entry<U, NeighborList> entry : map.entrySet()) {
+        // Delete the invalid edges to avoid "NullPointerException"
+        Iterator<Map.Entry<U, NeighborList>> iterator_1 =
+                map.entrySet().iterator();
+        while (iterator_1.hasNext()) {
+            Map.Entry<U, NeighborList> entry = iterator_1.next();
             NeighborList neighborlist = entry.getValue();
 
-            // On parcourt la liste, et en même temps on supprime des
-            // éléments de la  liste => for() ne peut pas être utilisé!
-            // http://stackoverflow.com/questions/223918/
-            Iterator<Neighbor> iterator = neighborlist.iterator();
-            while (iterator.hasNext()) {
-                Neighbor<U> neighbor = iterator.next();
+            // Delete reference to deleted node
+            // => for() can't be used
+            // (see http://stackoverflow.com/questions/223918/)
+            Iterator<Neighbor> iterator_2 = neighborlist.iterator();
+            while (iterator_2.hasNext()) {
+                Neighbor<U> neighbor = iterator_2.next();
                 if (neighbor.node.equals(node)) {
-                    iterator.remove();
+                    iterator_2.remove();
                 }
             }
         }
-
     }
 }

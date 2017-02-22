@@ -35,13 +35,12 @@ public final class Main {
         // Parse command line arguments
         Options options = new Options();
         options.addOption("i", true, "Input file (required)");
-        options.addOption("w", true, "Host file white listing (required)");
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        if (cmd.hasOption("h") || !cmd.hasOption("i") || !cmd.hasOption("w")) {
+        if (cmd.hasOption("h") || !cmd.hasOption("i")) {
 
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("java -jar server-<version>.jar", options);
@@ -50,8 +49,7 @@ public final class Main {
 
         // Start the json-rpc server
         JsonRpcServer jsonrpc_server = new JsonRpcServer(
-                new FileInputStream(cmd.getOptionValue("i")),
-                new FileInputStream(cmd.getOptionValue("w")));
+                new FileInputStream(cmd.getOptionValue("i")));
         jsonrpc_server.startInBackground();
 
         String url = "http://127.0.0.1:8000";
