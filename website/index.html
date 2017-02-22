@@ -28,15 +28,21 @@
           <h4>FEATURE WEIGHTS</h4>
           <div class="form-horizontal">
             <div class="form-group">
-              <label for="time" class="col-md-2 control-label" style="width: 50px;">TIME:</label>
+              <label for="time" class="col-md-2 control-label" style="text-align: left; width: 100px;">TIME:</label>
               <div class="col-md-4">
-                <input type="number" step="0.1" class="form-control" id="time" value="1" style="width: 100px;">
+                <input type="number" step="0.1" class="form-control" id="time" value="0.9" style="width: 100px;">
               </div>
             </div>
             <div class="form-group">
-              <label for="url" class="col-md-2 control-label" style="width: 50px;">URL:</label>
+              <label for="url" class="col-md-2 control-label" style="text-align: left; width: 100px;">URL:</label>
               <div class="col-md-4">
                 <input type="number" step="0.1" class="form-control" id="url" value="0" style="width: 100px;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="domain" class="col-md-2 control-label" style="text-align: left; width: 100px;">DOMAIN:</label>
+              <div class="col-md-4">
+                <input type="number" step="0.1" class="form-control" id="domain" value="0.1" style="width: 100px;">
               </div>
             </div>
           </div>
@@ -52,13 +58,13 @@
           <h3>DOMAIN CLUSTERING</h3>
           <div class="form-horizontal">
             <div class="form-group">
-              <label for="prune_threshold" class="col-md-4 control-label" style="text-align: left;">PRUNE THRESHOLD:</label>
+              <label for="prune_threshold" class="col-md-4 control-label" style="text-align: left; width: 200px;">PRUNE THRESHOLD:</label>
               <div class="col-md-4">
-                <input type="number" step="0.01" class="form-control" id="prune_threshold" value="0.25" style="width: 100px;">
+                <input type="number" step="0.01" class="form-control" id="prune_threshold" value="0.1" style="width: 100px;">
               </div>
             </div>
             <div class="form-group">
-              <label for="max_cluster_size" class="col-md-4 control-label" style="text-align: left;">MAX CLUSTER SIZE:</label>
+              <label for="max_cluster_size" class="col-md-4 control-label" style="text-align: left; width: 200px;">MAX CLUSTER SIZE:</label>
               <div class="col-md-4">
                 <input type="number" class="form-control" id="max_cluster_size" value="100" style="width: 100px;">
               </div>
@@ -107,7 +113,7 @@
     }
     
     $("#apply_button").click(function(){
-     if ( !$("#time").val() || !$("#url").val() ||
+     if ( !$("#time").val() || !$("#url").val() || !$("#domain").val() ||
           !$("#ord_weights_high").val() || !$("#ord_weights_low").val() ||
           !$("#prune_threshold").val() || !$("#max_cluster_size").val()){
             alert("Some of the parameter values are empty!");
@@ -117,7 +123,7 @@
                         "method": "analyze",
                         "params": [
                         "127.0.0.1",
-                        [$("#time").val(), $("#url").val()],
+                        [$("#time").val(), $("#url").val(), $("#domain").val()],
                         [$("#ord_weights_high").val(), $("#ord_weights_low").val()],
                         $("#prune_threshold").val(),
                         $("#max_cluster_size").val(),

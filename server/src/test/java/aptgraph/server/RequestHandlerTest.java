@@ -97,8 +97,8 @@ public class RequestHandlerTest extends TestCase {
         input.close();
 
         RequestHandler handler = new RequestHandler(user_graphs);
-        handler.analyze("127.0.0.1", new double[]{0.7, 0.3},
-                new double[]{0.8, 0.2}, 10.0, 10, true);
+        handler.analyze("127.0.0.1", new double[]{0.7, 0.1, 0.2},
+                new double[]{0.8, 0.2}, 10.0, 10);
     }
 
     /**
@@ -124,7 +124,7 @@ public class RequestHandlerTest extends TestCase {
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
 
         // Test
         boolean indicator = false;
@@ -166,7 +166,7 @@ public class RequestHandlerTest extends TestCase {
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         HashMap<String, Domain> domains =
                 handler.computeDomainGraph(merged_graph);
 
@@ -209,7 +209,7 @@ public class RequestHandlerTest extends TestCase {
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         HashMap<String, Domain> domains =
                 handler.computeDomainGraph(merged_graph);
         Graph<Domain> domain_graph =
@@ -253,7 +253,7 @@ public class RequestHandlerTest extends TestCase {
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         HashMap<String, Domain> domains =
                 handler.computeDomainGraph(merged_graph);
         Graph<Domain> domain_graph =
@@ -299,7 +299,7 @@ public class RequestHandlerTest extends TestCase {
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         HashMap<String, Domain> domains =
                 handler.computeDomainGraph(merged_graph);
         Graph<Domain> domain_graph =
