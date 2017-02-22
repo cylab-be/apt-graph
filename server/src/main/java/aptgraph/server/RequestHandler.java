@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -163,10 +164,10 @@ public class RequestHandler {
 
         // White listing
         // START PROBLEM
-        domain_graph.fastRemove(domain_graph.first());
+        remove(domain_graph, domain_graph.first());
         System.out.println("SUCCES");
         // STOP PROBLEM
-//        domain_graph = whiteListing(domain_graph);
+        // domain_graph = whiteListing(domain_graph);
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
@@ -518,5 +519,30 @@ public class RequestHandler {
             }
         }
         return domain_graph_new;
+    }
+
+    static <U> void remove(Graph<U> graph, U node) {
+        HashMap<U, NeighborList> map = graph.getHashMap();
+
+        // Supprime le node
+        map.remove(node);
+
+        // Maintenant il faut supprimer les edges invalides
+        // sinon on risque des erreurs "NullPointerException"
+        for (Map.Entry<U, NeighborList> entry : map.entrySet()) {
+            NeighborList neighborlist = entry.getValue();
+
+            // On parcourt la liste, et en même temps on supprime des
+            // éléments de la  liste => for() ne peut pas être utilisé!
+            // http://stackoverflow.com/questions/223918/
+            Iterator<Neighbor> iterator = neighborlist.iterator();
+            while (iterator.hasNext()) {
+                Neighbor<U> neighbor = iterator.next();
+                if (neighbor.node.equals(node)) {
+                    iterator.remove();
+                }
+            }
+        }
+
     }
 }
