@@ -45,6 +45,12 @@
                 <input type="number" step="0.1" class="form-control" id="domain" value="0.7" style="width: 100px;">
               </div>
             </div>
+            <div class="form-group">
+              <label for="children" class="col-md-2 control-label" style="text-align: left; width: 200px;">TEMPORAL CHILDREN:</label>
+              <div class="col-md-4">
+                <input type="checkbox" id="children" value="" checked>
+              </div>
+            </div>
           </div>
           <h4>ORDERED WEIGHTS</h4>
           <div class="form-group">
@@ -127,6 +133,7 @@
                         [$("#ord_weights_high").val(), $("#ord_weights_low").val()],
                         $("#prune_threshold").val(),
                         $("#max_cluster_size").val(),
+                        children.checked,
                         whitelist.checked],
                         "id": 123
                       };

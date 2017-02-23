@@ -111,6 +111,7 @@ public class RequestHandler {
             final double[] feature_ordered_weights,
             final double prune_threshold,
             final int max_cluster_size,
+            final boolean children_bool,
             final boolean whitelist_bool) {
 
         // START user selection
@@ -148,7 +149,9 @@ public class RequestHandler {
                         feature_ordered_weights, feature_weights);
 
         // Selection of the temporal children only
-        merged_graph = childrenSelection(merged_graph);
+        if (children_bool) {
+            merged_graph = childrenSelection(merged_graph);
+        }
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
