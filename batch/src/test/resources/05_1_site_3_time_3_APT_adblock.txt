@@ -38,7 +38,7 @@
 1487524873.907     24 127.0.0.1 TCP_MISS/200 1512 GET http://static.tijd.be/s2014/js/site/modules/realtime/homepage-heatmap.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524873.907     24 127.0.0.1 TCP_MISS/200 1540 GET http://static.tijd.be/s2014/js/site/modules/inlinevideo.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524873.908     25 127.0.0.1 TCP_MISS/200 981 GET http://static.tijd.be/s2014/js/site/modules/deficitCounter.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
-1487524874.026     17 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487524874.026     17 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487524874.028     16 127.0.0.1 TCP_MISS/200 2676 GET http://static.tijd.be/s2014/js/site/modules/main-nav-status.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524874.028     16 127.0.0.1 TCP_MISS/200 931 GET http://static.tijd.be/s2014/js/site/modules/event-tracker.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524874.028     17 127.0.0.1 TCP_MISS/200 1557 GET http://static.tijd.be/s2014/js/site/modules/MouseOverMenuController.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
@@ -119,7 +119,7 @@
 1487524912.479    436 127.0.0.1 TCP_TUNNEL/200 25297 CONNECT fonts.gstatic.com:443 - HIER_DIRECT/2a00:1450:4001:811::2003 -
 1487524912.588     16 127.0.0.1 TCP_MISS/304 331 GET http://static.tijd.be/connect/kbc/partner_content_logo.png - HIER_DIRECT/2a02:26f0:60:39d::2286 image/png
 1487524912.631     42 127.0.0.1 TCP_MISS/304 260 GET http://www.tijd.be/static/s2014/img/svg/main.svg - HIER_DIRECT/2a02:26f0:60:3a1::2286 -
-1487524912.655      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487524912.655      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487524912.682     18 127.0.0.1 TCP_MISS/304 340 GET http://static.tijd.be/s2014/js/site/modules/event-tracker.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524912.682     31 127.0.0.1 TCP_MISS/304 341 GET http://static.tijd.be/s2014/js/site/modules/mdffnp/dfp-requestor.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524912.712     16 127.0.0.1 TCP_MISS/304 340 GET http://static.tijd.be/s2014/js/site/modules/MouseOverMenuController.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
@@ -215,7 +215,7 @@
 1487524944.272     15 127.0.0.1 TCP_MISS/304 340 GET http://static.tijd.be/s2014/js/site/modules/util/object-validation.js? - HIER_DIRECT/2a02:26f0:60:38e::2286 text/javascript
 1487524944.273     16 127.0.0.1 TCP_MISS/304 339 GET http://static.tijd.be/s2014/js/site/modules/util/object-validation-rule.js? - HIER_DIRECT/2a02:26f0:60:38e::2286 text/javascript
 1487524944.274     18 127.0.0.1 TCP_MISS/304 339 GET http://static.tijd.be/s2014/js/site/modules/mdffnp/anim/slideUpPopUp.js? - HIER_DIRECT/2a02:26f0:60:38e::2286 text/javascript
-1487524944.298     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487524944.298     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487524944.872     15 127.0.0.1 TCP_MISS/304 342 GET http://static.tijd.be/s2014/js/site/hyphenator-4.2/patterns/nl.js? - HIER_DIRECT/2a02:26f0:60:38e::2286 text/javascript
 1487524946.527  60856 127.0.0.1 TCP_TUNNEL/200 4761 CONNECT self-repair.mozilla.org:443 - HIER_DIRECT/52.10.94.164 -
 1487524949.496  63030 127.0.0.1 TCP_TUNNEL/200 7146 CONNECT self-repair.mozilla.org:443 - HIER_DIRECT/52.10.94.164 -
