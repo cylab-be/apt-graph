@@ -522,7 +522,8 @@ public class RequestHandler {
             Iterator<Domain> iterator_2 = domain_graph.getNodes().iterator();
             while (iterator_2.hasNext()) {
                 Domain dom = iterator_2.next();
-                if (whitelist.contains(dom.toString())) {
+                if (whitelist.contains(dom.toString())
+                        && !whitelisted.contains(dom)) {
                     whitelisted.add(dom);
                 }
             }
