@@ -11,7 +11,7 @@
 1487525854.952     51 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
 1487525854.995     33 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
 1487525855.238     39 127.0.0.1 TCP_MISS/200 835 POST http://clients1.google.com/ocsp - HIER_DIRECT/2a00:1450:4001:81f::200e application/ocsp-response
-1487525855.368     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487525855.368     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487525855.536     50 127.0.0.1 TCP_MISS/200 835 POST http://clients1.google.com/ocsp - HIER_DIRECT/2a00:1450:4001:81f::200e application/ocsp-response
 1487525855.560    101 127.0.0.1 TCP_MISS/200 1242 GET http://ls.hit.gemius.pl/lscpy.html? - HIER_DIRECT/137.74.1.69 text/html
 1487525855.565     44 127.0.0.1 TCP_MISS/200 14749 GET http://www.tijd.be/ajax/blocks? - HIER_DIRECT/2a02:26f0:60:384::2286 application/json
@@ -175,7 +175,7 @@
 1487525890.331     16 127.0.0.1 TCP_MISS/304 209 GET http://ajax.googleapis.com/ajax/libs/dojo/1.10.3/dijit//_Contained.js? - HIER_DIRECT/2a00:1450:4001:81f::200a -
 1487525890.359     18 127.0.0.1 TCP_MISS/304 209 GET http://ajax.googleapis.com/ajax/libs/dojo/1.10.3/dojo/cldr/nls/nl/gregorian.js? - HIER_DIRECT/2a00:1450:4001:81f::200a -
 1487525890.381     22 127.0.0.1 TCP_MISS/200 967 GET http://gabe.hit.gemius.pl/_1487525890357/rexdot.js? - HIER_DIRECT/178.32.205.233 application/x-javascript
-1487525891.716      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487525891.716      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487525894.861     43 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
 1487525894.877     36 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
 1487525894.878     36 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
@@ -360,7 +360,7 @@
 1487525921.516     18 127.0.0.1 TCP_MISS/304 234 GET http://pagead2.googlesyndication.com/pagead/expansion_embed.js? - HIER_DIRECT/2a00:1450:4001:81d::2002 -
 1487525921.518     16 127.0.0.1 TCP_MISS/304 233 GET http://pagead2.googlesyndication.com/pagead/osd.js - HIER_DIRECT/2a00:1450:4001:81d::2002 -
 1487525922.298     97 127.0.0.1 TCP_MISS/200 315 GET http://ping.chartbeat.net/ping? - HIER_DIRECT/54.225.247.92 image/gif
-1487525922.672     14 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487525922.672     14 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487525923.086     30 127.0.0.1 TCP_MISS/200 583 GET http://pagead2.googlesyndication.com/activeview? - HIER_DIRECT/2a00:1450:4001:81d::2002 image/gif
 1487525931.516  61256 127.0.0.1 TCP_TUNNEL/200 4761 CONNECT self-repair.mozilla.org:443 - HIER_DIRECT/52.10.94.164 -
 1487525931.556  77130 127.0.0.1 TCP_TUNNEL/200 542977 CONNECT images.tijd.be:443 - HIER_DIRECT/2a02:26f0:60:39d::2286 -

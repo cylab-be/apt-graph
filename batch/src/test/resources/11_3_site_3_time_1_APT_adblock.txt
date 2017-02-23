@@ -41,7 +41,7 @@
 1487525071.556     16 127.0.0.1 TCP_MISS/304 263 GET http://ls.rosselcdn.net/sites/all/themes/custom_selv7/img/cim-metriweb.gif - HIER_DIRECT/2a02:26f0:60:298::27e image/gif
 1487525071.560     21 127.0.0.1 TCP_MISS/200 4905 GET http://ls.rosselcdn.net/sites/default/files/imagecache/188x125/Flows/flowmix_1338380986/20170219/c394702f8adf85e669d993469b9a00ed_17159.thumb232x154.jpg - HIER_DIRECT/2a02:26f0:60:298::27e image/jpeg
 1487525071.922     56 127.0.0.1 TCP_MISS/200 5928 GET http://www.lesoir.be/sport/cache/page/football_widget_livescore.php - HIER_DIRECT/2a02:26f0:60:3b6::1c8 text/html
-1487525072.770     16 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487525072.770     16 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487525073.044     24 127.0.0.1 TCP_MISS/304 264 GET http://ls.rosselcdn.net/sites/default/files/mediastore/1462545821_m036485_promo_systeme_solair.jpg - HIER_DIRECT/2a02:26f0:60:298::27e image/jpeg
 1487525073.111     16 127.0.0.1 TCP_MISS/304 263 GET http://ls.rosselcdn.net/sites/all/themes/custom_selv7/css/ui/site-logo-plus.png - HIER_DIRECT/2a02:26f0:60:298::27e image/png
 1487525073.112     17 127.0.0.1 TCP_MISS/304 263 GET http://ls.rosselcdn.net/sites/all/themes/custom_selv7/img/sprite-logo.png - HIER_DIRECT/2a02:26f0:60:298::27e image/png
