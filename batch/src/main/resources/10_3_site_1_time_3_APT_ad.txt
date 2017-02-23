@@ -28,7 +28,7 @@
 1487526089.632     25 127.0.0.1 TCP_MISS/200 583 GET http://pagead2.googlesyndication.com/activeview? - HIER_DIRECT/2a00:1450:4001:818::2002 image/gif
 1487526089.728     39 127.0.0.1 TCP_MISS/200 2030 POST http://ss.symcd.com/ - HIER_DIRECT/2a02:26f0:60:28b::201a application/ocsp-response
 1487526095.140     29 127.0.0.1 TCP_MISS/200 583 GET http://pagead2.googlesyndication.com/activeview? - HIER_DIRECT/2a00:1450:4001:818::2002 image/gif
-1487526099.328     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
+1487526099.328     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.be/ - HIER_NONE/- text/html
 1487526099.657  10273 127.0.0.1 TCP_TUNNEL/200 49239 CONNECT cdn.flashtalking.com:443 - HIER_DIRECT/209.197.3.19 -
 1487526099.657  10132 127.0.0.1 TCP_TUNNEL/200 5810 CONNECT cdn.flashtalking.com:443 - HIER_DIRECT/209.197.3.19 -
 1487526099.901  10294 127.0.0.1 TCP_TUNNEL/200 164073 CONNECT cdn.flashtalking.com:443 - HIER_DIRECT/209.197.3.19 -
@@ -239,7 +239,7 @@
 1487526120.266     12 127.0.0.1 TCP_MISS/302 745 GET http://ads.stickyadstv.com/user-registering? - HIER_DIRECT/46.105.104.54 -
 1487526120.285     15 127.0.0.1 TCP_MISS/302 745 GET http://ads.stickyadstv.com/user-registering? - HIER_DIRECT/46.105.104.54 -
 1487526120.342     93 127.0.0.1 TCP_TUNNEL/200 831 CONNECT adhese.standaard.be:443 - HIER_DIRECT/185.43.126.7 -
-1487526120.804      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
+1487526120.804      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.be/ - HIER_NONE/- text/html
 1487526124.643   6196 127.0.0.1 TCP_TUNNEL/200 6703 CONNECT coinurl.com:443 - HIER_DIRECT/94.23.50.33 -
 1487526130.133  11688 127.0.0.1 TCP_TUNNEL/200 5122 CONNECT static.criteo.net:443 - HIER_DIRECT/178.250.2.74 -
 1487526133.382  13847 127.0.0.1 TCP_MISS/200 64798 GET http://cdn.optimizely.com/js/2437990033.js - HIER_DIRECT/23.218.162.34 text/javascript
@@ -424,7 +424,7 @@
 1487526150.715     26 127.0.0.1 TCP_MISS/200 534 GET http://jadserve.postrelease.com/trk.gif? - HIER_DIRECT/46.51.199.110 image/gif
 1487526150.724     11 127.0.0.1 TCP_MISS/200 374 GET http://b.scorecardresearch.com/r? - HIER_DIRECT/62.4.254.174 image/gif
 1487526150.740    173 127.0.0.1 TCP_MISS/200 388 GET http://log.outbrain.com/loggerServices/widgetGlobalEvent? - HIER_DIRECT/64.202.112.8 application/json
-1487526150.771      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
+1487526150.771      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.be/ - HIER_NONE/- text/html
 1487526150.793     30 127.0.0.1 TCP_MISS/200 1840 POST http://gn.symcd.com/ - HIER_DIRECT/2a02:26f0:60:28b::201a application/ocsp-response
 1487526150.820     33 127.0.0.1 TCP_MISS/200 1840 POST http://gn.symcd.com/ - HIER_DIRECT/2a02:26f0:60:28b::201a application/ocsp-response
 1487526150.828     28 127.0.0.1 TCP_MISS/200 2336 POST http://ocsp.godaddy.com/ - HIER_DIRECT/188.121.36.239 application/ocsp-response

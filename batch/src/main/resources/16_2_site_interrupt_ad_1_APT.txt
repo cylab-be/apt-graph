@@ -33,7 +33,7 @@
 1487842932.541     84 127.0.0.1 TCP_MISS/200 1069 GET http://www.lesoir.be/toolbar/module/toasterJSON.php? - HIER_DIRECT/2a02:26f0:60:397::3c11 text/html
 1487842932.624    181 127.0.0.1 TCP_MISS/302 817 GET http://su.addthis.com/red/usync? - HIER_DIRECT/104.16.27.235 -
 1487842932.639    523 127.0.0.1 TCP_MISS/200 39243 GET http://www.dailymotion.com/widget/jukebox? - HIER_DIRECT/195.8.215.136 text/html
-1487842932.643     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
+1487842932.643     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.be/ - HIER_NONE/- text/html
 1487842932.657     36 127.0.0.1 TCP_MISS/200 13496 GET http://images.outbrain.com/Imaginarium/api/uuid/797b423ebadedc169228fe1cecff85cf8c4ea4924b3409179b176b8c4ff5b4cd/240/165/1.0 - HIER_DIRECT/23.218.162.110 image/jpeg
 1487842932.705     35 127.0.0.1 TCP_MISS/200 2029 POST http://ss.symcd.com/ - HIER_DIRECT/2a02:26f0:60:28b::201a application/ocsp-response
 1487842932.777    134 127.0.0.1 TCP_MISS/200 5110 GET http://odb.outbrain.com/utils/get? - HIER_DIRECT/151.101.36.68 text/x-json
