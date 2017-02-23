@@ -167,6 +167,9 @@ public class BatchProcessor {
         if (!url.startsWith("http://") && !url.startsWith("https://")
                 && url.endsWith(":443")) {
          url_temp = "https://" + url;
+        } else if (!url.startsWith("http://") && !url.startsWith("https://")
+                && url.endsWith(":80")) {
+         url_temp = "http://" + url;
         }
         URI uri = new URI(url_temp);
         String domain = uri.getHost();
