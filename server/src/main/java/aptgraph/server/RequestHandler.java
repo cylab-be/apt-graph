@@ -128,6 +128,7 @@ public class RequestHandler {
         String user = users.getFirst(); // a remplacer par user_temp
         // END user selection
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        System.out.println("k-NN Graph : k = " + graphs.getFirst().getK());
 
         // Verify the sum of the weights
         double sum_feature_weights = 0;
