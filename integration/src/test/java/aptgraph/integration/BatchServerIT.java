@@ -54,7 +54,6 @@ public class BatchServerIT extends TestCase {
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
                 new FileOutputStream(temp_file));
 
-
         final JsonRpcServer server = new JsonRpcServer(
                 new FileInputStream(temp_file));
 

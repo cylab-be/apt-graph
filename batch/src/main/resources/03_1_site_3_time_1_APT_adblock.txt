@@ -38,7 +38,7 @@
 1487524873.907     24 127.0.0.1 TCP_MISS/200 1512 GET http://static.tijd.be/s2014/js/site/modules/realtime/homepage-heatmap.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524873.907     24 127.0.0.1 TCP_MISS/200 1540 GET http://static.tijd.be/s2014/js/site/modules/inlinevideo.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524873.908     25 127.0.0.1 TCP_MISS/200 981 GET http://static.tijd.be/s2014/js/site/modules/deficitCounter.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
-1487524874.026     17 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487524874.026     17 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487524874.028     16 127.0.0.1 TCP_MISS/200 2676 GET http://static.tijd.be/s2014/js/site/modules/main-nav-status.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524874.028     16 127.0.0.1 TCP_MISS/200 931 GET http://static.tijd.be/s2014/js/site/modules/event-tracker.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript
 1487524874.028     17 127.0.0.1 TCP_MISS/200 1557 GET http://static.tijd.be/s2014/js/site/modules/MouseOverMenuController.js? - HIER_DIRECT/2a02:26f0:60:39d::2286 text/javascript

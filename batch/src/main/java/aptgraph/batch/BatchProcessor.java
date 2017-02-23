@@ -3,6 +3,7 @@ package aptgraph.batch;
 import aptgraph.core.Request;
 import aptgraph.core.TimeSimilarity;
 import aptgraph.core.URLSimilarity;
+import aptgraph.core.DomainSimilarity;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
 import java.io.BufferedOutputStream;
@@ -167,6 +168,9 @@ public class BatchProcessor {
         if (!url.startsWith("http://") && !url.startsWith("https://")
                 && url.endsWith(":443")) {
          url_temp = "https://" + url;
+        } else if (!url.startsWith("http://") && !url.startsWith("https://")
+                && url.endsWith(":80")) {
+         url_temp = "http://" + url;
         }
         URI uri = new URI(url_temp);
         String domain = uri.getHost();
@@ -212,11 +216,20 @@ public class BatchProcessor {
             nndes_url.setK(k);
             Graph<Request> url_graph = nndes_url.computeGraph(requests);
 
+            LOGGER.log(Level.INFO,
+                    "Build the Domain based graph for user {0} ...", user);
+            ThreadedNNDescent<Request> nndes_domain =
+                    new ThreadedNNDescent<Request>();
+            nndes_domain.setSimilarity(new DomainSimilarity());
+            nndes_domain.setK(k);
+            Graph<Request> domain_graph = nndes_domain.computeGraph(requests);
+
             // List of graphs
             LinkedList<Graph<Request>> graphs =
                     new LinkedList<Graph<Request>>();
             graphs.add(time_graph);
             graphs.add(url_graph);
+            graphs.add(domain_graph);
 
             // Store of the list of graphs for one user
             user_graphs.put(user, graphs);

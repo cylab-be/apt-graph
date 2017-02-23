@@ -41,7 +41,7 @@
 1487525071.556     16 127.0.0.1 TCP_MISS/304 263 GET http://ls.rosselcdn.net/sites/all/themes/custom_selv7/img/cim-metriweb.gif - HIER_DIRECT/2a02:26f0:60:298::27e image/gif
 1487525071.560     21 127.0.0.1 TCP_MISS/200 4905 GET http://ls.rosselcdn.net/sites/default/files/imagecache/188x125/Flows/flowmix_1338380986/20170219/c394702f8adf85e669d993469b9a00ed_17159.thumb232x154.jpg - HIER_DIRECT/2a02:26f0:60:298::27e image/jpeg
 1487525071.922     56 127.0.0.1 TCP_MISS/200 5928 GET http://www.lesoir.be/sport/cache/page/football_widget_livescore.php - HIER_DIRECT/2a02:26f0:60:3b6::1c8 text/html
-1487525072.770     16 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487525072.770     16 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487525073.044     24 127.0.0.1 TCP_MISS/304 264 GET http://ls.rosselcdn.net/sites/default/files/mediastore/1462545821_m036485_promo_systeme_solair.jpg - HIER_DIRECT/2a02:26f0:60:298::27e image/jpeg
 1487525073.111     16 127.0.0.1 TCP_MISS/304 263 GET http://ls.rosselcdn.net/sites/all/themes/custom_selv7/css/ui/site-logo-plus.png - HIER_DIRECT/2a02:26f0:60:298::27e image/png
 1487525073.112     17 127.0.0.1 TCP_MISS/304 263 GET http://ls.rosselcdn.net/sites/all/themes/custom_selv7/img/sprite-logo.png - HIER_DIRECT/2a02:26f0:60:298::27e image/png
@@ -81,7 +81,6 @@
 1487525101.222     72 127.0.0.1 TCP_TUNNEL/200 6589 CONNECT nbosport.akamaized.net:443 - HIER_DIRECT/62.4.254.88 -
 1487525101.990    134 127.0.0.1 TCP_MISS/200 3246 GET http://www.vroom.be/nl/latest-ads-specified-widget? - HIER_DIRECT/185.43.124.160 text/html
 1487525101.996     39 127.0.0.1 TCP_MISS/200 5286 GET http://www.tickers.zimmo.be/standaard/ - HIER_DIRECT/93.94.111.216 text/html
-1487525102.392      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1487525102.619     46 127.0.0.1 TCP_MISS/200 12821 GET http://files.vroom.be/pictures/secondhand/peugeot/308-sw/mdx-t4bprzez/peugeot-308-sw-diesel-0.jpg? - HIER_DIRECT/185.43.124.160 image/jpg
 1487525102.626     64 127.0.0.1 TCP_MISS/200 17383 GET http://files.vroom.be/pictures/secondhand/opel/astra/wildstream-476-136340/opel-astra-diesel-zwart-0.jpg? - HIER_DIRECT/185.43.124.160 image/jpg
 1487525102.633     75 127.0.0.1 TCP_MISS/200 13018 GET http://files.vroom.be/pictures/secondhand/opel/corsa/wildstream-496-144067/opel-corsa-benzine-zwart-0.jpg? - HIER_DIRECT/185.43.124.160 image/jpg
@@ -127,7 +126,6 @@
 1487525132.007    100 127.0.0.1 TCP_MISS/200 129102 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/161219184839-john-kasich-super-tease.jpg - HIER_DIRECT/2a02:26f0:5d:28b::9a2 image/jpeg
 1487525132.015     90 127.0.0.1 TCP_MISS/200 130803 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/170218190736-gene-huber-trump-supporter-super-tease.jpg - HIER_DIRECT/2a02:26f0:5d:28b::9a2 image/jpeg
 1487525132.015    102 127.0.0.1 TCP_MISS/200 69183 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/170210162720-ice-agent-super-tease.jpg - HIER_DIRECT/2a02:26f0:5d:28b::9a2 image/jpeg
-1487525132.452     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1487525132.568     14 127.0.0.1 TCP_MISS/200 3902 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/170127153154-cobalt-mining-small-11.jpg - HIER_DIRECT/2a02:26f0:5d:28b::9a2 image/jpeg
 1487525132.569     16 127.0.0.1 TCP_MISS/200 3279 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/170203105725-cotton-child-labour-my-freedom-day-00002627-small-11.jpg - HIER_DIRECT/2a02:26f0:5d:28b::9a2 image/jpeg
 1487525132.571     17 127.0.0.1 TCP_MISS/200 8440 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/170215131534-autism-brain-changes-mri-early-diagnosis-study-small-11.jpg - HIER_DIRECT/2a02:26f0:5d:28b::9a2 image/jpeg
@@ -253,7 +251,6 @@
 1487525162.478     94 127.0.0.1 TCP_MISS/200 1090 GET http://www.lesoir.be/profiles/wally/modules/custom/wally/wallystat/updater.php? - HIER_DIRECT/2a02:26f0:60:3bd::1c8 text/html
 1487525162.591    802 127.0.0.1 TCP_MISS/200 39178 GET http://www.dailymotion.com/widget/jukebox? - HIER_DIRECT/195.8.215.136 text/html
 1487525162.594     81 127.0.0.1 TCP_MISS/200 1066 GET http://www.lesoir.be/toolbar/module/toasterJSON.php? - HIER_DIRECT/2a02:26f0:60:3bd::1c8 text/html
-1487525163.215      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1487525164.029    109 127.0.0.1 TCP_MISS/200 28732 GET http://www.dailymotion.com/embed? - HIER_DIRECT/195.8.215.136 text/html
 1487525164.221     20 127.0.0.1 TCP_MISS/200 31900 GET http://liveapi.sportwereld.be/livesports/jsonlivematches? - HIER_DIRECT/185.43.126.20 application/json
 1487525166.035   1788 127.0.0.1 TCP_MISS/200 1997 GET http://www.lesoir.be/sport/cache/page/loadmodule.php? - HIER_DIRECT/2a02:26f0:60:3bd::1c8 text/xml
@@ -275,7 +272,6 @@
 1487525192.476     35 127.0.0.1 TCP_MISS/304 284 GET http://1.standaardcdn.be/Assets/Images_Upload/2014/10/29/hebbes.jpg - HIER_DIRECT/62.4.254.142 image/jpeg
 1487525192.492     34 127.0.0.1 TCP_MISS/304 253 GET http://2.standaardcdn.be/extra/snippets/icon_live.png - HIER_DIRECT/62.4.254.143 image/png
 1487525192.886     27 127.0.0.1 TCP_MISS/200 969 POST http://www.standaard.be/account/getidentity? - HIER_DIRECT/185.43.124.6 application/json
-1487525192.900     14 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1487525193.196     50 127.0.0.1 TCP_MISS/200 835 POST http://clients1.google.com/ocsp - HIER_DIRECT/2a00:1450:4001:816::200e application/ocsp-response
 1487525193.593     19 127.0.0.1 TCP_MISS/200 319 GET http://www.standaard.be/biz/beleggen/beursservice/index/bel20? - HIER_DIRECT/185.43.124.6 application/json
 1487525193.600     26 127.0.0.1 TCP_MISS/200 659 GET http://www.standaard.be/api/weather/forecast? - HIER_DIRECT/185.43.124.6 application/json
@@ -350,7 +346,6 @@
 1487525222.476     40 127.0.0.1 TCP_MISS/200 40113 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/161223085634-formula-e-di-grassi-hong-kong-large-tease.jpg - HIER_DIRECT/2a02:26f0:5d:292::9a2 image/jpeg
 1487525222.580     62 127.0.0.1 TCP_MISS/200 856 GET http://weather.api.cnn.io/graphql? - HIER_DIRECT/2a04:4e42:9::323 application/json
 1487525222.699     14 127.0.0.1 TCP_MISS/304 367 GET http://i.cdn.turner.com/cnn/.e/img/3.0/weather/weatherIcon_07.png - HIER_DIRECT/2a02:26f0:60:196::9f2 image/png
-1487525222.735      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1487525222.801     54 127.0.0.1 TCP_MISS/304 566 GET http://zor.fyre.co/wjs/v3.0.1486682540/javascripts/livefyre_base.js - HIER_DIRECT/52.85.63.192 -
 1487525223.758     30 127.0.0.1 TCP_MISS/200 31902 GET http://liveapi.sportwereld.be/livesports/jsonlivematches? - HIER_DIRECT/185.43.126.20 application/json
 1487525226.473    295 127.0.0.1 TCP_MISS/200 1995 GET http://www.lesoir.be/sport/cache/page/loadmodule.php? - HIER_DIRECT/2a02:26f0:60:3b6::1c8 text/xml
@@ -449,7 +444,6 @@
 1487525252.313    587 127.0.0.1 TCP_MISS/200 39178 GET http://www.dailymotion.com/widget/jukebox? - HIER_DIRECT/195.8.215.136 text/html
 1487525252.356    134 127.0.0.1 TCP_MISS/200 1090 GET http://www.lesoir.be/profiles/wally/modules/custom/wally/wallystat/updater.php? - HIER_DIRECT/2a02:26f0:60:3b6::1c8 text/html
 1487525252.556     68 127.0.0.1 TCP_MISS/200 1067 GET http://www.lesoir.be/toolbar/module/toasterJSON.php? - HIER_DIRECT/2a02:26f0:60:3b6::1c8 text/html
-1487525253.046     17 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1487525255.318     22 127.0.0.1 TCP_MISS/200 31903 GET http://liveapi.sportwereld.be/livesports/jsonlivematches? - HIER_DIRECT/185.43.126.20 application/json
 1487525255.598    102 127.0.0.1 TCP_MISS/200 28415 GET http://www.dailymotion.com/embed? - HIER_DIRECT/195.8.215.136 text/html
 1487525255.792     52 127.0.0.1 TCP_MISS/200 1997 GET http://www.lesoir.be/sport/cache/page/loadmodule.php? - HIER_DIRECT/2a02:26f0:60:3b6::1c8 text/xml
@@ -475,7 +469,6 @@
 1487525283.095     24 127.0.0.1 TCP_MISS/200 31692 GET http://liveapi.sportwereld.be/livesports/jsonlivematches? - HIER_DIRECT/185.43.126.20 application/json
 1487525283.236     31 127.0.0.1 TCP_MISS/304 256 GET http://2.nieuwsbladcdn.be/extra/static/img/sw/loading-ring.svg - HIER_DIRECT/62.4.254.135 image/svg+xml
 1487525283.422     41 127.0.0.1 TCP_MISS/200 964 GET http://api.hebbes.be/widgets/carousel/5? - HIER_DIRECT/185.43.124.165 text/javascript
-1487525284.125      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1487525284.344     69 127.0.0.1 TCP_MISS/200 1065 GET http://sp-mms.standaard.be/mms/get_site_js? - HIER_DIRECT/52.59.88.2 application/javascript
 1487525309.920     54 127.0.0.1 TCP_MISS/200 32250 GET http://edition.cnn.com/ - HIER_DIRECT/151.101.36.73 text/html
 1487525310.059     34 127.0.0.1 TCP_MISS/200 22169 GET http://edition.cnn.com/css/2.3.2/global.css - HIER_DIRECT/151.101.36.73 text/css
@@ -503,7 +496,6 @@
 1487525311.104     87 127.0.0.1 TCP_MISS/200 112826 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/170218150042-24-week-in-politics-0219-super-tease.jpg - HIER_DIRECT/2a02:26f0:5d:292::9a2 image/jpeg
 1487525311.111    106 127.0.0.1 TCP_MISS/200 129102 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/161219184839-john-kasich-super-tease.jpg - HIER_DIRECT/2a02:26f0:5d:292::9a2 image/jpeg
 1487525311.121     99 127.0.0.1 TCP_MISS/200 130803 GET http://i2.cdn.cnn.com/cnnnext/dam/assets/170218190736-gene-huber-trump-supporter-super-tease.jpg - HIER_DIRECT/2a02:26f0:5d:292::9a2 image/jpeg
-1487525311.715      0 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
 1487525311.772     14 127.0.0.1 TCP_MISS/304 365 GET http://i.cdn.turner.com/cnn/.e1mo/img/4.0/logos/logo_cnn_badge_2up.png - HIER_DIRECT/2a02:26f0:60:193::9f2 image/png
 1487525311.773     15 127.0.0.1 TCP_MISS/200 4924 GET http://edition.cnn.com/.a/2.3.2/assets/sprite-chrome.png - HIER_DIRECT/151.101.36.73 image/png
 1487525311.774     17 127.0.0.1 TCP_MISS/200 4011 GET http://edition.i.cdn.cnn.com/.a/bundles/mobile_one_tap.e50fb40b40f1249084f9.bundle.js - HIER_DIRECT/2a04:4e42:9::323 application/javascript

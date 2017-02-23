@@ -28,15 +28,23 @@ import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -50,6 +58,8 @@ public class RequestHandler {
             LinkedList<Graph<Request>>> user_graphs) {
         this.user_graphs = user_graphs;
     }
+
+    private static final Path PATH = Paths.get("./src/main/resources/hosts");
 
     /**
      * A test json-rpc call, with no argument, that should return "hello".
@@ -92,6 +102,7 @@ public class RequestHandler {
      * @param prune_threshold
      * @param feature_weights
      * @param max_cluster_size
+     * @param whitelist_value
      * @return
      */
     public final List<Graph<Domain>> analyze(
@@ -99,7 +110,8 @@ public class RequestHandler {
             final double[] feature_weights,
             final double[] feature_ordered_weights,
             final double prune_threshold,
-            final int max_cluster_size) {
+            final int max_cluster_size,
+            final boolean whitelist_bool) {
 
         // START user selection
         // List of the user
@@ -181,6 +193,11 @@ public class RequestHandler {
             if (subgraph.size() < max_cluster_size) {
                 filtered.add(subgraph);
             }
+        }
+
+        // White listing
+        if (whitelist_bool) {
+            filtered = whiteListing(filtered);
         }
 
         showRankingList(filtered);
@@ -475,5 +492,76 @@ public class RequestHandler {
         double mean = getMean(list);
         double variance = getVariance(list);
         return (value - mean) / Math.sqrt(variance);
+    }
+
+    /**
+     * White List unwanted domains.
+     * @param domain_graph
+     * @return domain_graph
+     */
+    final LinkedList<Graph<Domain>>
+         whiteListing(final LinkedList<Graph<Domain>> filtered) {
+        LinkedList<Graph<Domain>> filtered_new = filtered;
+
+        List<String> whitelist = new ArrayList<String>();
+        LinkedList<Domain> whitelisted = new LinkedList<Domain>();
+        try {
+            whitelist =
+                    Files.readAllLines(PATH, StandardCharsets.UTF_8);
+        } catch (IOException ex) {
+            Logger.getLogger(RequestHandler.class.getName())
+                    .log(Level.SEVERE, null, ex);
+        }
+
+        Iterator<Graph<Domain>> iterator_1 = filtered_new.iterator();
+        while (iterator_1.hasNext()) {
+            Graph<Domain> domain_graph = iterator_1.next();
+            Iterator<Domain> iterator_2 = domain_graph.getNodes().iterator();
+            while (iterator_2.hasNext()) {
+                Domain dom = iterator_2.next();
+                if (whitelist.contains(dom.toString())) {
+                    whitelisted.add(dom);
+                }
+            }
+            for (Domain dom : whitelisted) {
+                remove(domain_graph, dom);
+            }
+        }
+
+        System.out.println("Number of white listed domains = "
+                + whitelisted.size());
+        return filtered_new;
+    }
+
+    /**
+     * Remove a node from a given graph (and update graph).
+     * @param <U>
+     * @param graph
+     * @param node
+     */
+    static <U> void remove(final Graph<U> graph, final U node) {
+        HashMap<U, NeighborList> map = graph.getHashMap();
+
+        // Delete the node
+        map.remove(node);
+
+        // Delete the invalid edges to avoid "NullPointerException"
+        Iterator<Map.Entry<U, NeighborList>> iterator_1 =
+                map.entrySet().iterator();
+        while (iterator_1.hasNext()) {
+            Map.Entry<U, NeighborList> entry = iterator_1.next();
+            NeighborList neighborlist = entry.getValue();
+
+            // Delete reference to deleted node
+            // => for() can't be used
+            // (see http://stackoverflow.com/questions/223918/)
+            Iterator<Neighbor> iterator_2 = neighborlist.iterator();
+            while (iterator_2.hasNext()) {
+                Neighbor<U> neighbor = iterator_2.next();
+                if (neighbor.node.equals(node)) {
+                    iterator_2.remove();
+                }
+            }
+        }
     }
 }

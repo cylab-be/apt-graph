@@ -11,7 +11,7 @@
 1487525854.952     51 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
 1487525854.995     33 127.0.0.1 TCP_MISS/200 885 POST http://ocsp.digicert.com/ - HIER_DIRECT/93.184.220.29 application/ocsp-response
 1487525855.238     39 127.0.0.1 TCP_MISS/200 835 POST http://clients1.google.com/ocsp - HIER_DIRECT/2a00:1450:4001:81f::200e application/ocsp-response
-1487525855.368     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME/ - HIER_NONE/- text/html
+1487525855.368     12 127.0.0.1 TCP_MISS/503 4142 GET http://APT.FINDME.BE/ - HIER_NONE/- text/html
 1487525855.536     50 127.0.0.1 TCP_MISS/200 835 POST http://clients1.google.com/ocsp - HIER_DIRECT/2a00:1450:4001:81f::200e application/ocsp-response
 1487525855.560    101 127.0.0.1 TCP_MISS/200 1242 GET http://ls.hit.gemius.pl/lscpy.html? - HIER_DIRECT/137.74.1.69 text/html
 1487525855.565     44 127.0.0.1 TCP_MISS/200 14749 GET http://www.tijd.be/ajax/blocks? - HIER_DIRECT/2a02:26f0:60:384::2286 application/json
