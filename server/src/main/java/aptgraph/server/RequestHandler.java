@@ -102,7 +102,8 @@ public class RequestHandler {
      * @param prune_threshold
      * @param feature_weights
      * @param max_cluster_size
-     * @param whitelist_value
+     * @param children_bool
+     * @param whitelist_bool
      * @return
      */
     public final List<Graph<Domain>> analyze(
