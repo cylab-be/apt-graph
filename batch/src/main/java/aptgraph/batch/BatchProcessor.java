@@ -18,8 +18,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -105,8 +105,7 @@ public class BatchProcessor {
 
         try {
             thisdomain = computeDomain(match.group(8));
-
-        } catch (URISyntaxException ex) {
+        } catch (MalformedURLException ex) {
             Logger.getLogger(BatchProcessor.class.getName())
                     .log(Level.SEVERE, null, ex);
         }
@@ -160,24 +159,30 @@ public class BatchProcessor {
      * Return the domain name from URL (without wwww.).
      * @param url
      * @return
-     * @throws URISyntaxException if url is not correctly formed
+     * @throws MalformedURLException if url is not correctly formed
      */
     private static String computeDomain(final String url)
-            throws URISyntaxException {
+            throws MalformedURLException {
         String url_temp = url;
-        if (!url.startsWith("http://") && !url.startsWith("https://")
-                && url.endsWith(":443")) {
-         url_temp = "https://" + url;
-        } else if (!url.startsWith("http://") && !url.startsWith("https://")
-                && url.endsWith(":80")) {
-         url_temp = "http://" + url;
+        if (!url_temp.startsWith("http://")
+                && !url_temp.startsWith("https://")) {
+         url_temp = "http://" + url_temp;
         }
-        URI uri = new URI(url_temp);
-        String domain = uri.getHost();
+        if (url_temp.contains(":")) {
+            String[] url_split = url_temp.split("[:]");
+            url_temp = url_split[0] + ":" + url_split[1];
+        }
+        String domain = "";
+        try {
+            URL myurl = new URL(url_temp);
+            domain = myurl.getHost();
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(BatchProcessor.class.getName())
+                  .log(Level.SEVERE, "URL " + url + " is a malformed URL", ex);
+        }
         if (domain.startsWith("www.")) {
             return domain.substring(4);
         }
-
         return domain;
     }
 
