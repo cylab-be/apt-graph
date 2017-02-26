@@ -30,11 +30,8 @@ import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -99,9 +96,9 @@ public class RequestHandler {
      *
      * @param user_temp
      * @param feature_ordered_weights
-     * @param prune_threshold
+     * @param z_prune_threshold
      * @param feature_weights
-     * @param max_cluster_size
+     * @param z_max_cluster_size
      * @param children_bool
      * @param whitelist_bool
      * @return
@@ -110,8 +107,8 @@ public class RequestHandler {
             final String user_temp,
             final double[] feature_weights,
             final double[] feature_ordered_weights,
-            final double prune_threshold,
-            final int max_cluster_size,
+            final double z_prune_threshold,
+            final double z_max_cluster_size,
             final boolean children_bool,
             final boolean whitelist_bool) {
 
@@ -175,7 +172,8 @@ public class RequestHandler {
         }
 
         // Prune
-        showSimilaritiesInfo(domain_graph, prune_threshold);
+        double prune_threshold
+                = computePruneThreshold(domain_graph, z_prune_threshold);
         domain_graph.prune(prune_threshold);
 
         // The json-rpc request was probably canceled by the user
@@ -192,7 +190,8 @@ public class RequestHandler {
         }
 
         // Filtering
-        showClusterSizeInfo(clusters, max_cluster_size);
+        double max_cluster_size
+                = computeClusterSize(clusters, z_max_cluster_size);
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
         for (Graph<Domain> subgraph : clusters) {
             if (subgraph.size() < max_cluster_size) {
@@ -205,7 +204,9 @@ public class RequestHandler {
             filtered = whiteListing(filtered);
         }
 
-        showRankingList(filtered);
+        if (!filtered.isEmpty()) {
+            showRankingList(filtered);
+        }
         System.out.println("Found " + filtered.size() + " clusters");
         return filtered;
     }
@@ -373,57 +374,100 @@ public class RequestHandler {
      * @param filtered
      */
     private void showRankingList(final LinkedList<Graph<Domain>> filtered) {
-        HashMap<Domain, Integer> index = new HashMap<Domain, Integer>();
-
+        Graph<Domain> graph_all = new Graph<Domain>();
         for (Graph<Domain> graph : filtered) {
             for (Domain dom : graph.getNodes()) {
-                if (!index.containsKey(dom)) {
-                    index.put(dom, graph.getNeighbors(dom).size());
+                graph_all.put(dom, graph.getNeighbors(dom));
+            }
+        }
+        List<Domain> list_domain = new LinkedList<Domain>();
+        for (Domain dom : graph_all.getNodes()) {
+            list_domain.add(dom);
+        }
+
+        // Number of children & parents index
+        HashMap<Domain, Integer> index_1 = new HashMap<Domain, Integer>();
+        // Number of requests index
+        HashMap<Domain, Integer> index_2 = new HashMap<Domain, Integer>();
+
+        // Number of children & Number of requests
+        for (Domain dom : graph_all.getNodes()) {
+            index_1.put(dom, graph_all.getNeighbors(dom).size());
+            index_2.put(dom, dom.size());
+        }
+
+        // Number of parents
+        for (Domain parent : graph_all.getNodes()) {
+            for (Neighbor<Domain> child : graph_all.getNeighbors(parent)) {
+                index_1.put(child.node, index_1.get(child.node) + 1);
+            }
+        }
+
+        //Sort
+        ArrayList<Domain> sorted = sortByIndex(list_domain,
+                index_1, index_2);
+
+        // Print out
+        System.out.println("Ranking List :");
+        System.out.println("(#Children + #Parents / #Resquests)");
+        for (Domain dom : sorted) {
+            System.out.println("    (" + index_1.get(dom)
+                + "/" + index_2.get(dom)
+                + ") : " + dom);
+        }
+    }
+
+    /**
+     * Sorting function, based on the given index.
+     * @param list_domain
+     * @param index_1 Number of children
+     * @param index_2 Number of parents
+     * @param index_3 Number of requests
+     * @return ArrayList<Domain> sorted list
+     */
+    private ArrayList<Domain> sortByIndex(final List<Domain> list_domain,
+            final HashMap<Domain, Integer> index_1,
+            final HashMap<Domain, Integer> index_2) {
+        Domain selected;
+        ArrayList<Domain> sorted_temp = new ArrayList<Domain>();
+        while (!list_domain.isEmpty()) {
+            selected = list_domain.get(0);
+            for (Domain dom : list_domain) {
+                if (index_1.get(dom) < index_1.get(selected)) {
+                    selected = dom;
                 }
             }
+            sorted_temp.add(selected);
+            list_domain.remove(selected);
         }
-        Map<Domain, Integer> ranking = sortByValue(index);
-        System.out.println("Ranking List #Children(#Requests) =");
-        for (Map.Entry<Domain, Integer> entry : ranking.entrySet()) {
-            System.out.println("    " + entry.getValue()
-                    + "(" + entry.getKey().size()
-                    + ") : " + entry.getKey());
-        }
-    }
-
-    /**
-     * Sorting function (source : https://stackoverflow.com/questions/109383/
-     * sort-a-mapkey-value-by-values-java).
-     * @param <K>
-     * @param <V>
-     * @param map
-     * @return
-     */
-    public static <K, V extends Comparable<? super V>> Map<K, V>
-        sortByValue(final Map<K, V> map) {
-        List<Map.Entry<K, V>> list =
-            new LinkedList<Map.Entry<K, V>>(map.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            public int compare(final Map.Entry<K, V> o1,
-                    final Map.Entry<K, V> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
+        ArrayList<Domain> sorted = new ArrayList<Domain>();
+        int index_iterator1 = index_1.get(sorted_temp.get(0));
+        while (!sorted_temp.isEmpty()) {
+            selected = sorted_temp.get(0);
+            for (Domain dom : sorted_temp) {
+                if (index_1.get(dom) == index_iterator1
+                        && index_2.get(dom) < index_2.get(selected)) {
+                    selected = dom;
+                }
             }
-        });
-
-        Map<K, V> result = new LinkedHashMap<K, V>();
-        for (Map.Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
+            sorted.add(selected);
+            sorted_temp.remove(selected);
+            if (!sorted_temp.isEmpty()) {
+                index_iterator1 = index_1.get(sorted_temp.get(0));
+            }
         }
-        return result;
+
+        return sorted;
     }
 
     /**
-     * Show statistical information of Similarities.
+     * Compute the absolute prune threshold based on z score.
      * @param domain_graph
-     * @param prune_threshold
+     * @param z_prune_threshold
+     * @return prune_threshold
      */
-    private void showSimilaritiesInfo(final Graph<Domain> domain_graph,
-            final Double prune_threshold) {
+    private double computePruneThreshold(final Graph<Domain> domain_graph,
+            final Double z_prune_threshold) {
         ArrayList<Double> similarities = new ArrayList<Double>();
         for (Domain dom : domain_graph.getNodes()) {
             NeighborList neighbors = domain_graph.getNeighbors(dom);
@@ -433,31 +477,43 @@ public class RequestHandler {
         }
         double mean = getMean(similarities);
         double variance = getVariance(similarities);
-        double z = getZ(similarities, prune_threshold);
-        System.out.println("Similarities : ");
+        double prune_threshold = fromZ(similarities, z_prune_threshold);
+        if (prune_threshold < 0) {
+            prune_threshold = 0;
+        }
+        System.out.println("Prune Threshold : ");
         System.out.println("    Mean = " + mean);
         System.out.println("    Variance = " + variance);
-        System.out.println("    z = " + z);
+        System.out.println("    Prune Threshold = " + prune_threshold);
+
+        return prune_threshold;
     }
 
     /**
-     * Show statistical information of Cluster Sizes.
+     * Compute the absolute maximum cluster size based on z score.
      * @param clusters
-     * @param max_cluster_size
+     * @param z_max_cluster_size
+     * @return max_cluster_size
      */
-    private void showClusterSizeInfo(final ArrayList<Graph<Domain>> clusters,
-            final int max_cluster_size) {
+    private double computeClusterSize(final ArrayList<Graph<Domain>> clusters,
+            final Double z_max_cluster_size) {
         ArrayList<Double> cluster_sizes = new ArrayList<Double>();
         for (Graph<Domain> subgraph : clusters) {
             cluster_sizes.add((double) subgraph.size());
         }
         double mean = getMean(cluster_sizes);
         double variance = getVariance(cluster_sizes);
-        double z = getZ(cluster_sizes, (double) max_cluster_size);
+        double max_cluster_size_temp = fromZ(cluster_sizes, z_max_cluster_size);
+        int max_cluster_size = (int) Math.round(max_cluster_size_temp);
+        if (max_cluster_size < 0) {
+            max_cluster_size = 0;
+        }
         System.out.println("Cluster Size : ");
         System.out.println("    Mean = " + mean);
         System.out.println("    Variance = " + variance);
-        System.out.println("    z = " + z);
+        System.out.println("    Max Cluster Size = " + max_cluster_size);
+
+        return max_cluster_size;
     }
 
     /**
@@ -487,16 +543,28 @@ public class RequestHandler {
         return sum / list.size();
     }
 
+//    /**
+//     * Compute the z score of a value.
+//     * @param list
+//     * @param value
+//     * @return z
+//     */
+//    private double getZ(final ArrayList<Double> list, final Double value) {
+//        double mean = getMean(list);
+//        double variance = getVariance(list);
+//        return (value - mean) / Math.sqrt(variance);
+//    }
+
     /**
-     * Compute the z score of a value.
+     * Compute the absolute value from the z score.
      * @param list
-     * @param value
-     * @return z
+     * @param z
+     * @return absolute value
      */
-    private double getZ(final ArrayList<Double> list, final Double value) {
+    private double fromZ(final ArrayList<Double> list, final Double z) {
         double mean = getMean(list);
         double variance = getVariance(list);
-        return (value - mean) / Math.sqrt(variance);
+        return mean + z * Math.sqrt(variance);
     }
 
     /**

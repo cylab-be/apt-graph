@@ -1,0 +1,28 @@
+Parameters :
+
+- k = 20
+- File : all files without ad blocker
+
+NB : TOP = Number of domain alone (top of ranking list)
+	 APT = Is the APT in the top domains ?
+	 MAX CLUSTER = / because all clusters are keeped
+	 APT.README.BE != APT.README.be : DomainSimilarity makes APT alone
+
+Observations
+------------
+
+
+	TIME 	DOMAIN 	PRUNING 	MAX CLUSTER 	WHITE LISTING 	TOP	 APT
+					(z score)	(z score)							
+	--------------------------------------------------------------------
+2.	0.4		0.6		-0.24		/				YES				3	/
+4.	0.4		0.6		-0.26		/				YES				3	YES
+6.	0.4		0.6		-0.26		/				YES				3	YES
+8.	0.4		0.6		-0.25		/				YES				34	YES
+10.	0.4		0.6		-0.25		/				YES				38	YES
+12.	0.4		0.6		-0.26		/				YES				40	YES
+14.	0.4		0.6		-0.26		/				YES				33	YES
+15.	0.4		0.6		-0.23		/				YES				8	NO
+15.	0.2		0.8		-0.26		/				YES				11	YES
+15.	0.4		0.6		-0.26		/				YES				2	NO (k = 100)
+16.	0.4		0.6		-0.25		/				YES				12	YES
