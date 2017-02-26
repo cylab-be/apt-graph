@@ -30,11 +30,8 @@ import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -373,48 +370,114 @@ public class RequestHandler {
      * @param filtered
      */
     private void showRankingList(final LinkedList<Graph<Domain>> filtered) {
-        HashMap<Domain, Integer> index = new HashMap<Domain, Integer>();
-
+        Graph<Domain> graph_all = new Graph<Domain>();
         for (Graph<Domain> graph : filtered) {
             for (Domain dom : graph.getNodes()) {
-                if (!index.containsKey(dom)) {
-                    index.put(dom, graph.getNeighbors(dom).size());
-                }
+                graph_all.put(dom, graph.getNeighbors(dom));
             }
         }
-        Map<Domain, Integer> ranking = sortByValue(index);
-        System.out.println("Ranking List #Children(#Requests) =");
-        for (Map.Entry<Domain, Integer> entry : ranking.entrySet()) {
-            System.out.println("    " + entry.getValue()
-                    + "(" + entry.getKey().size()
-                    + ") : " + entry.getKey());
+        List<Domain> list_domain = new LinkedList<Domain>();
+        for (Domain dom : graph_all.getNodes()) {
+            list_domain.add(dom);
+        }
+
+        // Number of children index
+        HashMap<Domain, Integer> index_1 = new HashMap<Domain, Integer>();
+        // Number of parents index
+        HashMap<Domain, Integer> index_2 = new HashMap<Domain, Integer>();
+        // Number of requests index
+        HashMap<Domain, Integer> index_3 = new HashMap<Domain, Integer>();
+
+        // Number of children & Number of requests
+        for (Domain dom : graph_all.getNodes()) {
+            index_1.put(dom, graph_all.getNeighbors(dom).size());
+            index_2.put(dom, 0);
+            index_3.put(dom, dom.size());
+        }
+
+        // Number of parents
+        for (Domain parent : graph_all.getNodes()) {
+            for (Neighbor<Domain> child : graph_all.getNeighbors(parent)) {
+                index_2.put(child.node, index_2.get(child.node) + 1);
+            }
+        }
+
+        //Sort
+        ArrayList<Domain> sorted = sortByIndex(list_domain,
+                index_1, index_2, index_3);
+
+        // Print out
+        System.out.println("Ranking List :");
+        System.out.println("(#Children/#Parents/#Resquests)");
+        for (Domain dom : sorted) {
+            System.out.println("    (" + index_1.get(dom)
+                + "/" + index_2.get(dom)
+                + "/" + index_3.get(dom)
+                + ") : " + dom);
         }
     }
 
     /**
-     * Sorting function (source : https://stackoverflow.com/questions/109383/
-     * sort-a-mapkey-value-by-values-java).
-     * @param <K>
-     * @param <V>
-     * @param map
-     * @return
+     * Sorting function, based on the given index.
+     * @param list_domain
+     * @param index_1 Number of children
+     * @param index_2 Number of parents
+     * @param index_3 Number of requests
+     * @return ArrayList<Domain> sorted list
      */
-    public static <K, V extends Comparable<? super V>> Map<K, V>
-        sortByValue(final Map<K, V> map) {
-        List<Map.Entry<K, V>> list =
-            new LinkedList<Map.Entry<K, V>>(map.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            public int compare(final Map.Entry<K, V> o1,
-                    final Map.Entry<K, V> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
+    private ArrayList<Domain> sortByIndex(final List<Domain> list_domain,
+            final HashMap<Domain, Integer> index_1,
+            final HashMap<Domain, Integer> index_2,
+            final HashMap<Domain, Integer> index_3) {
+    Domain selected;
+        ArrayList<Domain> sorted_temp1 = new ArrayList<Domain>();
+        while (!list_domain.isEmpty()) {
+            selected = list_domain.get(0);
+            for (Domain dom : list_domain) {
+                if (index_1.get(dom) < index_1.get(selected)) {
+                    selected = dom;
+                }
             }
-        });
-
-        Map<K, V> result = new LinkedHashMap<K, V>();
-        for (Map.Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
+            sorted_temp1.add(selected);
+            list_domain.remove(selected);
         }
-        return result;
+        ArrayList<Domain> sorted_temp2 = new ArrayList<Domain>();
+        int index_iterator1 = index_1.get(sorted_temp1.get(0));
+        while (!sorted_temp1.isEmpty()) {
+            selected = sorted_temp1.get(0);
+            for (Domain dom : sorted_temp1) {
+                if (index_1.get(dom) == index_iterator1
+                        && index_2.get(dom) < index_2.get(selected)) {
+                    selected = dom;
+                }
+            }
+            sorted_temp2.add(selected);
+            sorted_temp1.remove(selected);
+            if (!sorted_temp1.isEmpty()) {
+                index_iterator1 = index_1.get(sorted_temp1.get(0));
+            }
+        }
+        ArrayList<Domain> sorted = new ArrayList<Domain>();
+        int index_iterator21 = index_1.get(sorted_temp2.get(0));
+        int index_iterator22 = index_2.get(sorted_temp2.get(0));
+        while (!sorted_temp2.isEmpty()) {
+            selected = sorted_temp2.get(0);
+            for (Domain dom : sorted_temp2) {
+                if (index_1.get(dom) == index_iterator21
+                        && index_2.get(dom) == index_iterator22
+                        && index_3.get(dom) < index_3.get(selected)) {
+                    selected = dom;
+                }
+            }
+            sorted.add(selected);
+            sorted_temp2.remove(selected);
+            if (!sorted_temp2.isEmpty()) {
+                index_iterator21 = index_1.get(sorted_temp2.get(0));
+                index_iterator22 = index_2.get(sorted_temp2.get(0));
+            }
+        }
+
+        return sorted;
     }
 
     /**
