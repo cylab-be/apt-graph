@@ -202,7 +202,9 @@ public class RequestHandler {
             filtered = whiteListing(filtered);
         }
 
-        showRankingList(filtered);
+        if (!filtered.isEmpty()) {
+            showRankingList(filtered);
+        }
         System.out.println("Found " + filtered.size() + " clusters");
         return filtered;
     }
@@ -381,38 +383,34 @@ public class RequestHandler {
             list_domain.add(dom);
         }
 
-        // Number of children index
+        // Number of children & parents index
         HashMap<Domain, Integer> index_1 = new HashMap<Domain, Integer>();
-        // Number of parents index
-        HashMap<Domain, Integer> index_2 = new HashMap<Domain, Integer>();
         // Number of requests index
-        HashMap<Domain, Integer> index_3 = new HashMap<Domain, Integer>();
+        HashMap<Domain, Integer> index_2 = new HashMap<Domain, Integer>();
 
         // Number of children & Number of requests
         for (Domain dom : graph_all.getNodes()) {
             index_1.put(dom, graph_all.getNeighbors(dom).size());
-            index_2.put(dom, 0);
-            index_3.put(dom, dom.size());
+            index_2.put(dom, dom.size());
         }
 
         // Number of parents
         for (Domain parent : graph_all.getNodes()) {
             for (Neighbor<Domain> child : graph_all.getNeighbors(parent)) {
-                index_2.put(child.node, index_2.get(child.node) + 1);
+                index_1.put(child.node, index_1.get(child.node) + 1);
             }
         }
 
         //Sort
         ArrayList<Domain> sorted = sortByIndex(list_domain,
-                index_1, index_2, index_3);
+                index_1, index_2);
 
         // Print out
         System.out.println("Ranking List :");
-        System.out.println("(#Children/#Parents/#Resquests)");
+        System.out.println("(#Children + #Parents / #Resquests)");
         for (Domain dom : sorted) {
             System.out.println("    (" + index_1.get(dom)
                 + "/" + index_2.get(dom)
-                + "/" + index_3.get(dom)
                 + ") : " + dom);
         }
     }
@@ -427,10 +425,9 @@ public class RequestHandler {
      */
     private ArrayList<Domain> sortByIndex(final List<Domain> list_domain,
             final HashMap<Domain, Integer> index_1,
-            final HashMap<Domain, Integer> index_2,
-            final HashMap<Domain, Integer> index_3) {
-    Domain selected;
-        ArrayList<Domain> sorted_temp1 = new ArrayList<Domain>();
+            final HashMap<Domain, Integer> index_2) {
+        Domain selected;
+        ArrayList<Domain> sorted_temp = new ArrayList<Domain>();
         while (!list_domain.isEmpty()) {
             selected = list_domain.get(0);
             for (Domain dom : list_domain) {
@@ -438,42 +435,23 @@ public class RequestHandler {
                     selected = dom;
                 }
             }
-            sorted_temp1.add(selected);
+            sorted_temp.add(selected);
             list_domain.remove(selected);
         }
-        ArrayList<Domain> sorted_temp2 = new ArrayList<Domain>();
-        int index_iterator1 = index_1.get(sorted_temp1.get(0));
-        while (!sorted_temp1.isEmpty()) {
-            selected = sorted_temp1.get(0);
-            for (Domain dom : sorted_temp1) {
+        ArrayList<Domain> sorted = new ArrayList<Domain>();
+        int index_iterator1 = index_1.get(sorted_temp.get(0));
+        while (!sorted_temp.isEmpty()) {
+            selected = sorted_temp.get(0);
+            for (Domain dom : sorted_temp) {
                 if (index_1.get(dom) == index_iterator1
                         && index_2.get(dom) < index_2.get(selected)) {
                     selected = dom;
                 }
             }
-            sorted_temp2.add(selected);
-            sorted_temp1.remove(selected);
-            if (!sorted_temp1.isEmpty()) {
-                index_iterator1 = index_1.get(sorted_temp1.get(0));
-            }
-        }
-        ArrayList<Domain> sorted = new ArrayList<Domain>();
-        int index_iterator21 = index_1.get(sorted_temp2.get(0));
-        int index_iterator22 = index_2.get(sorted_temp2.get(0));
-        while (!sorted_temp2.isEmpty()) {
-            selected = sorted_temp2.get(0);
-            for (Domain dom : sorted_temp2) {
-                if (index_1.get(dom) == index_iterator21
-                        && index_2.get(dom) == index_iterator22
-                        && index_3.get(dom) < index_3.get(selected)) {
-                    selected = dom;
-                }
-            }
             sorted.add(selected);
-            sorted_temp2.remove(selected);
-            if (!sorted_temp2.isEmpty()) {
-                index_iterator21 = index_1.get(sorted_temp2.get(0));
-                index_iterator22 = index_2.get(sorted_temp2.get(0));
+            sorted_temp.remove(selected);
+            if (!sorted_temp.isEmpty()) {
+                index_iterator1 = index_1.get(sorted_temp.get(0));
             }
         }
 
