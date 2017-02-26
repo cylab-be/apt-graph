@@ -5,6 +5,7 @@ Parameters :
 
 NB : TOP = Number of domain alone (top of ranking list)
 	 APT = Is the APT in the top domains ?
+	 APT.README.BE != APT.README.be : DomainSimilarity makes APT alone
 
 Observations
 ------------

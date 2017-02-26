@@ -1,0 +1,26 @@
+Parameters :
+
+- k = 20
+- File : all files without ad blocker
+
+NB : TOP = Number of domain alone (top of ranking list)
+	 APT = Is the APT in the top domains ?
+	 MAX CLUSTER = / because all clusters are keeped
+
+Observations
+------------
+
+
+	TIME 	DOMAIN 	PRUNING 	MAX CLUSTER 	WHITE LISTING 	TOP	 APT
+					(z score)	(z score)							
+	--------------------------------------------------------------------
+4.	0.6		0.4		-0.26		/				YES				7	YES
+6.	0.6		0.4		-0.26		/				YES				7	YES
+8.	0.6		0.4		-0.25		/				YES				38	YES
+10.	0.6		0.4		-0.23		/				YES				40	YES
+12.	0.6		0.4		-0.25		/				YES				61	YES
+14.	0.6		0.4		-0.25		/				YES				61	YES
+15.	0.6		0.4		-0.23		/				YES				28	NO
+15.	0.6		0.4		0.98		/				YES				61	YES
+15.	0.6		0.4		-0.26		/				YES				27	NO (k = 100)
+16.	0.6		0.4		-0.26		/				YES				25	YES
