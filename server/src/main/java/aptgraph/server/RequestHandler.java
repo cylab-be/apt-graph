@@ -194,7 +194,7 @@ public class RequestHandler {
                 = computeClusterSize(clusters, z_max_cluster_size);
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
         for (Graph<Domain> subgraph : clusters) {
-            if (subgraph.size() < max_cluster_size) {
+            if (subgraph.size() <= max_cluster_size) {
                 filtered.add(subgraph);
             }
         }
