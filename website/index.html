@@ -21,7 +21,11 @@
       <div class="col-md-4" id="side_bar">
         <div class="container-fluid" id="choice_user">
           <h3>CHOICE OF USER</h3>
-          .............................
+            <div class="dropdown" id="user-list">
+              <a class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" href="#" id="selected-user">User List<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+              </ul>
+            </div> 
         </div>
         <div class="container-fluid" id="feature_fusion">
           <h3>FEATURE FUSION</h3>
@@ -117,18 +121,40 @@
     function refresh(){
       location.reload();
     }
-    
+
+// Functions to do with populating the User-List
+    $(document).ready(function(){
+        var users = ["127.0.0.1"];
+
+        // ADD JSON-RPC call to method GetUsers()
+        //users = GetUsers();
+        
+        for (var i = 0; i < users.length; i++){
+          $('#user-list ul').append('<li><a href="#" user="' + users[i] + '">' + users[i] + '</a></li>');
+        }
+
+        $(".dropdown-menu li a").click(function(){
+          var selText = $(this).text();
+          $(this).parents('.dropdown').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+        });
+    });
+
+
+ // Functions to do with taking the variables filled in the fields
+ // and creating a request to the server for method analyze()   
     $("#apply_button").click(function(){
      if ( !$("#time").val() || !$("#url").val() || !$("#domain").val() ||
           !$("#ord_weights_high").val() || !$("#ord_weights_low").val() ||
-          !$("#prune_threshold").val() || !$("#max_cluster_size").val()){
+          !$("#prune_threshold").val() || !$("#max_cluster_size").val() ||
+          $("#selected-user").text() == "User List"){
             alert("Some of the parameter values are empty!");
             return;
       }
+      var selecteduser = $("#selected-user").text();
       var jsonbody = {"jsonrpc": "2.0",
                         "method": "analyze",
                         "params": [
-                        "127.0.0.1",
+                        selecteduser,
                         [$("#time").val(), $("#url").val(), $("#domain").val()],
                         [$("#ord_weights_high").val(), $("#ord_weights_low").val()],
                         $("#prune_threshold").val(),
