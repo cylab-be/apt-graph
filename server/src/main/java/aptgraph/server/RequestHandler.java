@@ -93,8 +93,22 @@ public class RequestHandler {
     }
 
     /**
-     *
-     * @param user_temp
+     * Give the list of users available in the log.
+     * @return List of users
+     */
+    public final List<String> getUsers() {
+        LinkedList<String> users = new LinkedList<String>();
+        for (Map.Entry<String, LinkedList<Graph<Request>>> entry_set
+                : user_graphs.entrySet()) {
+            String key = entry_set.getKey();
+            users.add(key);
+        }
+        return users;
+    }
+
+    /**
+     * Analyze the graph of a specific user.
+     * @param user
      * @param feature_ordered_weights
      * @param z_prune_threshold
      * @param feature_weights
@@ -104,28 +118,23 @@ public class RequestHandler {
      * @return
      */
     public final List<Graph<Domain>> analyze(
-            final String user_temp,
+            final String user,
             final double[] feature_weights,
             final double[] feature_ordered_weights,
             final double z_prune_threshold,
             final double z_max_cluster_size,
             final boolean children_bool,
             final boolean whitelist_bool) {
-
-        // START user selection
-        // List of the user
+        // Choice of the graphs of the user
         LinkedList<String> users = new LinkedList<String>();
         for (Map.Entry<String, LinkedList<Graph<Request>>> entry_set
                 : user_graphs.entrySet()) {
             String key = entry_set.getKey();
             users.add(key);
         }
-        System.out.println("List of user : " + users);
+        String user_temp = users.getFirst(); // a remplacer par user
+        LinkedList<Graph<Request>> graphs = user_graphs.get(user_temp);
 
-        // Choice of the graphs of the user(need to be choosed on the web page)
-        String user = users.getFirst(); // a remplacer par user_temp
-        // END user selection
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
         System.out.println("k-NN Graph : k = " + graphs.getFirst().getK());
 
         // Verify the sum of the weights
