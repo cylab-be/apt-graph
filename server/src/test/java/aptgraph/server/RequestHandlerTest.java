@@ -97,7 +97,7 @@ public class RequestHandlerTest extends TestCase {
         input.close();
 
         RequestHandler handler = new RequestHandler(user_graphs);
-        handler.analyze("127.0.0.1", new double[]{0.7, 0.1, 0.2},
+        handler.analyze("253.115.106.54", new double[]{0.7, 0.1, 0.2},
                 new double[]{0.8, 0.2}, 0.0, 0.0, true, true);
     }
 

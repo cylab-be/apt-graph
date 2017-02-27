@@ -124,19 +124,37 @@
 
 // Functions to do with populating the User-List
     $(document).ready(function(){
-        var users = ["127.0.0.1"];
+        var users;
+        // JSON-RPC call to method GetUsers()
+        var jsonbody = {"jsonrpc": "2.0",
+                        "method": "getUsers",
+                        "id": 123
+                        };
+        var request = json_post("http://127.0.0.1:8080" , jsonbody); 
+        users = request.addEventListener('load', function(){
+            if (request.readyState == 4 && request.status == 200){
+              json = JSON.parse(request.responseText);
+              users = json.result;
+              //console.log("Server Response: " + json.result);
+              $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
+              $("#panel_head").css('color', 'green');
+              $("#panel_body").text("Server Response: " + json.result.length + " Users loaded");
+            }
+            else if (request.status != 400) {
+              $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
+              $("#panel_head").css('color', 'red');
+              $("#panel_body").text("Server Response: Users can't be loaded");
+            }
 
-        // ADD JSON-RPC call to method GetUsers()
-        //users = GetUsers();
-        
-        for (var i = 0; i < users.length; i++){
-          $('#user-list ul').append('<li><a href="#" user="' + users[i] + '">' + users[i] + '</a></li>');
-        }
+            for (var i = 0; i < users.length; i++){
+              $('#user-list ul').append('<li><a href="#" user="' + users[i] + '">' + users[i] + '</a></li>');
+            }
 
-        $(".dropdown-menu li a").click(function(){
-          var selText = $(this).text();
-          $(this).parents('.dropdown').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
-        });
+            $(".dropdown-menu li a").click(function(){
+              var selText = $(this).text();
+              $(this).parents('.dropdown').find('.dropdown-toggle').html(selText+ '<span class="caret"></span>');
+            });
+          });
     });
 
 

@@ -96,8 +96,8 @@ public class RequestHandler {
      * Give the list of users available in the log.
      * @return List of users
      */
-    public final List<String> getUsers() {
-        LinkedList<String> users = new LinkedList<String>();
+    public final ArrayList<String> getUsers() {
+        ArrayList<String> users = new ArrayList<String>();
         for (Map.Entry<String, LinkedList<Graph<Request>>> entry_set
                 : user_graphs.entrySet()) {
             String key = entry_set.getKey();
@@ -126,14 +126,7 @@ public class RequestHandler {
             final boolean children_bool,
             final boolean whitelist_bool) {
         // Choice of the graphs of the user
-        LinkedList<String> users = new LinkedList<String>();
-        for (Map.Entry<String, LinkedList<Graph<Request>>> entry_set
-                : user_graphs.entrySet()) {
-            String key = entry_set.getKey();
-            users.add(key);
-        }
-        String user_temp = users.getFirst(); // a remplacer par user
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user_temp);
+        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
 
         System.out.println("k-NN Graph : k = " + graphs.getFirst().getK());
 
