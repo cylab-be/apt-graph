@@ -165,6 +165,8 @@ public class RequestHandler {
         // Compute similarity between domains and build domain graph
         Graph<Domain> domain_graph =
                 computeSimilarityDomain(merged_graph, domains);
+        System.out.println("Total number of domains : "
+                + domains.keySet().size());
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
@@ -408,13 +410,27 @@ public class RequestHandler {
                 index_1, index_2);
 
         // Print out
+        int top = 0;
+        int rank_1 = Integer.MAX_VALUE;
+        int rank_2 = Integer.MAX_VALUE;
         System.out.println("Ranking List :");
         System.out.println("(#Children + #Parents / #Resquests)");
         for (Domain dom : sorted) {
             System.out.println("    (" + index_1.get(dom)
                 + "/" + index_2.get(dom)
                 + ") : " + dom);
+            if (dom.toString().equals("APT.FINDME.be")) {
+                rank_1 = index_1.get(dom);
+                rank_2 = index_2.get(dom);
+                top++;
+            }
+            if (!dom.toString().equals("APT.FINDME.be")
+                    && index_1.get(dom) <= rank_1
+                    && index_2.get(dom) <= rank_2) {
+                top++;
+            }
         }
+        System.out.println("TOP for APT.FINDME.be : " + top);
     }
 
     /**
