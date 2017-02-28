@@ -55,7 +55,7 @@ function draw_graph(json_data) {
 	var force = d3.layout.force()
 		.nodes(d3.values(nodes))
 		.links(links)
-		.size([width / 2 , height/ 1.2])
+		.size([width / 2 , height / 1.2])
 		.linkDistance(100)
 		.charge(-300)
 		.on("tick", tick)
@@ -134,7 +134,7 @@ function draw_graph(json_data) {
 					.attr('x', 0)
 					.attr('y', -10)
 					.attr("font-size","30px")
-					.text(function(d) { return d.name[0]; });
+					.text(function(d) { return d.name[0] + " (" + d.name[1].length + ")"; });
 			} else {
 				d3.select(this).select('text.info').remove();	
 			}

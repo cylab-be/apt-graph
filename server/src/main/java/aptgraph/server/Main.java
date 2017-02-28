@@ -48,7 +48,6 @@ public final class Main {
         }
 
         // Start the json-rpc server
-        System.out.println("Input File : " + cmd.getOptionValue("i"));
         JsonRpcServer jsonrpc_server = new JsonRpcServer(
                 new FileInputStream(cmd.getOptionValue("i")));
         jsonrpc_server.startInBackground();
