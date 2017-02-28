@@ -36,6 +36,7 @@ svg {
     float: left;
 }
 
+/*Stdout*/
 .footer {
   width: 99%;
   margin: auto;
@@ -61,4 +62,20 @@ svg {
 .tab-pane {
   height: 85%;
   overflow: scroll;
+}
+
+/*Histogram*/
+.axis path,
+.axis line {
+fill: none;
+stroke: #eee;
+shape-rendering: crispEdges;
+}
+
+.axis text {
+font-size: 11px;
+}
+
+.bar {
+fill: steelblue;
 }
