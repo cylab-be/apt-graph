@@ -58,6 +58,9 @@ public class RequestHandler {
 
     private static final Path PATH = Paths.get("./src/main/resources/hosts");
 
+    // Define stdout on UI
+    private String stdout = "";
+
     /**
      * A test json-rpc call, with no argument, that should return "hello".
      * @return
@@ -115,9 +118,9 @@ public class RequestHandler {
      * @param z_max_cluster_size
      * @param children_bool
      * @param whitelist_bool
-     * @return
+     * @return Output
      */
-    public final List<Graph<Domain>> analyze(
+    public final Output analyze(
             final String user,
             final double[] feature_weights,
             final double[] feature_ordered_weights,
@@ -128,7 +131,9 @@ public class RequestHandler {
         // Choice of the graphs of the user
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
 
-        System.out.println("k-NN Graph : k = " + graphs.getFirst().getK());
+        stdout =
+                stdout.concat("<pre>k-NN Graph : k = "
+                        + graphs.getFirst().getK());
 
         // Verify the sum of the weights
         double sum_feature_weights = 0;
@@ -140,7 +145,7 @@ public class RequestHandler {
             sum_ordered_weights += d;
         }
         if (sum_feature_weights != 1 || sum_ordered_weights != 1) {
-            System.out.println("Error with weights");
+            stdout = stdout.concat("<br>Error with weights");
             return null;
         }
 
@@ -167,7 +172,7 @@ public class RequestHandler {
         // Compute similarity between domains and build domain graph
         Graph<Domain> domain_graph =
                 computeSimilarityDomain(merged_graph, domains);
-        System.out.println("Total number of domains : "
+        stdout = stdout.concat("<br>Total number of domains : "
                 + domains.keySet().size());
 
         // The json-rpc request was probably canceled by the user
@@ -211,8 +216,14 @@ public class RequestHandler {
         if (!filtered.isEmpty()) {
             showRankingList(filtered);
         }
-        System.out.println("Found " + filtered.size() + " clusters");
-        return filtered;
+
+        // Output
+        stdout = stdout.concat("<br>Found " + filtered.size()
+                + " clusters</pre>");
+        Output output = new Output();
+        output.setFiltered(filtered);
+        output.setStdout(stdout);
+        return output;
     }
 
     final Graph<Request> computeFusionFeatures(
@@ -415,10 +426,10 @@ public class RequestHandler {
         int top = 0;
         int rank_1 = Integer.MAX_VALUE;
         int rank_2 = Integer.MAX_VALUE;
-        System.out.println("Ranking List :");
-        System.out.println("(#Children + #Parents / #Resquests)");
+        stdout = stdout.concat("<br>Ranking List :");
+        stdout = stdout.concat("<br>(#Children + #Parents / #Resquests)");
         for (Domain dom : sorted) {
-            System.out.println("    (" + index_1.get(dom)
+            stdout = stdout.concat("<br>    (" + index_1.get(dom)
                 + "/" + index_2.get(dom)
                 + ") : " + dom);
             if (dom.toString().equals("APT.FINDME.be")) {
@@ -432,7 +443,7 @@ public class RequestHandler {
                 top++;
             }
         }
-        System.out.println("TOP for APT.FINDME.be : " + top);
+        stdout = stdout.concat("<br>TOP for APT.FINDME.be : " + top);
     }
 
     /**
@@ -499,10 +510,10 @@ public class RequestHandler {
         if (prune_threshold < 0) {
             prune_threshold = 0;
         }
-        System.out.println("Prune Threshold : ");
-        System.out.println("    Mean = " + mean);
-        System.out.println("    Variance = " + variance);
-        System.out.println("    Prune Threshold = " + prune_threshold);
+        stdout = stdout.concat("<br>Prune Threshold : ");
+        stdout = stdout.concat("<br>    Mean = " + mean);
+        stdout = stdout.concat("<br>    Variance = " + variance);
+        stdout = stdout.concat("<br>    Prune Threshold = " + prune_threshold);
 
         return prune_threshold;
     }
@@ -526,10 +537,11 @@ public class RequestHandler {
         if (max_cluster_size < 0) {
             max_cluster_size = 0;
         }
-        System.out.println("Cluster Size : ");
-        System.out.println("    Mean = " + mean);
-        System.out.println("    Variance = " + variance);
-        System.out.println("    Max Cluster Size = " + max_cluster_size);
+        stdout = stdout.concat("<br>Cluster Size : ");
+        stdout = stdout.concat("<br>    Mean = " + mean);
+        stdout = stdout.concat("<br>    Variance = " + variance);
+        stdout =
+              stdout.concat("<br>    Max Cluster Size = " + max_cluster_size);
 
         return max_cluster_size;
     }
@@ -620,7 +632,7 @@ public class RequestHandler {
             }
         }
 
-        System.out.println("Number of white listed domains = "
+        stdout = stdout.concat("<br>Number of white listed domains = "
                 + whitelisted.size());
         return filtered_new;
     }
