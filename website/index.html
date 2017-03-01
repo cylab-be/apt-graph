@@ -6,6 +6,8 @@
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
   <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link rel="stylesheet" href="chartist/chartist.min.css">
+  <link rel="stylesheet" href="chartist/tooltip/chartist-plugin-tooltip.css">
 </head>
 <body>
   <!-- Js -->
@@ -15,7 +17,10 @@
   <script src="js/graph.js"></script>
   <script src="js/json_methods.js"></script>
   <script src="js/change_visibility.js"></script>
-  <script src="js/histogram.js"></script>
+  <script src="chartist/chartist.js"></script>
+  <script src="chartist/axistitle/chartist-plugin-axistitle.js"></script>
+  <script src="chartist/tooltip/chartist-plugin-tooltip.js"></script>
+  <script src="chartist/zoom/chartist-plugin-zoom.min.js"></script>
 
   <div class="container-fluid" id="container">
     <div class="row" id="parent">
@@ -83,8 +88,10 @@
                         <h2 class="modal-title">Pruning Threshold Histogram</h2>
                       </div>
                       <div class="modal-body" id="hist_pruning">
+                        <div class="ct-chart ct-perfect-fourth" id="chart_pruning"></div>
                       </div>
                       <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="reset_button_pruning" style="display:none">Reset Zoom</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                       </div>
                     </div>
@@ -109,8 +116,10 @@
                         <h2 class="modal-title">Cluster Size Histogram</h2>
                       </div>
                       <div class="modal-body" id="hist_cluster">
+                        <div class="ct-chart ct-perfect-fourth" id="chart_cluster"></div>
                       </div>
                       <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="reset_button_cluster" style="display:none">Reset Zoom</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                       </div>
                     </div>
@@ -228,16 +237,129 @@
       request.addEventListener('load', function(){
         if (request.readyState == 4 && request.status == 200){
           json = JSON.parse(request.responseText);
-          //console.log("Server Response: " + json.result);
-          $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
-          $("#panel_head").css('color', 'green');
-          $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
-          draw_graph(json.result.filtered); 
-          draw_hist('#hist_pruning');
-          draw_hist('#hist_cluster');
-          $("#stdout_body").prepend(json.result.stdout);
-        }
-        else if (request.status != 400) {
+          if (json.result != null) {
+            //console.log("Server Response: " + json.result);
+            $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
+            $("#panel_head").css('color', 'green');
+            $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
+            draw_graph(json.result.filtered); 
+            $("#stdout_body").prepend(json.result.stdout);
+            $("#histogram_pruning").on('shown.bs.modal', function() {
+                // Function to draw an histogram
+                  var data = Chartist.deserialize(json.result.histPruning.array);
+                  var options = {
+                    referenceValue: 0,
+                    axisX: {
+                      type: Chartist.AutoScaleAxis,
+                    },
+                    axisY: {
+                      type: Chartist.AutoScaleAxis,
+                    },
+                    plugins: [
+                      Chartist.plugins.ctAxisTitle({
+                        axisX: {
+                          axisTitle: 'Value of Similarity (z)',
+                          axisClass: 'ct-axis-title',
+                          offset: {
+                            x: 0,
+                            y: 30
+                        },
+                        textAnchor: 'middle'
+                        },
+                        axisY: {
+                          axisTitle: 'Number of links',
+                          axisClass: 'ct-axis-title',
+                          offset: {
+                            x: 0,
+                            y: -10
+                          },
+                          textAnchor: 'middle',
+                          flipTitle: false
+                        }
+                      }),
+                      Chartist.plugins.tooltip(),
+                      Chartist.plugins.zoom({ onZoom : onZoom, pointClipOffset : 10 })
+                    ]
+                  };
+
+                  var chart = Chartist.Line("#chart_pruning", data, options);
+                  var resetFnc;
+
+                  // Functions to zoom on histogram
+                  function onZoom(chart, reset) {
+                    document.getElementById("reset_button_pruning").style.display = 'inline';
+                    resetFnc = reset;         
+                  }
+
+                  function reset() {
+                    resetFnc && resetFnc();
+                    resetFnc = null;
+                    document.getElementById("reset_button_pruning").style.display = 'none';
+                  }
+                  $("#reset_button_pruning").click(function() {
+                    return reset();
+                  });
+              });
+
+            $("#histogram_cluster").on('shown.bs.modal', function() {
+                // Function to draw an histogram
+                  var data = Chartist.deserialize(json.result.histCluster.array);
+                  var options = {
+                    referenceValue: 0,
+                    axisX: {
+                      type: Chartist.AutoScaleAxis,
+                    },
+                    axisY: {
+                      type: Chartist.AutoScaleAxis,
+                    },
+                    plugins: [
+                      Chartist.plugins.ctAxisTitle({
+                        axisX: {
+                          axisTitle: 'Size of Clusters (z)',
+                          axisClass: 'ct-axis-title',
+                          offset: {
+                            x: 0,
+                            y: 30
+                        },
+                        textAnchor: 'middle'
+                        },
+                        axisY: {
+                          axisTitle: 'Number of Clusters',
+                          axisClass: 'ct-axis-title',
+                          offset: {
+                            x: 0,
+                            y: -10
+                          },
+                          textAnchor: 'middle',
+                          flipTitle: false
+                        }
+                      }),
+                      Chartist.plugins.tooltip(),
+                      Chartist.plugins.zoom({ onZoom : onZoom, pointClipOffset : 10 })
+                    ]
+                  };
+                  var chart = Chartist.Line("#chart_cluster", data, options);
+                  var resetFnc;
+                  // Functions to zoom on histogram
+                  function onZoom(chart, reset) {
+                    document.getElementById("reset_button_cluster").style.display = 'inline';
+                    resetFnc = reset;         
+                  }
+                  function reset() {
+                    resetFnc();
+                    resetFnc = null;
+                    document.getElementById("reset_button_cluster").style.display = 'none';
+                  }
+                  $("#reset_button_cluster").click(function() {
+                    return reset();
+                  });
+              });
+          } else {
+            $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
+            $("#panel_head").css('color', 'red');
+            $("#panel_body").text("Server Response is empty ! (Weights are probably wrong)");
+          }
+        } else if (request.status != 400) {
           $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
           $("#panel_head").css('color', 'red');
           $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");

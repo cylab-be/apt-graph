@@ -35,6 +35,8 @@ public class Output implements Serializable {
     private String name = "";
     private LinkedList<Graph<Domain>> filtered;
     private String stdout;
+    private HistData hist_pruning;
+    private HistData hist_cluster;
 
     /**
      * Return name.
@@ -61,6 +63,22 @@ public class Output implements Serializable {
     }
 
     /**
+     * Return histogram for pruning.
+     * @return
+     */
+    public final HistData getHistPruning() {
+        return hist_pruning;
+    }
+
+    /**
+     * Return histogram of cluster size.
+     * @return
+     */
+    public final HistData getHistCluster() {
+        return hist_cluster;
+    }
+
+    /**
      * Set output name.
      * @param name
      */
@@ -82,6 +100,24 @@ public class Output implements Serializable {
      */
     public final void setStdout(final String stdout) {
         this.stdout = stdout;
+    }
+
+    /**
+     * Set histogram for pruning.
+     * @param hist_pruning
+     */
+    public final void setHistPruning(
+            final HistData hist_pruning) {
+        this.hist_pruning = hist_pruning;
+    }
+
+    /**
+     * Set histogram for cluster size.
+     * @param hist_cluster
+     */
+    public final void setHistCluster(
+            final HistData hist_cluster) {
+        this.hist_cluster = hist_cluster;
     }
 
     /**

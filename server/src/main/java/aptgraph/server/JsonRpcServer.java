@@ -106,6 +106,7 @@ public class JsonRpcServer {
 
         ObjectMapper object_mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
+        module.addSerializer(HistData.class, new HistDataSerializer());
         module.addSerializer(Graph.class, new GraphSerializer());
         module.addSerializer(Domain.class, new DomainSerializer());
         module.addSerializer(Neighbor.class, new NeighborSerializer());

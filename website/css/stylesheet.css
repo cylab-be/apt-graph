@@ -30,6 +30,7 @@ text {
 
 svg {
     width: 100%;
+    height: 100%;
 }
 
 .container_buttons {
@@ -62,20 +63,4 @@ svg {
 .tab-pane {
   height: 85%;
   overflow: scroll;
-}
-
-/*Histogram*/
-.axis path,
-.axis line {
-fill: none;
-stroke: #eee;
-shape-rendering: crispEdges;
-}
-
-.axis text {
-font-size: 11px;
-}
-
-.bar {
-fill: steelblue;
 }

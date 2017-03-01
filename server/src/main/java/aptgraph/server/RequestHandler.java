@@ -56,6 +56,7 @@ public class RequestHandler {
         this.user_graphs = user_graphs;
     }
 
+    // Path of the white list
     private static final Path PATH = Paths.get("./src/main/resources/hosts");
 
     // Define stdout on UI
@@ -131,8 +132,7 @@ public class RequestHandler {
         // Choice of the graphs of the user
         LinkedList<Graph<Request>> graphs = user_graphs.get(user);
 
-        stdout =
-                stdout.concat("<pre>k-NN Graph : k = "
+        stdout = ("<pre>k-NN Graph : k = "
                         + graphs.getFirst().getK());
 
         // Verify the sum of the weights
@@ -145,7 +145,6 @@ public class RequestHandler {
             sum_ordered_weights += d;
         }
         if (sum_feature_weights != 1 || sum_ordered_weights != 1) {
-            stdout = stdout.concat("<br>Error with weights");
             return null;
         }
 
@@ -180,9 +179,19 @@ public class RequestHandler {
             return null;
         }
 
+        // ---------------- STOP ----------------
+
         // Prune
         double prune_threshold
                 = computePruneThreshold(domain_graph, z_prune_threshold);
+        ArrayList<Double> similarities = new ArrayList<Double>();
+        for (Domain dom : domain_graph.getNodes()) {
+            NeighborList neighbors = domain_graph.getNeighbors(dom);
+            for (Neighbor<Domain> neighbor : neighbors) {
+                similarities.add(neighbor.similarity);
+            }
+        }
+        HistData hist_pruning = computeHistData(similarities);
         domain_graph.prune(prune_threshold);
 
         // The json-rpc request was probably canceled by the user
@@ -199,6 +208,11 @@ public class RequestHandler {
         }
 
         // Filtering
+        ArrayList<Double> cluster_sizes = new ArrayList<Double>();
+        for (Graph<Domain> subgraph : clusters) {
+            cluster_sizes.add((double) subgraph.size());
+        }
+        HistData hist_cluster = computeHistData(cluster_sizes);
         double max_cluster_size
                 = computeClusterSize(clusters, z_max_cluster_size);
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
@@ -223,6 +237,8 @@ public class RequestHandler {
         Output output = new Output();
         output.setFiltered(filtered);
         output.setStdout(stdout);
+        output.setHistPruning(hist_pruning);
+        output.setHistCluster(hist_cluster);
         return output;
     }
 
@@ -426,12 +442,7 @@ public class RequestHandler {
         int top = 0;
         int rank_1 = Integer.MAX_VALUE;
         int rank_2 = Integer.MAX_VALUE;
-        stdout = stdout.concat("<br>Ranking List :");
-        stdout = stdout.concat("<br>(#Children + #Parents / #Resquests)");
         for (Domain dom : sorted) {
-            stdout = stdout.concat("<br>    (" + index_1.get(dom)
-                + "/" + index_2.get(dom)
-                + ") : " + dom);
             if (dom.toString().equals("APT.FINDME.be")) {
                 rank_1 = index_1.get(dom);
                 rank_2 = index_2.get(dom);
@@ -444,6 +455,13 @@ public class RequestHandler {
             }
         }
         stdout = stdout.concat("<br>TOP for APT.FINDME.be : " + top);
+        stdout = stdout.concat("<br>Ranking List :");
+        stdout = stdout.concat("<br>(#Children + #Parents / #Resquests)");
+        for (Domain dom : sorted) {
+            stdout = stdout.concat("<br>    (" + index_1.get(dom)
+                + "/" + index_2.get(dom)
+                + ") : " + dom);
+        }
     }
 
     /**
@@ -573,17 +591,17 @@ public class RequestHandler {
         return sum / list.size();
     }
 
-//    /**
-//     * Compute the z score of a value.
-//     * @param list
-//     * @param value
-//     * @return z
-//     */
-//    private double getZ(final ArrayList<Double> list, final Double value) {
-//        double mean = getMean(list);
-//        double variance = getVariance(list);
-//        return (value - mean) / Math.sqrt(variance);
-//    }
+    /**
+     * Compute the z score of a value.
+     * @param list
+     * @param value
+     * @return z
+     */
+    private double getZ(final ArrayList<Double> list, final Double value) {
+        double mean = getMean(list);
+        double variance = getVariance(list);
+        return (value - mean) / Math.sqrt(variance);
+    }
 
     /**
      * Compute the absolute value from the z score.
@@ -667,5 +685,64 @@ public class RequestHandler {
                 }
             }
         }
+    }
+
+    /**
+     * Compute distribution of an histogram.
+     * @param list
+     * @return HashMap<Double, Integer>
+     */
+    private HistData computeHistData(
+            final ArrayList<Double> list) {
+        Double max = getMax(list);
+        Double min = getMin(list);
+        int bins = (int) Math.round(list.size() / 30.0);
+        bins = Math.min(100, bins);
+        bins = Math.max(10, bins);
+        Double range = max - min;
+        Double step = range / bins;
+        HistData hist_data = new HistData();
+        for (Double i = min; i <= max + step; i += step) {
+            hist_data.put(getZ(list, i), 0);
+        }
+        for (Double d1 : list) {
+            Double diff = Double.MAX_VALUE;
+            Double bin = hist_data.keySet().iterator().next();
+            for (Double d2 : hist_data.keySet()) {
+                if (Math.abs(d2 - d1) < diff) {
+                    diff = Math.abs(d2 - d1);
+                    bin = d2;
+                }
+            }
+            hist_data.put(bin, hist_data.get(bin) + 1);
+        }
+        // there ara actually (bins + 1) bins
+        return hist_data;
+    }
+
+    /**
+     * Compute maximum of an ArrayList.
+     * @param list
+     * @return Double
+     */
+    private Double getMax(final ArrayList<Double> list) {
+        Double max = 0.0;
+        for (Double d : list) {
+            max = Math.max(d, max);
+        }
+        return max;
+    }
+
+    /**
+     * Compute minimum of an ArrayList.
+     * @param list
+     * @return Double
+     */
+    private Double getMin(final ArrayList<Double> list) {
+        Double min = Double.MAX_VALUE;
+        for (Double d : list) {
+            min = Math.min(d, min);
+        }
+        return min;
     }
 }
