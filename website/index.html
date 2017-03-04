@@ -218,7 +218,7 @@
         // JSON-RPC call to method GetUsers()
         var jsonbody = {"jsonrpc": "2.0",
                         "method": "getUsers",
-                        "id": 123
+                        "id": 167
                         };
         var request = json_post("http://127.0.0.1:8080" , jsonbody); 
         users = request.addEventListener('load', function(){
@@ -251,11 +251,17 @@
  // and creating a request to the server for method analyze()   
     $("#apply_button").click(function(){
      if ( !$("#time").val() || !$("#url").val() || !$("#domain").val() ||
+          parseFloat($("#time").val()) < 0.0 || parseFloat($("#url").val()) < 0.0 || parseFloat($("#domain").val()) < 0.0 ||
+          ((parseFloat($("#time").val()) + parseFloat($("#url").val()) + parseFloat($("#domain").val())) != 1.0) ||
           !$("#ord_weights_high").val() || !$("#ord_weights_low").val() ||
+          parseFloat($("#ord_weights_high").val()) < 0.0 || parseFloat($("#ord_weights_low").val()) < 0.0 ||
+          ((parseFloat($("#ord_weights_high").val()) + parseFloat($("#ord_weights_low").val())) != 1.0) ||
           !$("#prune_threshold").val() || !$("#max_cluster_size").val() ||
           $("#selected-user").text() == "User List" ||
           (prune_absolute.checked == prune_z.checked) ||
-          (cluster_absolute.checked == cluster_z.checked)){
+          (prune_absolute.checked && $("#prune_threshold").val() < 0) ||
+          (cluster_absolute.checked == cluster_z.checked) ||
+          (cluster_absolute.checked && $("#max_cluster_size").val() < 0)){
             alert("Some of the parameter values are wrong!");
             return;
       }
@@ -272,7 +278,7 @@
                         prune_z.checked,
                         cluster_z.checked,
                         whitelist.checked],
-                        "id": 123
+                        "id": 167
                       };
       var request = json_post("http://127.0.0.1:8080" , jsonbody); 
       request.addEventListener('load', function(){

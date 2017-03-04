@@ -274,14 +274,21 @@ public class RequestHandler {
         if (!user_graphs.keySet().contains(user)) {
             return false;
         }
-        // Verify the sum of the weights
+
+        // Verify the non negativity of weights and the sum of the weights
         double sum_feature_weights = 0;
         for (double d : feature_weights) {
             sum_feature_weights += d;
+            if (d < 0) {
+                return false;
+            }
         }
         double sum_ordered_weights = 0;
         for (double d : feature_ordered_weights) {
             sum_ordered_weights += d;
+            if (d < 0) {
+                return false;
+            }
         }
         if (sum_feature_weights != 1 || sum_ordered_weights != 1) {
             return false;
