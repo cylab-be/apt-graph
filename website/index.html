@@ -72,7 +72,7 @@
           <h3>DOMAIN CLUSTERING</h3>
           <div class="form-horizontal">
             <div class="form-group">
-              <label for="prune_threshold" class="col-md-4 control-label" style="text-align: left; width: 200px;">PRUNE THRESHOLD (z):</label>
+              <label for="prune_threshold" class="col-md-4 control-label" style="text-align: left; width: 200px;">PRUNE THRESHOLD:</label>
             </div>
             <div class="form-group">
               <div class="col-md-12">
@@ -97,10 +97,22 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-md-12">
+  	              <label for="prune_absolute" class="col-md-8 control-label" style="text-align: left; width: 150px;">Absolute value:</label>
+  	              <div class="col-md-4">
+  	                <input type="checkbox" id="prune_absolute" value="">
+  	              </div>
+              	</div>
+              	<div class="col-md-12">
+  	              <label for="prune_z" class="col-md-8 control-label" style="text-align: left; width: 150px;">Z score:</label>
+  	              <div class="col-md-4">
+  	                <input type="checkbox" id="prune_z" value="" checked="">
+  	              </div>
+              	</div>
               </div>
             </div>
             <div class="form-group">
-              <label for="max_cluster_size" class="col-md-4 control-label" style="text-align: left; width: 200px;">MAX CLUSTER SIZE (z):</label>
+              <label for="max_cluster_size" class="col-md-4 control-label" style="text-align: left; width: 200px;">MAX CLUSTER SIZE:</label>
             </div>
             <div class="form-group">
               <div class="col-md-12">
@@ -125,6 +137,18 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-md-12">
+  	              <label for="cluster_absolute" class="col-md-8 control-label" style="text-align: left; width: 150px;">Absolute value:</label>
+  	              <div class="col-md-4">
+  	                <input type="checkbox" id="cluster_absolute" value="">
+  	              </div>
+              	</div>
+              	<div class="col-md-12">
+  	              <label for="cluster_z" class="col-md-8 control-label" style="text-align: left; width: 150px;">Z score:</label>
+  	              <div class="col-md-4">
+  	                <input type="checkbox" id="cluster_z" value="" checked="">
+  	              </div>
+              	</div>
               </div>
             </div>
           </div> 
@@ -174,6 +198,20 @@
       location.reload();
     }
 
+// Function to manage checkboxes
+	$("#prune_absolute").change(function() {
+		document.getElementById("prune_z").checked = !document.getElementById("prune_absolute").checked;
+	})
+	$("#prune_z").change(function() {
+		document.getElementById("prune_absolute").checked = !document.getElementById("prune_z").checked;
+	})
+	$("#cluster_absolute").change(function() {
+		document.getElementById("cluster_z").checked = !document.getElementById("cluster_absolute").checked;
+	})
+	$("#cluster_z").change(function() {
+		document.getElementById("cluster_absolute").checked = !document.getElementById("cluster_z").checked;
+	})
+
 // Functions to do with populating the User-List
     $(document).ready(function(){
         var users;
@@ -209,15 +247,16 @@
           });
     });
 
-
  // Functions to do with taking the variables filled in the fields
  // and creating a request to the server for method analyze()   
     $("#apply_button").click(function(){
      if ( !$("#time").val() || !$("#url").val() || !$("#domain").val() ||
           !$("#ord_weights_high").val() || !$("#ord_weights_low").val() ||
           !$("#prune_threshold").val() || !$("#max_cluster_size").val() ||
-          $("#selected-user").text() == "User List"){
-            alert("Some of the parameter values are empty!");
+          $("#selected-user").text() == "User List" ||
+          (prune_absolute.checked == prune_z.checked) ||
+          (cluster_absolute.checked == cluster_z.checked)){
+            alert("Some of the parameter values are wrong!");
             return;
       }
       var selecteduser = $("#selected-user").text();
@@ -230,6 +269,8 @@
                         $("#prune_threshold").val(),
                         $("#max_cluster_size").val(),
                         children.checked,
+                        prune_z.checked,
+                        cluster_z.checked,
                         whitelist.checked],
                         "id": 123
                       };
@@ -253,12 +294,13 @@
                       type: Chartist.AutoScaleAxis,
                     },
                     axisY: {
+                	  onlyInteger: true,
                       type: Chartist.AutoScaleAxis,
                     },
                     plugins: [
                       Chartist.plugins.ctAxisTitle({
                         axisX: {
-                          axisTitle: 'Value of Similarity (z)',
+                          axisTitle: 'Value of Similarity',
                           axisClass: 'ct-axis-title',
                           offset: {
                             x: 0,
@@ -278,7 +320,7 @@
                         }
                       }),
                       Chartist.plugins.tooltip(),
-                      Chartist.plugins.zoom({ onZoom : onZoom, pointClipOffset : 10 })
+                      Chartist.plugins.zoom({ onZoom : onZoom})
                     ]
                   };
 
@@ -315,7 +357,7 @@
                     plugins: [
                       Chartist.plugins.ctAxisTitle({
                         axisX: {
-                          axisTitle: 'Size of Clusters (z)',
+                          axisTitle: 'Size of Clusters',
                           axisClass: 'ct-axis-title',
                           offset: {
                             x: 0,
@@ -335,7 +377,7 @@
                         }
                       }),
                       Chartist.plugins.tooltip(),
-                      Chartist.plugins.zoom({ onZoom : onZoom, pointClipOffset : 10 })
+                      Chartist.plugins.zoom({ onZoom : onZoom})
                     ]
                   };
                   var chart = Chartist.Line("#chart_cluster", data, options);
@@ -357,9 +399,9 @@
           } else {
             $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
             $("#panel_head").css('color', 'red');
-            $("#panel_body").text("Server Response is empty ! (Weights are probably wrong)");
+            $("#panel_body").text("Server Response is empty ! (Input values are probably wrong)");
           }
-        } else if (request.status != 400) {
+        } else {
           $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
           $("#panel_head").css('color', 'red');
           $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");

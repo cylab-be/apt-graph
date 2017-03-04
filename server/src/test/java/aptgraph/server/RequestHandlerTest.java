@@ -98,7 +98,7 @@ public class RequestHandlerTest extends TestCase {
 
         RequestHandler handler = new RequestHandler(user_graphs);
         handler.analyze("253.115.106.54", new double[]{0.7, 0.1, 0.2},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true);
+                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, true);
     }
 
     /**
@@ -168,7 +168,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         HashMap<String, Domain> domains =
-                handler.computeDomainGraph(merged_graph);
+                handler.computeDomainNodes(merged_graph);
 
         // Test
         System.out.println("Before computation = " + merged_graph.getNodes());
@@ -211,7 +211,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         HashMap<String, Domain> domains =
-                handler.computeDomainGraph(merged_graph);
+                handler.computeDomainNodes(merged_graph);
         Graph<Domain> domain_graph =
                 handler.computeSimilarityDomain(merged_graph, domains);
 
@@ -255,7 +255,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         HashMap<String, Domain> domains =
-                handler.computeDomainGraph(merged_graph);
+                handler.computeDomainNodes(merged_graph);
         Graph<Domain> domain_graph =
                 handler.computeSimilarityDomain(merged_graph, domains);
         Graph<Domain> domain_graph_old = domain_graph;
@@ -301,7 +301,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         HashMap<String, Domain> domains =
-                handler.computeDomainGraph(merged_graph);
+                handler.computeDomainNodes(merged_graph);
         Graph<Domain> domain_graph =
                 handler.computeSimilarityDomain(merged_graph, domains);
         domain_graph.prune(0.5);
@@ -349,7 +349,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
         HashMap<String, Domain> domains =
-                handler.computeDomainGraph(merged_graph);
+                handler.computeDomainNodes(merged_graph);
         Graph<Domain> domain_graph =
                 handler.computeSimilarityDomain(merged_graph, domains);
         
@@ -384,7 +384,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
         HashMap<String, Domain> domains =
-                handler.computeDomainGraph(merged_graph);
+                handler.computeDomainNodes(merged_graph);
         Graph<Domain> domain_graph =
                 handler.computeSimilarityDomain(merged_graph, domains);
         ArrayList<Graph<Domain>> clusters = domain_graph.connectedComponents();
