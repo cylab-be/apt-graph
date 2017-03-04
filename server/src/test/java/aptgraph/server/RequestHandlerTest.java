@@ -355,7 +355,9 @@ public class RequestHandlerTest extends TestCase {
         
         // Test 
         Domain first_node = domain_graph.first();
-        RequestHandler.remove(domain_graph, first_node);
+        LinkedList<Domain> nodes = new LinkedList<Domain>();
+        nodes.add(first_node);
+        RequestHandler.remove(domain_graph, nodes);
         assertFalse(domain_graph.containsKey(first_node));
     }
 

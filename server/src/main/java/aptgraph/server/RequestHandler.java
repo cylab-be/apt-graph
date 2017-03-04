@@ -165,8 +165,9 @@ public class RequestHandler {
         // (it contains every requests of a specific domain, for each domain)
         HashMap<String, Domain> domains =
                 computeDomainNodes(merged_graph);
+        int domains_total = domains.keySet().size();
         stdout = stdout.concat("<br>Total number of domains : "
-                + domains.keySet().size());
+                + domains_total);
 
         // Compute similarity between domains and build domain graph
         Graph<Domain> domain_graph =
@@ -179,11 +180,16 @@ public class RequestHandler {
 
         // Prune
         ArrayList<Double> similarities = listSimilarities(domain_graph);
-        HistData hist_pruning = computeHistData(similarities, prune_z_bool);
+        ArrayList<Double> mean_var_prune = getMeanVariance(similarities);
+        double mean_prune = mean_var_prune.get(0);
+        double variance_prune = mean_var_prune.get(1);
+        HistData hist_pruning = computeHistData(similarities, mean_prune,
+                variance_prune, prune_z_bool);
         double prune_threshold;
         if (prune_z_bool) {
             prune_threshold
-                = computePruneThreshold(similarities, prune_threshold_temp);
+                = computePruneThreshold(mean_prune, variance_prune,
+                        prune_threshold_temp);
         } else {
             prune_threshold = prune_threshold_temp;
         }
@@ -204,11 +210,16 @@ public class RequestHandler {
 
         // Filtering
         ArrayList<Double> cluster_sizes = listClusterSizes(clusters);
-        HistData hist_cluster = computeHistData(cluster_sizes, cluster_z_bool);
+        ArrayList<Double> mean_var_cluster = getMeanVariance(cluster_sizes);
+        double mean_cluster = mean_var_cluster.get(0);
+        double variance_cluster = mean_var_cluster.get(1);
+        HistData hist_cluster = computeHistData(cluster_sizes, mean_cluster,
+                variance_cluster, cluster_z_bool);
         double max_cluster_size;
         if (prune_z_bool) {
             max_cluster_size
-                = computeClusterSize(cluster_sizes, max_cluster_size_temp);
+                = computeClusterSize(mean_cluster, variance_cluster,
+                        max_cluster_size_temp);
         } else {
             max_cluster_size = max_cluster_size_temp;
         }
@@ -226,7 +237,7 @@ public class RequestHandler {
 
         // Ranking list
         if (!filtered.isEmpty()) {
-            showRankingList(filtered);
+            showRankingList(filtered, domains_total);
         }
 
         // Output
@@ -251,7 +262,7 @@ public class RequestHandler {
      * @param cluster_z_bool
      * @return True if no problem
      */
-    final boolean checkInputUser(
+    private boolean checkInputUser(
             final String user,
             final double[] feature_weights,
             final double[] feature_ordered_weights,
@@ -342,6 +353,27 @@ public class RequestHandler {
         }
 
         return merged_graph;
+    }
+
+    /**
+     * Select only the temporal children.
+     * @param graph
+     * @return graph
+     */
+    private Graph<Request> childrenSelection(
+            final Graph<Request> graph) {
+        Graph<Request> graph_new = new Graph<Request>();
+        for (Request req : graph.getNodes()) {
+            NeighborList neighbors_new = new NeighborList(1000);
+            NeighborList neighbors = graph.getNeighbors(req);
+            for (Neighbor<Request> neighbor : neighbors) {
+                if (req.getTime() <= neighbor.node.getTime()) {
+                    neighbors_new.add(neighbor);
+                }
+            }
+            graph_new.put(req, neighbors_new);
+        }
+        return graph_new;
     }
 
     /**
@@ -443,27 +475,6 @@ public class RequestHandler {
     }
 
     /**
-     * Select only the temporal children.
-     * @param graph
-     * @return graph
-     */
-    private Graph<Request> childrenSelection(
-            final Graph<Request> graph) {
-        Graph<Request> graph_new = new Graph<Request>();
-        for (Request req : graph.getNodes()) {
-            NeighborList neighbors_new = new NeighborList(1000);
-            NeighborList neighbors = graph.getNeighbors(req);
-            for (Neighbor<Request> neighbor : neighbors) {
-                if (req.getTime() <= neighbor.node.getTime()) {
-                    neighbors_new.add(neighbor);
-                }
-            }
-            graph_new.put(req, neighbors_new);
-        }
-        return graph_new;
-    }
-
-    /**
      * Compute the list of all the similarities of domain graph.
      * @param domain_graph
      * @return similarities
@@ -481,16 +492,60 @@ public class RequestHandler {
     }
 
     /**
+     * Compute distribution of a list.
+     * @param list
+     * @param mean
+     * @param variance
+     * @param z_bool
+     * @return HashMap<Double, Integer>
+     */
+    final HistData computeHistData(
+            final ArrayList<Double> list,
+            final double mean, final double variance, final boolean z_bool) {
+        ArrayList<Double> list_func = new ArrayList<Double>(list.size());
+        // Transform list in z score if needed
+        if (z_bool) {
+            for (int i = 0; i <= list.size() - 1; i++) {
+                list_func.add(i, getZ(mean, variance, list.get(i)));
+            }
+        } else {
+            list_func = list;
+        }
+        ArrayList<Double> max_min = getMaxMin(list_func);
+        double max = max_min.get(0);
+        double min = max_min.get(1);
+        int bins = (int) Math.round(list_func.size() / 10.0);
+        Double step = (max - min) / bins;
+        HistData hist_data = new HistData();
+        for (Double i = min; i <= max + step; i += step) {
+            hist_data.put(i, 0);
+        }
+        for (Double d1 : list_func) {
+            Double diff = Double.MAX_VALUE;
+            Double bin = hist_data.keySet().iterator().next();
+            for (Double d2 : hist_data.keySet()) {
+                if (Math.abs(d2 - d1) < diff) {
+                    diff = Math.abs(d2 - d1);
+                    bin = d2;
+                }
+            }
+            hist_data.put(bin, hist_data.get(bin) + 1);
+        }
+        // there ara actually (bins + 1) bins
+        return hist_data;
+    }
+
+    /**
      * Compute the absolute prune threshold based on z score.
-     * @param similarities
+     * @param mean
+     * @param variance
      * @param z_prune_threshold
      * @return prune_threshold
      */
-    private double computePruneThreshold(final ArrayList<Double> similarities,
+    private double computePruneThreshold(final double mean,
+            final double variance,
             final Double z_prune_threshold) {
-        double mean = getMean(similarities);
-        double variance = getVariance(similarities);
-        double prune_threshold = fromZ(similarities, z_prune_threshold);
+        double prune_threshold = fromZ(mean, variance, z_prune_threshold);
         if (prune_threshold < 0) {
             prune_threshold = 0;
         }
@@ -518,15 +573,15 @@ public class RequestHandler {
 
     /**
      * Compute the absolute maximum cluster size based on z score.
-     * @param clusters
+     * @param mean
+     * @param variance
      * @param z_max_cluster_size
      * @return max_cluster_size
      */
-    private double computeClusterSize(final ArrayList<Double> cluster_sizes,
+    private double computeClusterSize(final double mean, final double variance,
             final Double z_max_cluster_size) {
-        double mean = getMean(cluster_sizes);
-        double variance = getVariance(cluster_sizes);
-        double max_cluster_size_temp = fromZ(cluster_sizes, z_max_cluster_size);
+        double max_cluster_size_temp = fromZ(mean, variance,
+                z_max_cluster_size);
         int max_cluster_size = (int) Math.round(max_cluster_size_temp);
         if (max_cluster_size < 0) {
             max_cluster_size = 0;
@@ -538,46 +593,6 @@ public class RequestHandler {
               stdout.concat("<br>    Max Cluster Size = " + max_cluster_size);
 
         return max_cluster_size;
-    }
-
-    /**
-     * Compute distribution of an histogram.
-     * @param list
-     * @param z_bool
-     * @return HashMap<Double, Integer>
-     */
-    final HistData computeHistData(
-            final ArrayList<Double> list, final boolean z_bool) {
-        ArrayList<Double> list_func = new ArrayList<Double>(list.size());
-        if (z_bool) {
-            for (int i = 0; i <= list.size() - 1; i++) {
-                list_func.add(i, getZ(list, list.get(i)));
-            }
-        } else {
-            list_func = list;
-        }
-        Double max = getMax(list_func);
-        Double min = getMin(list_func);
-        int bins = (int) Math.round(list_func.size() / 10.0);
-        Double range = max - min;
-        Double step = range / bins;
-        HistData hist_data = new HistData();
-        for (Double i = min; i <= max + step; i += step) {
-            hist_data.put(i, 0);
-        }
-        for (Double d1 : list_func) {
-            Double diff = Double.MAX_VALUE;
-            Double bin = hist_data.keySet().iterator().next();
-            for (Double d2 : hist_data.keySet()) {
-                if (Math.abs(d2 - d1) < diff) {
-                    diff = Math.abs(d2 - d1);
-                    bin = d2;
-                }
-            }
-            hist_data.put(bin, hist_data.get(bin) + 1);
-        }
-        // there ara actually (bins + 1) bins
-        return hist_data;
     }
 
     /**
@@ -610,9 +625,7 @@ public class RequestHandler {
                     whitelisted.add(dom);
                 }
             }
-            for (Domain dom : whitelisted) {
-                remove(domain_graph, dom);
-            }
+            remove(domain_graph, whitelisted);
         }
 
         stdout = stdout.concat("<br>Number of white listed domains = "
@@ -621,17 +634,18 @@ public class RequestHandler {
     }
 
     /**
-     * Remove a node from a given graph (and update graph).
+     * Remove a list of nodes from a given graph (and update graph).
      * @param <U>
      * @param graph
      * @param node
      */
-    static <U> void remove(final Graph<U> graph, final U node) {
+    static <U> void remove(final Graph<U> graph, final LinkedList<U> nodes) {
         HashMap<U, NeighborList> map = graph.getHashMap();
 
         // Delete the node
-        map.remove(node);
-
+        for (U node : nodes) {
+            map.remove(node);
+        }
         // Delete the invalid edges to avoid "NullPointerException"
         Iterator<Map.Entry<U, NeighborList>> iterator_1 =
                 map.entrySet().iterator();
@@ -645,7 +659,7 @@ public class RequestHandler {
             Iterator<Neighbor> iterator_2 = neighborlist.iterator();
             while (iterator_2.hasNext()) {
                 Neighbor<U> neighbor = iterator_2.next();
-                if (neighbor.node.equals(node)) {
+                if (nodes.contains(neighbor.node)) {
                     iterator_2.remove();
                 }
             }
@@ -655,8 +669,10 @@ public class RequestHandler {
     /**
      * Print of the ranking list.
      * @param filtered
+     * @param domains_total
      */
-    private void showRankingList(final LinkedList<Graph<Domain>> filtered) {
+    private void showRankingList(final LinkedList<Graph<Domain>> filtered,
+            final int domains_total) {
         // Creation of a big graph with the result
         Graph<Domain> graph_all = new Graph<Domain>();
         for (Graph<Domain> graph : filtered) {
@@ -694,7 +710,7 @@ public class RequestHandler {
                 index_1, index_2);
 
         // Print out
-        int top = 0;
+        double top = 0.0;
         int rank_1 = Integer.MAX_VALUE;
         int rank_2 = Integer.MAX_VALUE;
         boolean founded = false;
@@ -712,7 +728,8 @@ public class RequestHandler {
             }
         }
         if (founded) {
-            stdout = stdout.concat("<br>TOP for APT.FINDME.be : " + top);
+            stdout = stdout.concat("<br>TOP for APT.FINDME.be: "
+                   + Math.round(top / domains_total * 100 * 100) / 100.0 + "%");
         } else {
             stdout = stdout.concat("<br>TOP for APT.FINDME.be : NOT FOUND");
         }
@@ -736,6 +753,7 @@ public class RequestHandler {
     private ArrayList<Domain> sortByIndex(final List<Domain> list_domain,
             final HashMap<Domain, Integer> index_1,
             final HashMap<Domain, Integer> index_2) {
+        // Sort on first index
         Domain selected;
         ArrayList<Domain> sorted_temp = new ArrayList<Domain>();
         while (!list_domain.isEmpty()) {
@@ -748,6 +766,7 @@ public class RequestHandler {
             sorted_temp.add(selected);
             list_domain.remove(selected);
         }
+        // Sort on second index
         ArrayList<Domain> sorted = new ArrayList<Domain>();
         int index_iterator1 = index_1.get(sorted_temp.get(0));
         while (!sorted_temp.isEmpty()) {
@@ -782,17 +801,20 @@ public class RequestHandler {
     }
 
     /**
-     * Compute the variance of an ArrayList<Double>.
+     * Compute the mean and variance of an ArrayList<Double>.
      * @param list
-     * @return variance
+     * @return ArrayList<Double> mean_variance
      */
-    private double getVariance(final ArrayList<Double> list) {
+    private ArrayList<Double> getMeanVariance(final ArrayList<Double> list) {
         double mean = getMean(list);
         double sum = 0.0;
         for (double i :list) {
             sum += (i - mean) * (i - mean);
         }
-        return sum / list.size();
+        ArrayList<Double> out = new ArrayList<Double>(2);
+        out.add(mean);
+        out.add(sum / list.size());
+        return out;
     }
 
     /**
@@ -801,9 +823,8 @@ public class RequestHandler {
      * @param value
      * @return z
      */
-    private double getZ(final ArrayList<Double> list, final Double value) {
-        double mean = getMean(list);
-        double variance = getVariance(list);
+    private double getZ(final double mean, final double variance,
+            final Double value) {
         return (value - mean) / Math.sqrt(variance);
     }
 
@@ -813,35 +834,26 @@ public class RequestHandler {
      * @param z
      * @return absolute value
      */
-    private double fromZ(final ArrayList<Double> list, final Double z) {
-        double mean = getMean(list);
-        double variance = getVariance(list);
+    private double fromZ(final double mean, final double variance,
+            final Double z) {
         return mean + z * Math.sqrt(variance);
     }
 
     /**
-     * Compute maximum of an ArrayList.
+     * Compute maximum and minimum of an ArrayList.
      * @param list
-     * @return Double
+     * @return ArrayList<Double> max_min
      */
-    private Double getMax(final ArrayList<Double> list) {
+    private ArrayList<Double> getMaxMin(final ArrayList<Double> list) {
         Double max = 0.0;
-        for (Double d : list) {
-            max = Math.max(d, max);
-        }
-        return max;
-    }
-
-    /**
-     * Compute minimum of an ArrayList.
-     * @param list
-     * @return Double
-     */
-    private Double getMin(final ArrayList<Double> list) {
         Double min = Double.MAX_VALUE;
         for (Double d : list) {
+            max = Math.max(d, max);
             min = Math.min(d, min);
         }
-        return min;
+        ArrayList<Double> max_min = new ArrayList<Double>(2);
+        max_min.add(max);
+        max_min.add(min);
+        return max_min;
     }
 }
