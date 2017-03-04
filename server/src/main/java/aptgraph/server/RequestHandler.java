@@ -522,6 +522,8 @@ public class RequestHandler {
         double max = max_min.get(0);
         double min = max_min.get(1);
         int bins = (int) Math.round(list_func.size() / 10.0);
+        bins = Math.min(148, bins);
+        bins = Math.max(3, bins);
         Double step = (max - min) / bins;
         HistData hist_data = new HistData();
         for (Double i = min; i <= max + step; i += step) {
@@ -538,7 +540,7 @@ public class RequestHandler {
             }
             hist_data.put(bin, hist_data.get(bin) + 1);
         }
-        // there ara actually (bins + 1) bins
+        // there ara actually (bins + 2) bins (to include max in the histogram)
         return hist_data;
     }
 

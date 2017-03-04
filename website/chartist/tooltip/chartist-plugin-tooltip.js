@@ -83,7 +83,7 @@
           var seriesName = (isPieChart) ? $point.parentNode.getAttribute('ct:meta') || $point.parentNode.getAttribute('ct:series-name') : '';
           var meta = $point.getAttribute('ct:meta') || seriesName || '';
           var hasMeta = !!meta;
-          var value = $point.getAttribute('ct:value');
+          var value = $point.getAttribute('ct:value_histo');
 
           if (options.transformTooltipTextFnc && typeof options.transformTooltipTextFnc === 'function') {
             value = options.transformTooltipTextFnc(value);

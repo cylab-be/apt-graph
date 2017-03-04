@@ -64,3 +64,8 @@ svg {
   height: 85%;
   overflow: scroll;
 }
+
+/*Histogram*/
+.ct-series-a .ct-point {
+  stroke-width: 7px;
+}
