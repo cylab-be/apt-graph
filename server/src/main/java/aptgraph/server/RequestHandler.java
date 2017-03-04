@@ -695,6 +695,8 @@ public class RequestHandler {
         for (Domain dom : graph_all.getNodes()) {
             list_domain.add(dom);
         }
+        stdout = stdout.concat("<br>Number of domains shown: "
+                + list_domain.size());
 
         // Number of children & parents index
         HashMap<Domain, Integer> index_1 = new HashMap<Domain, Integer>();
