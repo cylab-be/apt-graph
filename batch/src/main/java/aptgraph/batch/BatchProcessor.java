@@ -36,9 +36,9 @@ public class BatchProcessor {
 
     // Regex to use for the full match of the squid log
     private static final String REGEX
-            = "^(\\d+\\.\\d+)\\s*(\\d+)\\s"
+            = "^(\\d+\\.\\d+)\\s+(\\d+)\\s"
             + "([^\\s]+)\\s"
-            + "(\\S+)\\/(\\d{3})\\s(\\d+)\\s(\\S+)\\s(\\S+)\\s\\-\\s(\\S+)\\/"
+            + "(\\S+)\\/(\\d+)\\s(\\d+)\\s(\\S+)\\s(\\S+)\\s\\-\\s(\\S+)\\/"
             + "([^\\s]+)\\s(\\S+).*$";
 
     private final Pattern pattern;
