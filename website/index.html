@@ -168,24 +168,102 @@
             <h4>LOG DETAILS</h4>
             <div class="form-horizontal">
               <div class="form-group">
-                <label for="request_text_show" class="col-md-4 control-label" style="text-align: left; width: 160px;">Selected Domains:</label>
-                <button type="button" class="btn btn-default" data-toggle="modal" id="request_text_show" data-target="#request_text_modal">Show Requests</button>
-                <div class="modal fade" id="request_text_modal" role="dialog">
-                    <div class="modal-dialog modal-lg">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <button type="button" class="close" data-dismiss="modal">&times;</button>
-                          <h2 class="modal-title">Requests of selected domains</h2>
+                <label for="type_show" class="col-md-4 control-label" style="text-align: left; width: 160px;">Selection of Types:</label>
+                <button type="button" class="btn btn-default" data-toggle="modal" id="type_show" data-target="#type_modal">Show Types</button>
+                <div class="modal fade" id="type_modal" role="dialog">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h2 class="modal-title">Selection of types</h2>
+                      </div>
+                      <div class="modal-body" id="type_text">
+                        <div>
+                          <label><input type="checkbox" id="type_app_octet_stream" value="application/octet-stream" checked=""/> application/octet-stream</label>
                         </div>
-                        <div class="modal-body" id="request_text">
+                        <div>
+                          <label><input type="checkbox" id="type_app_js" value="application/javascript" checked=""/> application/javascript</label>
                         </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-default" id="show_all_domains_button" style="display:none">Print all domains</button>
-                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <div>
+                          <label><input type="checkbox" id="type_app_json" value="application/json" checked=""/> application/json</label>
                         </div>
+                        <div>
+                          <label><input type="checkbox" id="type_app_ocsp" value="application/ocsp-response" checked=""/> application/ocsp-response</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_app_xml" value="application/xml" checked=""/> application/xml</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_app_x_js" value="application/x-javascript" checked=""/> application/x-javascript</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_app_x_shockwave_flash" value="application/x-shockwave-flash" checked=""/> application/x-shockwave-flash</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_font_ttf" value="font/ttf" checked=""/> font/ttf</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_font_woff2" value="font/woff2" checked=""/> font/woff2</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_im_gif" value="image/gif" checked=""/> image/gif</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_im_jpg" value="image/jpg" checked=""/> image/jpg</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_im_jpeg" value="image/jpeg" checked=""/> image/jpeg</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_im_png" value="image/png" checked=""/> image/png</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_im_svg_xml" value="image/svg+xml" checked=""/> image/svg+xml</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_txt_css" value="text/css" checked=""/> text/css</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_txt_html" value="text/html" checked=""/> text/html</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_txt_js" value="text/javascript" checked=""/> text/javascript</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_txt_plain" value="text/plain" checked=""/> text/plain</label>
+                        </div>
+                        <div>
+                          <label><input type="checkbox" id="type_unknown" value="-" checked=""/> - (unknown)</label>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="check_all_type" onclick="checkAll()">Chek all</button>
+                        <button type="button" class="btn btn-default" id="uncheck_all_type" onclick="uncheckAll()">Unchek all</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="request_text_show" class="col-md-4 control-label" style="text-align: left; width: 160px;">Selected Domains:</label>
+                <button type="button" class="btn btn-default" data-toggle="modal" id="request_text_show" data-target="#request_text_modal">Show Requests</button>
+                <div class="modal fade" id="request_text_modal" role="dialog">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h2 class="modal-title">Requests of selected domains</h2>
+                      </div>
+                      <div class="modal-body" id="request_text">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="show_all_domains_button" style="display:none">Print all domains</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -224,7 +302,7 @@
       location.reload();
     }
 
-// Function to manage checkboxes
+// Function to manage some checkboxes
   	$("#prune_absolute").change(function() {
   		document.getElementById("prune_z").checked = !document.getElementById("prune_absolute").checked;
   	})
@@ -238,21 +316,129 @@
   		document.getElementById("cluster_absolute").checked = !document.getElementById("cluster_z").checked;
   	})
 
+// Function to manage the check/uncheck all for types
+function checkAll() {
+  $("#type_app_octet_stream").prop("checked", true);
+  $("#type_app_js").prop("checked", true);
+  $("#type_app_json").prop("checked", true);
+  $("#type_app_ocsp").prop("checked", true);
+  $("#type_app_xml").prop("checked", true);
+  $("#type_app_x_js").prop("checked", true);
+  $("#type_app_x_shockwave_flash").prop("checked", true);
+  $("#type_font_ttf").prop("checked", true);
+  $("#type_font_woff2").prop("checked", true);
+  $("#type_im_gif").prop("checked", true);
+  $("#type_im_jpg").prop("checked", true);
+  $("#type_im_jpeg").prop("checked", true);
+  $("#type_im_png").prop("checked", true);
+  $("#type_im_svg_xml").prop("checked", true);
+  $("#type_txt_css").prop("checked", true);
+  $("#type_txt_html").prop("checked", true);
+  $("#type_txt_js").prop("checked", true);
+  $("#type_txt_plain").prop("checked", true);
+  $("#type_unknown").prop("checked", true);
+}
+function uncheckAll() {
+  $("#type_app_octet_stream").prop("checked", false);
+  $("#type_app_js").prop("checked", false);
+  $("#type_app_json").prop("checked", false);
+  $("#type_app_ocsp").prop("checked", false);
+  $("#type_app_xml").prop("checked", false);
+  $("#type_app_x_js").prop("checked", false);
+  $("#type_app_x_shockwave_flash").prop("checked", false);
+  $("#type_font_ttf").prop("checked", false);
+  $("#type_font_woff2").prop("checked", false);
+  $("#type_im_gif").prop("checked", false);
+  $("#type_im_jpg").prop("checked", false);
+  $("#type_im_jpeg").prop("checked", false);
+  $("#type_im_png").prop("checked", false);
+  $("#type_im_svg_xml").prop("checked", false);
+  $("#type_txt_css").prop("checked", false);
+  $("#type_txt_html").prop("checked", false);
+  $("#type_txt_js").prop("checked", false);
+  $("#type_txt_plain").prop("checked", false);
+  $("#type_unknown").prop("checked", false);
+}
+
+// Function to manage the types of requests to print 
+function checkType(t) {
+  if (t == "application/octet-stream" && !type_app_octet_stream.checked) {
+    return false;
+  }
+  if (t == "application/javascript" && !type_app_js.checked) {
+    return false;
+  }
+  if (t == "application/json" && !type_app_json.checked) {
+    return false;
+  }
+  if (t == "application/ocsp-response" && !type_app_ocsp.checked) {
+    return false;
+  }
+  if (t == "application/xml" && !type_app_xml.checked) {
+    return false;
+  }
+  if (t == "application/x-javascript" && !type_app_x_js.checked) {
+    return false;
+  }
+  if (t == "application/x-shockwave-flash" && !type_app_x_shockwave_flash.checked) {
+    return false;
+  }
+  if (t == "font/ttf" && !type_font_ttf.checked) {
+    return false;
+  }
+  if (t == "font/woff2" && !type_font_woff2.checked) {
+    return false;
+  }
+  if (t == "image/gif" && !type_im_gif.checked) {
+    return false;
+  }
+  if (t == "image/jpg" && !type_im_jpg.checked) {
+    return false;
+  }
+  if (t == "image/jpeg" && !type_im_jpeg.checked) {
+    return false;
+  }
+  if (t == "image/png" && !type_im_png.checked) {
+    return false;
+  }
+  if (t == "image/svg+xml" && !type_im_svg_xml.checked) {
+    return false;
+  }
+  if (t == "text/css" && !type_txt_css.checked) {
+    return false;
+  }
+  if (t == "text/html" && !type_txt_html.checked) {
+    return false;
+  }
+  if (t == "text/javascript" && !type_txt_js.checked) {
+    return false;
+  }
+  if (t == "text/plain" && !type_txt_plain.checked) {
+    return false;
+  }
+  if (t == "-" && !type_unknown.checked) {
+    return false;
+  }
+  return true;
+}
+
 // Prepend all the requests of a specific domain to the panel
 function printRequests(d) {
     $("#request_text").prepend("<br><br>");
     for (var i = 0; i < d.length; i++) {
-      $("#request_text").prepend(d[i].type + "<br><br>");
-      $("#request_text").prepend(d[i].peerhost + " ");
-      $("#request_text").prepend(d[i].peerstatus + "/");
-      $("#request_text").prepend(d[i].url + " - ");
-      $("#request_text").prepend(d[i].method + " ");
-      $("#request_text").prepend(d[i].bytes + " ");
-      $("#request_text").prepend(d[i].status + " ");
-      $("#request_text").prepend(d[i].code + "/");
-      $("#request_text").prepend(d[i].client + " ");
-      $("#request_text").prepend(d[i].elapsed + " ");
-      $("#request_text").prepend(d[i].time.toString().substring(0,10) + "." + d[i].time.toString().substring(10,13) + " ");       
+      if (checkType(d[i].type)) {
+        $("#request_text").prepend(d[i].type + "<br><br>");
+        $("#request_text").prepend(d[i].peerhost + " ");
+        $("#request_text").prepend(d[i].peerstatus + "/");
+        $("#request_text").prepend(d[i].url + " - ");
+        $("#request_text").prepend(d[i].method + " ");
+        $("#request_text").prepend(d[i].bytes + " ");
+        $("#request_text").prepend(d[i].status + " ");
+        $("#request_text").prepend(d[i].code + "/");
+        $("#request_text").prepend(d[i].client + " ");
+        $("#request_text").prepend(d[i].elapsed + " ");
+        $("#request_text").prepend(d[i].time.toString().substring(0,10) + "." + d[i].time.toString().substring(10,13) + " ");       
+      }
     }
     $("#request_text").prepend(d[0].domain.bold().big() + "<br><br>");
   }

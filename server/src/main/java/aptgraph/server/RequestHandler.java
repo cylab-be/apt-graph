@@ -530,7 +530,6 @@ public class RequestHandler {
             step = 1.0;
         } else {
             int bins = (int) Math.round(list_func.size() / 10.0);
-            bins = Math.min(148, bins);
             bins = Math.max(3, bins);
             step = (max - min) / bins;
         }
