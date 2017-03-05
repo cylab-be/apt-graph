@@ -184,7 +184,7 @@ public class RequestHandler {
         double mean_prune = mean_var_prune.get(0);
         double variance_prune = mean_var_prune.get(1);
         HistData hist_pruning = computeHistData(similarities, mean_prune,
-                variance_prune, prune_z_bool);
+                variance_prune, prune_z_bool, false);
         double prune_threshold;
         if (prune_z_bool) {
             prune_threshold
@@ -214,7 +214,7 @@ public class RequestHandler {
         double mean_cluster = mean_var_cluster.get(0);
         double variance_cluster = mean_var_cluster.get(1);
         HistData hist_cluster = computeHistData(cluster_sizes, mean_cluster,
-                variance_cluster, cluster_z_bool);
+                variance_cluster, cluster_z_bool, true);
         double max_cluster_size;
         if (prune_z_bool) {
             max_cluster_size
@@ -236,7 +236,7 @@ public class RequestHandler {
         }
 
         // Ranking list
-        if (!filtered.isEmpty()) {
+        if (filtered.size() > 1) {
             showRankingList(filtered, domains_total);
         }
 
@@ -504,11 +504,13 @@ public class RequestHandler {
      * @param mean
      * @param variance
      * @param z_bool
+     * @param int_bool
      * @return HashMap<Double, Integer>
      */
     final HistData computeHistData(
             final ArrayList<Double> list,
-            final double mean, final double variance, final boolean z_bool) {
+            final double mean, final double variance, final boolean z_bool,
+            final boolean int_bool) {
         ArrayList<Double> list_func = new ArrayList<Double>(list.size());
         // Transform list in z score if needed
         if (z_bool) {
@@ -521,10 +523,17 @@ public class RequestHandler {
         ArrayList<Double> max_min = getMaxMin(list_func);
         double max = max_min.get(0);
         double min = max_min.get(1);
-        int bins = (int) Math.round(list_func.size() / 10.0);
-        bins = Math.min(148, bins);
-        bins = Math.max(3, bins);
-        Double step = (max - min) / bins;
+        double step;
+        if (int_bool) {
+            max = Math.round(max);
+            min = Math.round(min);
+            step = 1.0;
+        } else {
+            int bins = (int) Math.round(list_func.size() / 10.0);
+            bins = Math.min(148, bins);
+            bins = Math.max(3, bins);
+            step = (max - min) / bins;
+        }
         HistData hist_data = new HistData();
         for (Double i = min; i <= max + step; i += step) {
             hist_data.put(i, 0);

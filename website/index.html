@@ -175,11 +175,12 @@
                       <div class="modal-content">
                         <div class="modal-header">
                           <button type="button" class="close" data-dismiss="modal">&times;</button>
-                          <h2 class="modal-title">Requets of selected domains</h2>
+                          <h2 class="modal-title">Requests of selected domains</h2>
                         </div>
                         <div class="modal-body" id="request_text">
                         </div>
                         <div class="modal-footer">
+                          <button type="button" class="btn btn-default" id="show_all_domains_button" style="display:none">Print all domains</button>
                           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         </div>
                       </div>
@@ -224,18 +225,37 @@
     }
 
 // Function to manage checkboxes
-	$("#prune_absolute").change(function() {
-		document.getElementById("prune_z").checked = !document.getElementById("prune_absolute").checked;
-	})
-	$("#prune_z").change(function() {
-		document.getElementById("prune_absolute").checked = !document.getElementById("prune_z").checked;
-	})
-	$("#cluster_absolute").change(function() {
-		document.getElementById("cluster_z").checked = !document.getElementById("cluster_absolute").checked;
-	})
-	$("#cluster_z").change(function() {
-		document.getElementById("cluster_absolute").checked = !document.getElementById("cluster_z").checked;
-	})
+  	$("#prune_absolute").change(function() {
+  		document.getElementById("prune_z").checked = !document.getElementById("prune_absolute").checked;
+  	})
+  	$("#prune_z").change(function() {
+  		document.getElementById("prune_absolute").checked = !document.getElementById("prune_z").checked;
+  	})
+  	$("#cluster_absolute").change(function() {
+  		document.getElementById("cluster_z").checked = !document.getElementById("cluster_absolute").checked;
+  	})
+  	$("#cluster_z").change(function() {
+  		document.getElementById("cluster_absolute").checked = !document.getElementById("cluster_z").checked;
+  	})
+
+// Prepend all the requests of a specific domain to the panel
+function printRequests(d) {
+    $("#request_text").prepend("<br><br>");
+    for (var i = 0; i < d.length; i++) {
+      $("#request_text").prepend(d[i].type + "<br><br>");
+      $("#request_text").prepend(d[i].peerhost + " ");
+      $("#request_text").prepend(d[i].peerstatus + "/");
+      $("#request_text").prepend(d[i].url + " - ");
+      $("#request_text").prepend(d[i].method + " ");
+      $("#request_text").prepend(d[i].bytes + " ");
+      $("#request_text").prepend(d[i].status + " ");
+      $("#request_text").prepend(d[i].code + "/");
+      $("#request_text").prepend(d[i].client + " ");
+      $("#request_text").prepend(d[i].elapsed + " ");
+      $("#request_text").prepend(d[i].time.toString().substring(0,10) + "." + d[i].time.toString().substring(10,13) + " ");       
+    }
+    $("#request_text").prepend(d[0].domain.bold().big() + "<br><br>");
+  }
 
 // Functions to do with populating the User-List
     $(document).ready(function(){
@@ -314,7 +334,7 @@
             $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
             $("#panel_head").css('color', 'green');
             $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
-            draw_graph(json.result.filtered); 
+            draw_graph(json.result.filtered, printRequests); 
             $("#request_text").html("");
             $("#stdout_body").prepend(json.result.stdout);
             $("#histogram_pruning").on('shown.bs.modal', function() {
@@ -382,6 +402,7 @@
                     referenceValue: 0,
                     axisX: {
                       type: Chartist.AutoScaleAxis,
+                      onlyInteger: true,
                     },
                     axisY: {
                       type: Chartist.AutoScaleAxis,
@@ -420,7 +441,7 @@
                     resetFnc = reset;         
                   }
                   function reset() {
-                    resetFnc();
+                    resetFnc && resetFnc();
                     resetFnc = null;
                     document.getElementById("reset_button_cluster").style.display = 'none';
                   }
@@ -428,6 +449,15 @@
                     return reset();
                   });
               });
+
+            document.getElementById("show_all_domains_button").style.display = 'inline';
+            $("#show_all_domains_button").click(function() {
+              for (var i = 0; i < json.result.filtered.length; i++) {
+                for (var j = 0; j < json.result.filtered[i].nodes.length; j++) {
+                  printRequests(json.result.filtered[i].nodes[j].requests);
+                }
+              }
+            });
           } else {
             $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
             $("#panel_head").css('color', 'red');
