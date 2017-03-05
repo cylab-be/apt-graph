@@ -129,6 +129,21 @@ function draw_graph(json_data) {
 			var g = d3.select(this); // The node
 			// The class is used to remove the additional text later
 			if (d3.select(this).select('text.info')[0][0] === null){
+				document.getElementById('request_text').innerHTML = "<br><br>" + document.getElementById('request_text').innerHTML;
+				for (i = 0; i < d.name[1].length; i++) {
+					document.getElementById('request_text').innerHTML = d.name[1][i].type + "<br><br>" + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].peerhost + " " + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].peerstatus + "/" + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].url + " - " + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].method + " " + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].bytes + " " + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].status + " " + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].code + "/" + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].client + " " + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].elapsed + " " + document.getElementById('request_text').innerHTML;
+					document.getElementById('request_text').innerHTML = d.name[1][i].time.toString().substring(0,10) + "." + d.name[1][i].time.toString().substring(10,13) + " " + document.getElementById('request_text').innerHTML;				
+				}
+				document.getElementById('request_text').innerHTML = d.name[1][0].domain.bold().big() + "<br><br>" + document.getElementById('request_text').innerHTML;
 				var info = g.append('text')
 					.classed('info', true)
 					.attr('x', 0)

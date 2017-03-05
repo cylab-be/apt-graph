@@ -24,152 +24,177 @@
 
   <div class="container-fluid" id="container">
     <div class="row" id="parent">
-      <div class="col-md-2" id="side_bar">
-        <div class="container-fluid" id="choice_user">
-          <h3>CHOICE OF USER</h3>
-            <div class="dropdown" id="user-list">
-              <a class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" href="#" id="selected-user">User List<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-              </ul>
+      <div class="col-md-3" id="side_bar">
+        <h3>PARAMETERS</h3>
+        <div class="form-group" id="side_bar_group">
+          <div class="container-fluid" id="choice_user">
+            <h4>CHOICE OF USER</h4>
+              <div class="dropdown" id="user-list">
+                <a class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" href="#" id="selected-user">User List<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                </ul>
+              </div> 
+          </div>
+          <div class="container-fluid" id="feature_fusion">
+            <h4>FEATURE FUSION</h4>
+            <h5>FEATURE WEIGHTS</h5>
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label for="time" class="col-md-4 control-label" style="text-align: left; width: 100px">TIME:</label>
+                <div class="col-md-2">
+                  <input type="number" step="0.1" class="form-control" id="time" value="0.6" style="width: 80px;">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="url" class="col-md-4 control-label" style="text-align: left; width: 100px">URL:</label>
+                <div class="col-md-2">
+                  <input type="number" step="0.1" class="form-control" id="url" value="0" style="width: 80px;">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="domain" class="col-md-4 control-label" style="text-align: left; width: 100px">DOMAIN:</label>
+                <div class="col-md-2">
+                  <input type="number" step="0.1" class="form-control" id="domain" value="0.4" style="width: 80px;">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="children" class="col-md-4 control-label" style="text-align: left; width: 200px">TEMPORAL CHILDREN:</label>
+                <div class="col-md-2">
+                  <input type="checkbox" id="children" value="" checked>
+                </div>
+              </div>
+            </div>
+            <h5>ORDERED WEIGHTS</h5>
+            <div class="form-group">
+              <input type="number" class="form-control" id="ord_weights_high" value="0.8" style="width: 80px; float: left; margin-right: 10px;">
+              <input type="number" class="form-control" id="ord_weights_low" value="0.2" style="width: 80px; float: left; margin-right: 10px;">
+            </div>
+          </div>
+          <div class="container-fluid" id="domain_clustering">
+            <h4>DOMAIN CLUSTERING</h4>
+            <h5>PRUNE THRESHOLD</h5>
+            <div class="form-horizontal">
+              <div class="form-group">
+                <div class="col-md-12">
+                  <input type="number" step="0.01" class="form-control" id="prune_threshold" value="-0.25" style="width: 80px; float: left; margin-right: 10px;">
+                  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#histogram_pruning" style="width: 100px; float: left; margin-right: 10px">
+                    Histogram
+                  </button>
+                  <div class="modal fade" id="histogram_pruning" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                          <h2 class="modal-title">Pruning Threshold Histogram</h2>
+                        </div>
+                        <div class="modal-body" id="hist_pruning">
+                          <div class="ct-chart ct-perfect-fourth" id="chart_pruning"></div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" id="reset_button_pruning" style="display:none">Reset Zoom</button>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+    	              <label for="prune_absolute" class="col-md-4 control-label" style="text-align: left; width: 150px;">Absolute value:</label>
+    	              <div class="col-md-2">
+    	                <input type="checkbox" id="prune_absolute" value="">
+    	              </div>
+                  </div>
+                  <div class="col-md-12">
+    	              <label for="prune_z" class="col-md-4 control-label" style="text-align: left; width: 150px;">Z score:</label>
+    	              <div class="col-md-2">
+    	                <input type="checkbox" id="prune_z" value="" checked="">
+    	              </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h5>MAX CLUSTER SIZE</h5>
+            <div class="form-horizontal">
+              <div class="form-group">
+                <div class="col-md-12">
+                  <input type="number" step="0.01" class="form-control" id="max_cluster_size" value="0" style="width: 80px; float: left; margin-right: 10px;">
+                  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#histogram_cluster" style="width: 100px; float: left; margin-right: 10px;">
+                    Histogram
+                  </button>
+                  <div class="modal fade" id="histogram_cluster" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                          <h2 class="modal-title">Cluster Size Histogram</h2>
+                        </div>
+                        <div class="modal-body" id="hist_cluster">
+                          <div class="ct-chart ct-perfect-fourth" id="chart_cluster"></div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" id="reset_button_cluster" style="display:none">Reset Zoom</button>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+    	              <label for="cluster_absolute" class="col-md-4 control-label" style="text-align: left; width: 150px;">Absolute value:</label>
+    	              <div class="col-md-2">
+    	                <input type="checkbox" id="cluster_absolute" value="">
+    	              </div>
+                	</div>
+                	<div class="col-md-12">
+    	              <label for="cluster_z" class="col-md-4 control-label" style="text-align: left; width: 150px;">Z score:</label>
+    	              <div class="col-md-2">
+    	                <input type="checkbox" id="cluster_z" value="" checked="">
+    	              </div>
+                	</div>
+                </div>
+              </div>
             </div> 
-        </div>
-        <div class="container-fluid" id="feature_fusion">
-          <h3>FEATURE FUSION</h3>
-          <h4>FEATURE WEIGHTS</h4>
-          <div class="form-horizontal">
-            <div class="form-group">
-              <label for="time" class="col-md-2 control-label" style="text-align: left; width: 100px;">TIME:</label>
-              <div class="col-md-4">
-                <input type="number" step="0.1" class="form-control" id="time" value="0.6" style="width: 100px;">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="url" class="col-md-2 control-label" style="text-align: left; width: 100px;">URL:</label>
-              <div class="col-md-4">
-                <input type="number" step="0.1" class="form-control" id="url" value="0" style="width: 100px;">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="domain" class="col-md-2 control-label" style="text-align: left; width: 100px;">DOMAIN:</label>
-              <div class="col-md-4">
-                <input type="number" step="0.1" class="form-control" id="domain" value="0.4" style="width: 100px;">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="children" class="col-md-2 control-label" style="text-align: left; width: 200px;">TEMPORAL CHILDREN:</label>
-              <div class="col-md-4">
-                <input type="checkbox" id="children" value="" checked>
-              </div>
-            </div>
           </div>
-          <h4>ORDERED WEIGHTS</h4>
-          <div class="form-group">
-            <input type="number" class="form-control" id="ord_weights_high" value="0.8" style="width: 100px; float: left; margin-right: 10px;">
-            <input type="number" class="form-control" id="ord_weights_low" value="0.2" style="width: 100px; float: left; margin-right: 10px;">
+          <div class="container-fluid" id="domain_display">
+            <h4>DOMAIN DISPLAY</h4>
+            <div class="form-horizontal">
+              <div class="form-group">
+               <label for="whitelist" class="col-md-4 control-label" style="text-align: left; width: 200px;">WHITE LISTING</label>
+               <div class="col-md-2">
+                 <input type="checkbox" id="whitelist" value="" checked>
+               </div>
+              </div>
+            </div>  
           </div>
-        </div>
-        <div class="container-fluid" id="domain_clustering">
-          <h3>DOMAIN CLUSTERING</h3>
-          <div class="form-horizontal">
-            <div class="form-group">
-              <label for="prune_threshold" class="col-md-4 control-label" style="text-align: left; width: 200px;">PRUNE THRESHOLD:</label>
-            </div>
-            <div class="form-group">
-              <div class="col-md-12">
-                <input type="number" step="0.01" class="form-control" id="prune_threshold" value="-0.25" style="width: 100px; float: left; margin-right: 10px;">
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#histogram_pruning" style="width: 100px; float: left; margin-right: 10px">
-                  Histogram
-                </button>
-                <div class="modal fade" id="histogram_pruning" role="dialog">
-                  <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h2 class="modal-title">Pruning Threshold Histogram</h2>
-                      </div>
-                      <div class="modal-body" id="hist_pruning">
-                        <div class="ct-chart ct-perfect-fourth" id="chart_pruning"></div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id="reset_button_pruning" style="display:none">Reset Zoom</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <div class="container-fluid" id="log_details">
+            <h4>LOG DETAILS</h4>
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label for="request_text_show" class="col-md-4 control-label" style="text-align: left; width: 160px;">Selected Domains:</label>
+                <button type="button" class="btn btn-default" data-toggle="modal" id="request_text_show" data-target="#request_text_modal">Show Requests</button>
+                <div class="modal fade" id="request_text_modal" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                          <h2 class="modal-title">Requets of selected domains</h2>
+                        </div>
+                        <div class="modal-body" id="request_text">
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-md-12">
-  	              <label for="prune_absolute" class="col-md-8 control-label" style="text-align: left; width: 150px;">Absolute value:</label>
-  	              <div class="col-md-4">
-  	                <input type="checkbox" id="prune_absolute" value="">
-  	              </div>
-              	</div>
-              	<div class="col-md-12">
-  	              <label for="prune_z" class="col-md-8 control-label" style="text-align: left; width: 150px;">Z score:</label>
-  	              <div class="col-md-4">
-  	                <input type="checkbox" id="prune_z" value="" checked="">
-  	              </div>
-              	</div>
               </div>
             </div>
-            <div class="form-group">
-              <label for="max_cluster_size" class="col-md-4 control-label" style="text-align: left; width: 200px;">MAX CLUSTER SIZE:</label>
-            </div>
-            <div class="form-group">
-              <div class="col-md-12">
-                <input type="number" step="0.01" class="form-control" id="max_cluster_size" value="0" style="width: 100px; float: left; margin-right: 10px;">
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#histogram_cluster" style="width: 100px; float: left; margin-right: 10px;">
-                  Histogram
-                </button>
-                <div class="modal fade" id="histogram_cluster" role="dialog">
-                  <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h2 class="modal-title">Cluster Size Histogram</h2>
-                      </div>
-                      <div class="modal-body" id="hist_cluster">
-                        <div class="ct-chart ct-perfect-fourth" id="chart_cluster"></div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id="reset_button_cluster" style="display:none">Reset Zoom</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-12">
-  	              <label for="cluster_absolute" class="col-md-8 control-label" style="text-align: left; width: 150px;">Absolute value:</label>
-  	              <div class="col-md-4">
-  	                <input type="checkbox" id="cluster_absolute" value="">
-  	              </div>
-              	</div>
-              	<div class="col-md-12">
-  	              <label for="cluster_z" class="col-md-8 control-label" style="text-align: left; width: 150px;">Z score:</label>
-  	              <div class="col-md-4">
-  	                <input type="checkbox" id="cluster_z" value="" checked="">
-  	              </div>
-              	</div>
-              </div>
-            </div>
-          </div> 
-        </div>
-        <div class="container-fluid" id="domain_display">
-          <h3>DOMAIN DISPLAY</h3>
-          <div class="form-horizontal">
-            <div class="form-group">
-             <label for="whitelist" class="col-md-2 control-label" style="text-align: left; width: 150px;">WHITE LISTING</label>
-             <div class="col-md-4">
-               <input type="checkbox" id="whitelist" value="" checked>
-             </div>
-            </div>
-          </div>  
-        </div>
-        <div class="container-fluid" id="buttons">
-          <button type="button" class="btn btn-primary" id="apply_button">Apply</button>
-          <button type="button" class="btn btn-default" id="cancel_button">Cancel</button>
+          </div>
+          <div class="container-fluid" id="buttons">
+            <button type="button" class="btn btn-primary" id="apply_button">Apply</button>
+            <button type="button" class="btn btn-default" id="cancel_button">Cancel</button>
+          </div>
         </div>
       </div>
-      <div class="col-md-7" id="graph"></div>
+      <div class="col-md-6" id="graph"></div>
       <div class="col-md-3" id="stdout">
         <div class="container-fluid" id="stdout_group">
             <h3>STANDARD OUTPUT</h3>
@@ -290,6 +315,7 @@
             $("#panel_head").css('color', 'green');
             $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
             draw_graph(json.result.filtered); 
+            $("#request_text").html("");
             $("#stdout_body").prepend(json.result.stdout);
             $("#histogram_pruning").on('shown.bs.modal', function() {
                 // Function to draw an histogram

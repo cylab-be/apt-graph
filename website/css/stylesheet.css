@@ -1,5 +1,5 @@
 html, body {
-  height: 99%;
+  height: 100%;
   width: 100%;
 }
 
@@ -47,22 +47,40 @@ svg {
   z-index: 0;
 }
 
-.container-fluid {
+#container {
   height: 100%;
 }
 
-.row {
-  width: 100%;
+#parent {
   height: 100%;
 }
 
-.col-md-3 {
+#side_bar {
+  height: 78%;
+  width: 18%;
+}
+
+#side_bar_group {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+#graph {
+  width: 60%;
+}
+
+#stdout {
+  height: 77%;
+  width: 22%;
+}
+
+#stdout_group {
   height: 100%;
 }
 
-.tab-pane {
-  height: 85%;
-  overflow: scroll;
+#stdout_body {
+  height: 100%;
+  overflow-y: scroll;
 }
 
 /*Histogram*/
