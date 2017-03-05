@@ -403,8 +403,8 @@ public class RequestHandlerTest extends TestCase {
         Domain domain_node_1 = new Domain();
         Domain domain_node_2 = new Domain();
         for (Domain dom : domain_graph_new.getNodes()) {
-            if (dom.toString().equals("cdn.optimizely.com")) {
-                domain_node_1 = dom;
+            if (dom.toString().equals("stats.g.doubleclick.net")) {
+              domain_node_1 = dom;
             }
             if (dom.toString().equals("ad.doubleclick.net")) {
                 domain_node_2 = dom;
