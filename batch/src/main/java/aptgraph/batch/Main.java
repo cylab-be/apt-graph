@@ -8,6 +8,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -37,8 +38,13 @@ public final class Main {
         Options options = new Options();
         options.addOption("i", true, "Input file (required)");
         options.addOption("o", true, "Output file (required)");
-        options.addOption("k", true,
-                "Impose k value of k-NN graphs (default: 20");
+        Option optionalargument = Option.builder("k")
+                .optionalArg(true)
+                .desc("Impose k value of k-NN graphs (default: 20)")
+                .hasArg(true)
+                .numberOfArgs(1)
+                .build();
+        options.addOption(optionalargument);
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
@@ -46,8 +52,7 @@ public final class Main {
 
         if (cmd.hasOption("h")
                 || !cmd.hasOption("i")
-                || !cmd.hasOption("o")
-                || !cmd.hasOption("k")) {
+                || !cmd.hasOption("o")) {
 
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("java -jar batch-<version>.jar", options);
