@@ -23,14 +23,18 @@ public final class Main {
      * @throws ParseException If we cannot parse command line args
      * @throws FileNotFoundException if the input file does not exist
      * @throws IOException if we cannot read the input file
+     * @throws IllegalArgumentException if argument k is not an int
      */
     public static void main(final String[] args)
-            throws ParseException, FileNotFoundException, IOException {
+            throws ParseException, FileNotFoundException, IOException,
+            IllegalArgumentException {
 
         // Parse command line arguments
         Options options = new Options();
         options.addOption("i", true, "Input file (required)");
         options.addOption("o", true, "Output file (required)");
+        options.addOption("k", false,
+                "Impose k value of k-NN graphs (default: 10");
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
@@ -45,11 +49,20 @@ public final class Main {
             return;
         }
 
+        int myk = 10;
+        try {
+            if (cmd.hasOption("k")) {
+                myk = Integer.parseInt(cmd.getOptionValue("k"));
+            }
+        } catch (IllegalArgumentException ex) {
+                System.err.println(ex.getMessage());
+        }
+
         FileOutputStream output_stream =
                 new FileOutputStream(cmd.getOptionValue("o"));
         try {
             BatchProcessor processor = new BatchProcessor();
-            processor.analyze(
+            processor.analyze(myk,
                     new FileInputStream(cmd.getOptionValue("i")),
                     output_stream);
         } finally {

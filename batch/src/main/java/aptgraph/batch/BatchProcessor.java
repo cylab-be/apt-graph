@@ -57,12 +57,12 @@ public class BatchProcessor {
      * @param output_file
      * @throws IOException if we cannot read the input file
      */
-    public final void analyze(
+    public final void analyze(final int myk,
             final InputStream input_file, final FileOutputStream output_file)
             throws IOException {
 
         HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-                computeGraphs(input_file);
+                computeGraphs(myk, input_file);
 
         saveGraphs(user_graphs, output_file);
     }
@@ -187,7 +187,7 @@ public class BatchProcessor {
     }
 
     final HashMap<String, LinkedList<Graph<Request>>> computeGraphs(
-            final InputStream input_file) throws IOException {
+            final int myk, final InputStream input_file) throws IOException {
 
         // Parsing of the log file
         LOGGER.info("Read and parse input file...");
