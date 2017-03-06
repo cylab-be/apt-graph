@@ -466,14 +466,14 @@ function printRequests(d) {
 
 // Functions to do with populating the User-List
     $(document).ready(function(){
-        var users;
         // JSON-RPC call to method GetUsers()
+        var users;
         var jsonbody = {"jsonrpc": "2.0",
                         "method": "getUsers",
                         "id": 167
                         };
         var request = json_post("http://127.0.0.1:8080" , jsonbody); 
-        users = request.addEventListener('load', function(){
+        request.addEventListener('load', function(){
             if (request.readyState == 4 && request.status == 200){
               json = JSON.parse(request.responseText);
               users = json.result;
@@ -517,6 +517,9 @@ function printRequests(d) {
             alert("Some of the parameter values are wrong!");
             return;
       }
+      $("#panel_head").text('Request Status');
+      $("#panel_head").css('color', 'orange');
+      $("#panel_body").text("Request sent");
       var selecteduser = $("#selected-user").text();
       var white_ongo_text = document.getElementById("white_ongo").value;
       var jsonbody = {"jsonrpc": "2.0",
@@ -679,6 +682,9 @@ function printRequests(d) {
 
         } 
       });
+      request.addEventListener('error', function(){
+          alert('Server is NOT available !');
+        });
     });
     $("#cancel_button").click(function(){
       location.reload();
