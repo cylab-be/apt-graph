@@ -17,6 +17,8 @@ import org.apache.commons.cli.ParseException;
  */
 public final class Main {
 
+    private static final int DEFAULT_K = 20;
+
     /**
      *
      * @param args
@@ -28,13 +30,15 @@ public final class Main {
     public static void main(final String[] args)
             throws ParseException, FileNotFoundException, IOException,
             IllegalArgumentException {
+        // Default value of k (if no user input)
+        int k = DEFAULT_K;
 
         // Parse command line arguments
         Options options = new Options();
         options.addOption("i", true, "Input file (required)");
         options.addOption("o", true, "Output file (required)");
-        options.addOption("k", false,
-                "Impose k value of k-NN graphs (default: 10");
+        options.addOption("k", true,
+                "Impose k value of k-NN graphs (default: 20");
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
@@ -42,27 +46,26 @@ public final class Main {
 
         if (cmd.hasOption("h")
                 || !cmd.hasOption("i")
-                || !cmd.hasOption("o")) {
+                || !cmd.hasOption("o")
+                || !cmd.hasOption("k")) {
 
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("java -jar batch-<version>.jar", options);
             return;
         }
 
-        int myk = 10;
         try {
             if (cmd.hasOption("k")) {
-                myk = Integer.parseInt(cmd.getOptionValue("k"));
+                k = Integer.parseInt(cmd.getOptionValue("k"));
             }
         } catch (IllegalArgumentException ex) {
-                System.err.println(ex.getMessage());
+                System.err.println(ex);
         }
-
         FileOutputStream output_stream =
                 new FileOutputStream(cmd.getOptionValue("o"));
         try {
             BatchProcessor processor = new BatchProcessor();
-            processor.analyze(myk,
+            processor.analyze(k,
                     new FileInputStream(cmd.getOptionValue("i")),
                     output_stream);
         } finally {
