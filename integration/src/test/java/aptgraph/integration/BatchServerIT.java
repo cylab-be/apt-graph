@@ -50,7 +50,7 @@ public class BatchServerIT extends TestCase {
         File temp_file = File.createTempFile("tempfile", ".tmp");
 
         BatchProcessor processor = new BatchProcessor();
-        processor.analyze(
+        processor.analyze(20,
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
                 new FileOutputStream(temp_file));
 

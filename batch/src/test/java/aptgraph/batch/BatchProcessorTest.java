@@ -28,7 +28,7 @@ public class BatchProcessorTest extends TestCase {
         File temp_file = File.createTempFile("tempfile", ".tmp");
 
         BatchProcessor processor = new BatchProcessor();
-        processor.analyze(
+        processor.analyze(20,
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
                 new FileOutputStream(temp_file));
 
@@ -47,7 +47,7 @@ public class BatchProcessorTest extends TestCase {
 
         BatchProcessor processor = new BatchProcessor();
         HashMap<String, LinkedList<Graph<Request>>> original_user_graphs =
-                processor.computeGraphs(
+                processor.computeGraphs(20,
                 getClass().getResourceAsStream("/1000_http_requests.txt"));
         processor.saveGraphs(original_user_graphs,
                 new FileOutputStream(temp_file));
@@ -73,9 +73,8 @@ public class BatchProcessorTest extends TestCase {
         for (int i = 0; i < trials; i++) {
 
             BatchProcessor processor = new BatchProcessor();
-            processor.setK(k);
             HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-                    processor.computeGraphs(
+                    processor.computeGraphs(k,
                     getClass().getResourceAsStream("/simple.txt"));
 
             for (LinkedList<Graph<Request>> graphs : user_graphs.values()) {

@@ -32,8 +32,6 @@ public class BatchProcessor {
     private static final Logger LOGGER = Logger.getLogger(
             BatchProcessor.class.getName());
 
-    private static final int DEFAULT_K = 20;
-
     // Regex to use for the full match of the squid log
     private static final String REGEX
             = "^(\\d+\\.\\d+)\\s+(\\d+)\\s"
@@ -42,7 +40,6 @@ public class BatchProcessor {
             + "([^\\s]+)\\s(\\S+).*$";
 
     private final Pattern pattern;
-    private int k = DEFAULT_K;
 
     /**
      *
@@ -53,16 +50,17 @@ public class BatchProcessor {
 
     /**
      *
+     * @param k
      * @param input_file
      * @param output_file
      * @throws IOException if we cannot read the input file
      */
-    public final void analyze(
+    public final void analyze(final int k,
             final InputStream input_file, final FileOutputStream output_file)
             throws IOException {
 
         HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-                computeGraphs(input_file);
+                computeGraphs(k, input_file);
 
         saveGraphs(user_graphs, output_file);
     }
@@ -187,7 +185,7 @@ public class BatchProcessor {
     }
 
     final HashMap<String, LinkedList<Graph<Request>>> computeGraphs(
-            final InputStream input_file) throws IOException {
+            final int k, final InputStream input_file) throws IOException {
 
         // Parsing of the log file
         LOGGER.info("Read and parse input file...");
@@ -254,13 +252,5 @@ public class BatchProcessor {
         output.writeObject(user_graphs);
         output.close();
         output_file.close();
-    }
-
-    /**
-     * Set the value for k (useful for testing).
-     * @param k
-     */
-    public final void setK(final int k) {
-        this.k = k;
     }
 }
