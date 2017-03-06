@@ -98,7 +98,7 @@ public class RequestHandlerTest extends TestCase {
 
         RequestHandler handler = new RequestHandler(user_graphs);
         handler.analyze("253.115.106.54", new double[]{0.7, 0.1, 0.2},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, true);
+                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, true, "");
     }
 
     /**
@@ -402,6 +402,7 @@ public class RequestHandlerTest extends TestCase {
         Graph<Domain> domain_graph_new = filtered_new.getFirst();
         Domain domain_node_1 = new Domain();
         Domain domain_node_2 = new Domain();
+        Domain domain_node_3 = new Domain();
         for (Domain dom : domain_graph_new.getNodes()) {
             if (dom.toString().equals("stats.g.doubleclick.net")) {
               domain_node_1 = dom;
@@ -409,12 +410,16 @@ public class RequestHandlerTest extends TestCase {
             if (dom.toString().equals("ad.doubleclick.net")) {
                 domain_node_2 = dom;
             }
+            if (dom.toString().equals("google-analytics.com")) {
+                domain_node_3 = dom;
+            }
         }
 
-        filtered_new = handler.whiteListing(filtered);
+        filtered_new = handler.whiteListing(filtered, "google-analytics.com");
         Graph<Domain> domain_graph_new_bis = filtered_new.getFirst();
 
         assertFalse(domain_graph_new_bis.containsKey(domain_node_1));
         assertFalse(domain_graph_new_bis.containsKey(domain_node_2));
+        assertFalse(domain_graph_new_bis.containsKey(domain_node_3));
     }
 }

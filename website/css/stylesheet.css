@@ -87,3 +87,8 @@ svg {
 .ct-series-a .ct-point {
   stroke-width: 7px;
 }
+
+/*Text Area*/
+textarea { 
+  resize: vertical;
+}

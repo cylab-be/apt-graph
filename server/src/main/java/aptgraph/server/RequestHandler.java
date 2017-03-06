@@ -42,6 +42,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  *
@@ -121,6 +122,7 @@ public class RequestHandler {
      * @param prune_z_bool
      * @param cluster_z_bool
      * @param whitelist_bool
+     * @param white_ongo
      * @return Output
      */
     public final Output analyze(
@@ -132,7 +134,8 @@ public class RequestHandler {
             final boolean children_bool,
             final boolean prune_z_bool,
             final boolean cluster_z_bool,
-            final boolean whitelist_bool) {
+            final boolean whitelist_bool,
+            final String white_ongo) {
         // Check input of the user
         if (!checkInputUser(user, feature_weights, feature_ordered_weights,
                 prune_threshold_temp, max_cluster_size_temp,
@@ -232,7 +235,7 @@ public class RequestHandler {
 
         // White listing
         if (whitelist_bool) {
-            filtered = whiteListing(filtered);
+            filtered = whiteListing(filtered, white_ongo);
         }
 
         // Ranking list
@@ -615,17 +618,21 @@ public class RequestHandler {
     /**
      * White List unwanted domains.
      * @param domain_graph
+     * @param white_ongo
      * @return domain_graph
      */
     final LinkedList<Graph<Domain>>
-         whiteListing(final LinkedList<Graph<Domain>> filtered) {
+         whiteListing(final LinkedList<Graph<Domain>> filtered,
+                 final String white_ongo) {
         LinkedList<Graph<Domain>> filtered_new = filtered;
 
         List<String> whitelist = new ArrayList<String>();
+        List<String> whitelist_ongo = new ArrayList<String>();
         LinkedList<Domain> whitelisted = new LinkedList<Domain>();
         try {
             whitelist =
                     Files.readAllLines(PATH, StandardCharsets.UTF_8);
+            whitelist_ongo.addAll(Arrays.asList(white_ongo.split("\n")));
         } catch (IOException ex) {
             Logger.getLogger(RequestHandler.class.getName())
                     .log(Level.SEVERE, null, ex);
@@ -637,7 +644,8 @@ public class RequestHandler {
             Iterator<Domain> iterator_2 = domain_graph.getNodes().iterator();
             while (iterator_2.hasNext()) {
                 Domain dom = iterator_2.next();
-                if (whitelist.contains(dom.toString())
+                if ((whitelist.contains(dom.toString())
+                        || whitelist_ongo.contains(dom.toString()))
                         && !whitelisted.contains(dom)) {
                     whitelisted.add(dom);
                 }
