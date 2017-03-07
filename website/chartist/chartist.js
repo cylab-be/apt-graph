@@ -3442,7 +3442,7 @@ var Chartist = {
             y2: pathElement.y
           }, options.classNames.point).attr({
             'ct:value': [pathElement.data.value.x, pathElement.data.value.y].filter(Chartist.isNumeric).join(','),
-            'ct:value_histo': 'x: ' + Chartist.roundWithPrecision(pathElement.data.value.x,2) + '<br>y: ' + pathElement.data.value.y,
+            'ct:value_histo': 'x: ' + Chartist.roundWithPrecision(pathElement.data.value.x,2) + '<br>y: ' + Chartist.roundWithPrecision(pathElement.data.value.y,2),
             'ct:meta': Chartist.serialize(pathElement.data.meta)
           });
 

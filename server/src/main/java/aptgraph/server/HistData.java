@@ -30,7 +30,7 @@ import java.util.TreeMap;
  *
  * @author Thomas
  */
-public class HistData extends TreeMap<Double, Integer> {
+public class HistData extends TreeMap<Double, Double> {
     private String name = "";
 
     /**
@@ -57,9 +57,9 @@ public class HistData extends TreeMap<Double, Integer> {
      * HistData values.
      * @return
      */
-    public final LinkedList<Integer> getValues() {
-        LinkedList<Integer> list = new LinkedList();
-        for (Integer i : this.values()) {
+    public final LinkedList<Double> getValues() {
+        LinkedList<Double> list = new LinkedList();
+        for (Double i : this.values()) {
             list.add(i);
         }
         return list;
@@ -72,7 +72,7 @@ public class HistData extends TreeMap<Double, Integer> {
     public final String getArray() {
         String data = "";
         LinkedList<Double> keys = this.getKeys();
-        LinkedList<Integer> values = this.getValues();
+        LinkedList<Double> values = this.getValues();
         for (int i = 0; i < keys.size(); i++) {
             data = data.concat("{&quot;x&quot;:");
             data = data.concat(keys.get(i).toString());

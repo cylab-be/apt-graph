@@ -89,6 +89,7 @@
                         </div>
                         <div class="modal-body" id="hist_pruning">
                           <div class="ct-chart ct-perfect-fourth" id="chart_pruning"></div>
+                          <div>N.B.: Similarities higher than 5 have been set to 5.</div>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-default" id="reset_button_pruning" style="display:none">Reset Zoom</button>
@@ -266,12 +267,12 @@
                   </div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group" id="group_modal">
                 <label for="request_text_show" class="col-md-4 control-label" style="text-align: left; width: 160px;">Selected Domains:</label>
-                <button type="button" class="btn btn-default" data-toggle="modal" id="request_text_show" data-target="#request_text_modal">Show Requests</button>
-                <div class="modal fade" id="request_text_modal" role="dialog">
-                  <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
+                <button type="button" class="btn btn-default" data-toggle="modal" id="request_text_show" data-target="#modal_fade_request_text">Show Requests</button>
+                <div class="modal fade" id="modal_fade_request_text" role="dialog">
+                  <div class="modal-dialog modal-lg" id ="modal_dialog_request_text">
+                    <div class="modal-content" id="modal_request_text">
                       <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                         <h2 class="modal-title">Requests of selected domains</h2>
@@ -280,6 +281,7 @@
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-default" id="show_all_domains_button" style="display:none">Print all domains</button>
+                        <button type="button" class="btn btn-default" id="clear_domains_button" style="display:none">Clear</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                       </div>
                     </div>
@@ -314,7 +316,6 @@
       </div>
     </div>
   </div>
-  
 
   <script>
     var json;
@@ -520,6 +521,8 @@ function printRequests(d) {
       $("#panel_head").text('Request Status');
       $("#panel_head").css('color', 'orange');
       $("#panel_body").text("Request sent");
+      $("#chart_pruning").html("");
+      $("#chart_cluster").html("");
       var selecteduser = $("#selected-user").text();
       var white_ongo_text = document.getElementById("white_ongo").value;
       var jsonbody = {"jsonrpc": "2.0",
@@ -550,16 +553,20 @@ function printRequests(d) {
             $("#request_text").html("");
             $("#stdout_body").prepend(json.result.stdout);
             $("#histogram_pruning").on('shown.bs.modal', function() {
+              if($("#chart_pruning").is(':empty')) {
                 // Function to draw an histogram
                   var data = Chartist.deserialize(json.result.histPruning.array);
-                  var options = {
-                    referenceValue: 0,
+                  var options = {                    
                     axisX: {
+                      referenceValue: 0,
                       type: Chartist.AutoScaleAxis,
+                      high: 5.25,
+                      low: -0.25,
                     },
                     axisY: {
-                	  onlyInteger: true,
                       type: Chartist.AutoScaleAxis,
+                      high: 100,
+                      low: 0,
                     },
                     plugins: [
                       Chartist.plugins.ctAxisTitle({
@@ -573,11 +580,11 @@ function printRequests(d) {
                         textAnchor: 'middle'
                         },
                         axisY: {
-                          axisTitle: 'Number of links',
+                          axisTitle: 'Number of links (%)',
                           axisClass: 'ct-axis-title',
                           offset: {
                             x: 0,
-                            y: -10
+                            y: -5
                           },
                           textAnchor: 'middle',
                           flipTitle: false
@@ -605,19 +612,24 @@ function printRequests(d) {
                   $("#reset_button_pruning").click(function() {
                     return reset();
                   });
+                }
               });
 
             $("#histogram_cluster").on('shown.bs.modal', function() {
+              if($("#chart_cluster").is(':empty')) {
                 // Function to draw an histogram
                   var data = Chartist.deserialize(json.result.histCluster.array);
                   var options = {
-                    referenceValue: 0,
                     axisX: {
+                      referenceValue: 0,
                       type: Chartist.AutoScaleAxis,
                       onlyInteger: true,
+                      low: 0,
                     },
                     axisY: {
                       type: Chartist.AutoScaleAxis,
+                      high: 100,
+                      low: 0,
                     },
                     plugins: [
                       Chartist.plugins.ctAxisTitle({
@@ -628,14 +640,14 @@ function printRequests(d) {
                             x: 0,
                             y: 30
                         },
-                        textAnchor: 'middle'
+                        textAnchor: 'middle',
                         },
                         axisY: {
-                          axisTitle: 'Number of Clusters',
+                          axisTitle: 'Number of Clusters (%)',
                           axisClass: 'ct-axis-title',
                           offset: {
                             x: 0,
-                            y: -10
+                            y: -5
                           },
                           textAnchor: 'middle',
                           flipTitle: false
@@ -660,9 +672,11 @@ function printRequests(d) {
                   $("#reset_button_cluster").click(function() {
                     return reset();
                   });
+                }
               });
 
             document.getElementById("show_all_domains_button").style.display = 'inline';
+            document.getElementById("clear_domains_button").style.display = 'inline';
             $("#show_all_domains_button").click(function() {
               for (var i = 0; i < json.result.filtered.length; i++) {
                 for (var j = 0; j < json.result.filtered[i].nodes.length; j++) {
@@ -670,6 +684,9 @@ function printRequests(d) {
                 }
               }
             });
+            $("#clear_domains_button").click(function() {
+              $("#request_text").html("");
+            })
           } else {
             $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
             $("#panel_head").css('color', 'red');

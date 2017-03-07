@@ -92,3 +92,25 @@ svg {
 textarea { 
   resize: vertical;
 }
+
+/*Requests Print*/
+#group_modal {
+  height: 100%;
+}
+
+#modal_fade_request_text {
+  height: 100%;
+}
+
+#modal_dialog_request_text {
+  height: 95%;
+}
+
+#modal_request_text {
+  height: 95%;
+}
+
+#request_text {
+  height: 88%;
+  overflow-y: scroll;
+}

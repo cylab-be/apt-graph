@@ -532,14 +532,14 @@ public class RequestHandler {
             min = Math.round(min);
             step = 1.0;
         } else {
-            int bins = (int) Math.round(list_func.size() / 10.0);
-            bins = Math.max(3, bins);
-            step = (max - min) / bins;
+            max = Math.min(5.0, max);
+            step = 0.01;
         }
         HistData hist_data = new HistData();
         for (Double i = min; i <= max + step; i += step) {
-            hist_data.put(i, 0);
+            hist_data.put(i, 0.0);
         }
+        int total_links = list_func.size();
         for (Double d1 : list_func) {
             Double diff = Double.MAX_VALUE;
             Double bin = hist_data.keySet().iterator().next();
@@ -549,7 +549,7 @@ public class RequestHandler {
                     bin = d2;
                 }
             }
-            hist_data.put(bin, hist_data.get(bin) + 1);
+            hist_data.put(bin, hist_data.get(bin) + 1.0 / total_links * 100);
         }
         // there ara actually (bins + 2) bins (to include max in the histogram)
         return hist_data;
