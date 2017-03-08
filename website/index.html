@@ -677,15 +677,21 @@ function printRequests(d) {
 
             document.getElementById("show_all_domains_button").style.display = 'inline';
             document.getElementById("clear_domains_button").style.display = 'inline';
+            var domains_printed = [];
             $("#show_all_domains_button").click(function() {
               for (var i = 0; i < json.result.filtered.length; i++) {
                 for (var j = 0; j < json.result.filtered[i].nodes.length; j++) {
-                  printRequests(json.result.filtered[i].nodes[j].requests);
+                  var name = json.result.filtered[i].nodes[j].name;
+                  if (!domains_printed.includes(name)) {
+                    printRequests(json.result.filtered[i].nodes[j].requests);
+                    domains_printed.push(name);
+                  }
                 }
               }
             });
             $("#clear_domains_button").click(function() {
               $("#request_text").html("");
+              domains_printed = [];
             })
           } else {
             $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);

@@ -100,14 +100,14 @@ function draw_graph(json_data, printRequests) {
 			// The class is used to remove the additional text later
 	//			if (d3.select(this).select('text.info')[0][0] == null){
 			var info = g.append('text')
-				.classed('info', true)
-	//				.attr('x', 20)
-	//				.attr('y', 10)
-				.attr("font-size","30px")
-				.append("textPath")
+				.append('textPath')
 				.attr("xlink:href", function (d,i) {
 					var path_id = g[0][0].id;
 					return path_id; })
+				.classed('info', true)
+				.attr('x', 20)
+				.attr('y', 10)
+				.attr("font-size","30px")
 				.text(function(d) { 
 					return d.value; });
 		})
@@ -130,14 +130,20 @@ function draw_graph(json_data, printRequests) {
 			// The class is used to remove the additional text later
 			if (d3.select(this).select('text.info')[0][0] === null){
 				printRequests(d.name[1]);
+				g.select('text').remove();
 				var info = g.append('text')
 					.classed('info', true)
-					.attr('x', 0)
-					.attr('y', -10)
+					.attr("x", 12)
+					.attr("dy", ".35em")
 					.attr("font-size","30px")
 					.text(function(d) { return d.name[0] + " (" + d.name[1].length + ")"; });
 			} else {
-				d3.select(this).select('text.info').remove();	
+				d3.select(this).select('text.info').remove();
+				d3.select(this).append('text')
+					.attr("x", 12)
+					.attr("dy", ".35em")
+					.attr("font-size", "10xp")
+					.text(function(d) { return d.name[0]; });
 			}
 		})
 	/*		.on("mouseout", function() {
