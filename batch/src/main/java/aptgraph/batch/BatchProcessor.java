@@ -2,7 +2,7 @@ package aptgraph.batch;
 
 import aptgraph.core.Request;
 import aptgraph.core.TimeSimilarity;
-import aptgraph.core.URLSimilarity;
+//import aptgraph.core.URLSimilarity;
 import aptgraph.core.DomainSimilarity;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
@@ -59,10 +59,7 @@ public class BatchProcessor {
             final InputStream input_file, final FileOutputStream output_file)
             throws IOException {
 
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-                computeGraphs(k, input_file);
-
-        saveGraphs(user_graphs, output_file);
+        saveGraphs(computeGraphs(k, input_file), output_file);
     }
 
     /**
@@ -187,13 +184,10 @@ public class BatchProcessor {
     final HashMap<String, LinkedList<Graph<Request>>> computeGraphs(
             final int k, final InputStream input_file) throws IOException {
 
-        // Parsing of the log file
+        // Parsing of the log file and Split of the log file by users
         LOGGER.info("Read and parse input file...");
-        LinkedList<Request> requests_temp = parseFile(input_file);
-
-        // Split of the log file by users
         HashMap<String, LinkedList<Request>> user_requests =
-                computeUserLog(requests_temp);
+                computeUserLog(parseFile(input_file));
 
         // Build graphs for each user
         HashMap<String, LinkedList<Graph<Request>>> user_graphs =
@@ -211,13 +205,13 @@ public class BatchProcessor {
             nndes_time.setK(k);
             Graph<Request> time_graph = nndes_time.computeGraph(requests);
 
-            LOGGER.log(Level.INFO,
+            /*LOGGER.log(Level.INFO,
                     "Build the URL based graph for user {0} ...", user);
             ThreadedNNDescent<Request> nndes_url =
                     new ThreadedNNDescent<Request>();
             nndes_url.setSimilarity(new URLSimilarity());
             nndes_url.setK(k);
-            Graph<Request> url_graph = nndes_url.computeGraph(requests);
+            Graph<Request> url_graph = nndes_url.computeGraph(requests);*/
 
             LOGGER.log(Level.INFO,
                     "Build the Domain based graph for user {0} ...", user);
@@ -231,7 +225,7 @@ public class BatchProcessor {
             LinkedList<Graph<Request>> graphs =
                     new LinkedList<Graph<Request>>();
             graphs.add(time_graph);
-            graphs.add(url_graph);
+            //graphs.add(url_graph);
             graphs.add(domain_graph);
 
             // Store of the list of graphs for one user
