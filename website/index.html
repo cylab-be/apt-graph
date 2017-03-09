@@ -500,6 +500,148 @@ function printRequests(d) {
           });
     });
 
+// Definition of the histograms
+    $("#histogram_pruning").on('shown.bs.modal', function() {
+      if($("#chart_pruning").is(':empty')) {
+        // Function to draw an histogram
+          var data = Chartist.deserialize(json.result.histPruning.array);
+          var options = {                    
+            axisX: {
+              referenceValue: 0,
+              type: Chartist.AutoScaleAxis,
+              high: 5.25,
+              low: -0.25,
+            },
+            axisY: {
+              type: Chartist.AutoScaleAxis,
+              high: 100,
+              low: 0,
+            },
+            plugins: [
+              Chartist.plugins.ctAxisTitle({
+                axisX: {
+                  axisTitle: 'Value of Similarity',
+                  axisClass: 'ct-axis-title',
+                  offset: {
+                    x: 0,
+                    y: 30
+                },
+                textAnchor: 'middle'
+                },
+                axisY: {
+                  axisTitle: 'Number of links (%)',
+                  axisClass: 'ct-axis-title',
+                  offset: {
+                    x: 0,
+                    y: -5
+                  },
+                  textAnchor: 'middle',
+                  flipTitle: false
+                }
+              }),
+              Chartist.plugins.tooltip(),
+              Chartist.plugins.zoom({ onZoom : onZoom})
+            ]
+          };
+
+          var chart = Chartist.Line("#chart_pruning", data, options);
+          var resetFnc;
+
+          // Functions to zoom on histogram
+          function onZoom(chart, reset) {
+            document.getElementById("reset_button_pruning").style.display = 'inline';
+            resetFnc = reset;         
+          }
+
+          function reset() {
+            resetFnc && resetFnc();
+            resetFnc = null;
+            document.getElementById("reset_button_pruning").style.display = 'none';
+          }
+          $("#reset_button_pruning").click(function() {
+            return reset();
+          });
+        }
+      });
+
+    $("#histogram_cluster").on('shown.bs.modal', function() {
+      if($("#chart_cluster").is(':empty')) {
+        // Function to draw an histogram
+          var data = Chartist.deserialize(json.result.histCluster.array);
+          var options = {
+            axisX: {
+              referenceValue: 0,
+              type: Chartist.AutoScaleAxis,
+              onlyInteger: true,
+              low: 0,
+            },
+            axisY: {
+              type: Chartist.AutoScaleAxis,
+              high: 100,
+              low: 0,
+            },
+            plugins: [
+              Chartist.plugins.ctAxisTitle({
+                axisX: {
+                  axisTitle: 'Size of Clusters',
+                  axisClass: 'ct-axis-title',
+                  offset: {
+                    x: 0,
+                    y: 30
+                },
+                textAnchor: 'middle',
+                },
+                axisY: {
+                  axisTitle: 'Number of Clusters (%)',
+                  axisClass: 'ct-axis-title',
+                  offset: {
+                    x: 0,
+                    y: -5
+                  },
+                  textAnchor: 'middle',
+                  flipTitle: false
+                }
+              }),
+              Chartist.plugins.tooltip(),
+              Chartist.plugins.zoom({ onZoom : onZoom})
+            ]
+          };
+          var chart = Chartist.Line("#chart_cluster", data, options);
+          var resetFnc;
+          // Functions to zoom on histogram
+          function onZoom(chart, reset) {
+            document.getElementById("reset_button_cluster").style.display = 'inline';
+            resetFnc = reset;         
+          }
+          function reset() {
+            resetFnc && resetFnc();
+            resetFnc = null;
+            document.getElementById("reset_button_cluster").style.display = 'none';
+          }
+          $("#reset_button_cluster").click(function() {
+            return reset();
+          });
+        }
+      });
+
+// Functions to manage the print of requests
+    $("#show_all_domains_button").click(function() {
+    var domains_printed = [];
+    for (var i = 0; i < json.result.filtered.length; i++) {
+      for (var j = 0; j < json.result.filtered[i].nodes.length; j++) {
+        var name = json.result.filtered[i].nodes[j].name;
+        if (!domains_printed.includes(name)) {
+          printRequests(json.result.filtered[i].nodes[j].requests);
+          domains_printed.push(name);
+        }
+      }
+    }
+  });
+  $("#clear_domains_button").click(function() {
+    $("#request_text").html("");
+    var domains_printed = [];
+  });
+
  // Functions to do with taking the variables filled in the fields
  // and creating a request to the server for method analyze()   
     $("#apply_button").click(function(){
@@ -551,148 +693,10 @@ function printRequests(d) {
             $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
             draw_graph(json.result.filtered, printRequests); 
             $("#request_text").html("");
+            var domains_printed = [];
             $("#stdout_body").prepend(json.result.stdout);
-            $("#histogram_pruning").on('shown.bs.modal', function() {
-              if($("#chart_pruning").is(':empty')) {
-                // Function to draw an histogram
-                  var data = Chartist.deserialize(json.result.histPruning.array);
-                  var options = {                    
-                    axisX: {
-                      referenceValue: 0,
-                      type: Chartist.AutoScaleAxis,
-                      high: 5.25,
-                      low: -0.25,
-                    },
-                    axisY: {
-                      type: Chartist.AutoScaleAxis,
-                      high: 100,
-                      low: 0,
-                    },
-                    plugins: [
-                      Chartist.plugins.ctAxisTitle({
-                        axisX: {
-                          axisTitle: 'Value of Similarity',
-                          axisClass: 'ct-axis-title',
-                          offset: {
-                            x: 0,
-                            y: 30
-                        },
-                        textAnchor: 'middle'
-                        },
-                        axisY: {
-                          axisTitle: 'Number of links (%)',
-                          axisClass: 'ct-axis-title',
-                          offset: {
-                            x: 0,
-                            y: -5
-                          },
-                          textAnchor: 'middle',
-                          flipTitle: false
-                        }
-                      }),
-                      Chartist.plugins.tooltip(),
-                      Chartist.plugins.zoom({ onZoom : onZoom})
-                    ]
-                  };
-
-                  var chart = Chartist.Line("#chart_pruning", data, options);
-                  var resetFnc;
-
-                  // Functions to zoom on histogram
-                  function onZoom(chart, reset) {
-                    document.getElementById("reset_button_pruning").style.display = 'inline';
-                    resetFnc = reset;         
-                  }
-
-                  function reset() {
-                    resetFnc && resetFnc();
-                    resetFnc = null;
-                    document.getElementById("reset_button_pruning").style.display = 'none';
-                  }
-                  $("#reset_button_pruning").click(function() {
-                    return reset();
-                  });
-                }
-              });
-
-            $("#histogram_cluster").on('shown.bs.modal', function() {
-              if($("#chart_cluster").is(':empty')) {
-                // Function to draw an histogram
-                  var data = Chartist.deserialize(json.result.histCluster.array);
-                  var options = {
-                    axisX: {
-                      referenceValue: 0,
-                      type: Chartist.AutoScaleAxis,
-                      onlyInteger: true,
-                      low: 0,
-                    },
-                    axisY: {
-                      type: Chartist.AutoScaleAxis,
-                      high: 100,
-                      low: 0,
-                    },
-                    plugins: [
-                      Chartist.plugins.ctAxisTitle({
-                        axisX: {
-                          axisTitle: 'Size of Clusters',
-                          axisClass: 'ct-axis-title',
-                          offset: {
-                            x: 0,
-                            y: 30
-                        },
-                        textAnchor: 'middle',
-                        },
-                        axisY: {
-                          axisTitle: 'Number of Clusters (%)',
-                          axisClass: 'ct-axis-title',
-                          offset: {
-                            x: 0,
-                            y: -5
-                          },
-                          textAnchor: 'middle',
-                          flipTitle: false
-                        }
-                      }),
-                      Chartist.plugins.tooltip(),
-                      Chartist.plugins.zoom({ onZoom : onZoom})
-                    ]
-                  };
-                  var chart = Chartist.Line("#chart_cluster", data, options);
-                  var resetFnc;
-                  // Functions to zoom on histogram
-                  function onZoom(chart, reset) {
-                    document.getElementById("reset_button_cluster").style.display = 'inline';
-                    resetFnc = reset;         
-                  }
-                  function reset() {
-                    resetFnc && resetFnc();
-                    resetFnc = null;
-                    document.getElementById("reset_button_cluster").style.display = 'none';
-                  }
-                  $("#reset_button_cluster").click(function() {
-                    return reset();
-                  });
-                }
-              });
-
             document.getElementById("show_all_domains_button").style.display = 'inline';
             document.getElementById("clear_domains_button").style.display = 'inline';
-            var domains_printed = [];
-            $("#show_all_domains_button").click(function() {
-              for (var i = 0; i < json.result.filtered.length; i++) {
-                for (var j = 0; j < json.result.filtered[i].nodes.length; j++) {
-                  var name = json.result.filtered[i].nodes[j].name;
-                  if (!domains_printed.includes(name)) {
-                    printRequests(json.result.filtered[i].nodes[j].requests);
-                    domains_printed.push(name);
-                  }
-                }
-              }
-            });
-            $("#clear_domains_button").click(function() {
-              $("#request_text").html("");
-              domains_printed = [];
-            })
           } else {
             $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
             $("#panel_head").css('color', 'red');
