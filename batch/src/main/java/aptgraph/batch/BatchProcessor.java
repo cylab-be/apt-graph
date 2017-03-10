@@ -185,6 +185,10 @@ public class BatchProcessor {
     private static String computeDomain(final String url)
             throws MalformedURLException {
         String url_temp = url;
+        if (url_temp.startsWith("tcp://")) {
+            String[] url_split = url_temp.split("[:]//");
+            url_temp = url_split[1];
+        }
         if (!url_temp.startsWith("http://")
                 && !url_temp.startsWith("https://")) {
          url_temp = "http://" + url_temp;
