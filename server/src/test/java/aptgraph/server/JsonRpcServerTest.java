@@ -24,6 +24,7 @@
 
 package aptgraph.server;
 
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.TestCase;
@@ -43,7 +44,7 @@ public class JsonRpcServerTest extends TestCase {
     public final void testStart() throws InterruptedException, Exception {
         System.out.println("start");
         final JsonRpcServer server = new JsonRpcServer(
-                getClass().getResourceAsStream("/dummy_graph.ser"));
+                Paths.get("src/test/resources/dummyDir"));
 
         Config conf = new Config();
         conf.setServerPort(12345);

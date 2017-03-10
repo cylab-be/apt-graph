@@ -28,7 +28,11 @@ import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,12 +53,13 @@ import java.util.Arrays;
  * @author Thibault Debatty
  */
 public class RequestHandler {
-    private final HashMap<String,
-            LinkedList<Graph<Request>>> user_graphs;
+    private final Path input_dir;
 
-    RequestHandler(final HashMap<String,
-            LinkedList<Graph<Request>>> user_graphs) {
-        this.user_graphs = user_graphs;
+    private static final Logger LOGGER
+            = Logger.getLogger(JsonRpcServer.class.getName());
+
+    RequestHandler(final Path input_dir) {
+        this.input_dir = input_dir;
     }
 
     // Path of the white list
@@ -76,7 +81,7 @@ public class RequestHandler {
      * @return
      */
     public final List<Graph<Request>> dummy() {
-        Graph<Request> graph = user_graphs.get("219.253.194.242").getFirst();
+        Graph<Request> graph = getUserGraphs("219.253.194.242").getFirst();
 
         // Feature Fusion
 
@@ -101,14 +106,24 @@ public class RequestHandler {
      * Give the list of users available in the log.
      * @return List of users
      */
-    public final ArrayList<String> getUsers() {
-        ArrayList<String> users = new ArrayList<String>();
-        for (Map.Entry<String, LinkedList<Graph<Request>>> entry_set
-                : user_graphs.entrySet()) {
-            String key = entry_set.getKey();
-            users.add(key);
+    public final LinkedList<String> getUsers() {
+        LinkedList<String> user_list = new LinkedList<String>();
+        LOGGER.info("Reading graphs of list of users from disk...");
+        try {
+            File file = new File(input_dir.toString(), "users.ser");
+            FileInputStream input_stream =
+                    new FileInputStream(file.toString());
+            ObjectInputStream input = new ObjectInputStream(
+                    new BufferedInputStream(input_stream));
+            user_list = (LinkedList<String>) input.readObject();
+            input.close();
+        } catch (IOException ex) {
+                System.err.println(ex);
+        } catch (ClassNotFoundException ex) {
+                System.err.println(ex);
         }
-        return users;
+
+        return user_list;
     }
 
     /**
@@ -137,17 +152,16 @@ public class RequestHandler {
             final boolean whitelist_bool,
             final String white_ongo) {
         // Check input of the user
-        if (!checkInputUser(user, feature_weights, feature_ordered_weights,
+        if (!checkInputUser(feature_weights, feature_ordered_weights,
                 prune_threshold_temp, max_cluster_size_temp,
                 prune_z_bool, cluster_z_bool)) {
             return null;
         }
 
         // Choice of the graphs of the user
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        LinkedList<Graph<Request>> graphs = getUserGraphs(user);
 
-        stdout = ("<pre>k-NN Graph : k = "
-                        + graphs.getFirst().getK());
+        stdout = ("<pre>k-NN Graph : k = " + graphs.getFirst().getK());
 
         // Fusion of the features (Graph of Requests)
         Graph<Request> merged_graph =
@@ -256,7 +270,6 @@ public class RequestHandler {
 
     /**
      * Check input of user.
-     * @param user
      * @param feature_weights
      * @param feature_ordered_weights
      * @param prune_threshold_temp
@@ -266,18 +279,12 @@ public class RequestHandler {
      * @return True if no problem
      */
     private boolean checkInputUser(
-            final String user,
             final double[] feature_weights,
             final double[] feature_ordered_weights,
             final double prune_threshold_temp,
             final double max_cluster_size_temp,
             final boolean prune_z_bool,
             final boolean cluster_z_bool) {
-        // Verify that user exists
-        if (!user_graphs.keySet().contains(user)) {
-            return false;
-        }
-
         // Verify the non negativity of weights and the sum of the weights
         double sum_feature_weights = 0;
         for (double d : feature_weights) {
@@ -306,6 +313,31 @@ public class RequestHandler {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Give the list of graphs for a given user.
+     * @param user
+     * @return List of graphs
+     */
+    final LinkedList<Graph<Request>> getUserGraphs(final String user) {
+        LinkedList<Graph<Request>> graphs = new LinkedList<Graph<Request>>();
+        LOGGER.info("Reading graphs of user " + user + " from disk...");
+        try {
+            File file = new File(input_dir.toString(), user + ".ser");
+            FileInputStream input_stream =
+                    new FileInputStream(file.toString());
+            ObjectInputStream input = new ObjectInputStream(
+                    new BufferedInputStream(input_stream));
+            graphs = (LinkedList<Graph<Request>>) input.readObject();
+            input.close();
+        } catch (IOException ex) {
+                System.err.println(ex);
+        } catch (ClassNotFoundException ex) {
+                System.err.println(ex);
+        }
+
+        return graphs;
     }
 
     /**

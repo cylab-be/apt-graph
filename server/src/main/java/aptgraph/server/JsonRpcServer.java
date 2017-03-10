@@ -23,18 +23,12 @@
  */
 package aptgraph.server;
 
-import aptgraph.core.Request;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.nio.file.Path;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,16 +47,15 @@ public class JsonRpcServer {
 
     private volatile org.eclipse.jetty.server.Server http_server;
     private Config config;
-    private final InputStream input_file;
+    private final Path input_dir;
 
     /**
      * Instantiate a server with default configuration.
-     *
-     * @param input_file
+     * @param input_dir
      */
-    public JsonRpcServer(final InputStream input_file) {
+    public JsonRpcServer(final Path input_dir) {
         config = new Config();
-        this.input_file = input_file;
+        this.input_dir = input_dir;
     }
 
     /**
@@ -83,25 +76,11 @@ public class JsonRpcServer {
     public final void start()
             throws IOException, ClassNotFoundException, Exception {
 
-        LOGGER.info("Reading graphs from disk...");
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(input_file));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        Map.Entry<String, LinkedList<Graph<Request>>> entry_set =
-                user_graphs.entrySet().iterator().next();
-        String first_key = entry_set.getKey();
-        LOGGER.log(Level.INFO, "Graph has {0} features",
-                user_graphs.get(first_key).size());
-        LOGGER.log(Level.INFO, "k-NN Graph : k = {0}",
-                user_graphs.get(first_key).getFirst().getK());
         LOGGER.log(Level.INFO, "Starting JSON-RPC server at http://{0}:{1}",
              new Object[]{config.getServerHost(), "" + config.getServerPort()});
 
         RequestHandler request_handler =
-                new RequestHandler(user_graphs);
+                new RequestHandler(input_dir);
 
 
         ObjectMapper object_mapper = new ObjectMapper();

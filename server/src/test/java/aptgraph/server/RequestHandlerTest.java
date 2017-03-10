@@ -25,10 +25,8 @@ package aptgraph.server;
 
 import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -47,16 +45,9 @@ public class RequestHandlerTest extends TestCase {
      */
     public void testTest() throws IOException, ClassNotFoundException {
         System.out.println("test");
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph.ser");
 
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         handler.test();
     }
 
@@ -67,16 +58,9 @@ public class RequestHandlerTest extends TestCase {
      */
     public void testDummy() throws IOException, ClassNotFoundException {
         System.out.println("dummy");
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph.ser");
 
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         handler.dummy();
     }
 
@@ -87,16 +71,9 @@ public class RequestHandlerTest extends TestCase {
      */
     public void testAnalyze() throws IOException, ClassNotFoundException {
         System.out.println("analyze");
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph.ser");
 
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         handler.analyze("253.115.106.54", new double[]{0.7, 0.1, 0.2},
                 new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, true, "");
     }
@@ -109,19 +86,12 @@ public class RequestHandlerTest extends TestCase {
     public void testIntegrityFusionFeatures()
             throws IOException, ClassNotFoundException {
         System.out.println("Integrity : fusion of features");
+
         // Creation of the data
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph.ser");
-
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
-        String user = user_graphs.keySet().iterator().next();
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        String user = handler.getUsers().getFirst();
+        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
@@ -151,19 +121,12 @@ public class RequestHandlerTest extends TestCase {
     public void testIntegrityComputeDomains()
             throws IOException, ClassNotFoundException {
         System.out.println("Integrity : computation of domains");
+        
         // Creation of the data
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph.ser");
-
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
-        String user = user_graphs.keySet().iterator().next();
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        String user = handler.getUsers().getFirst();
+        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
@@ -194,19 +157,12 @@ public class RequestHandlerTest extends TestCase {
     public void testIntegrityDomainSimilarity()
             throws IOException, ClassNotFoundException {
         System.out.println("Integrity : computation of domain similarity");
+        
         // Creation of the data
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph.ser");
-
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
-        String user = user_graphs.keySet().iterator().next();
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        String user = handler.getUsers().getFirst();
+        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
@@ -238,19 +194,13 @@ public class RequestHandlerTest extends TestCase {
     public void testIntegrityDomainPruning()
             throws IOException, ClassNotFoundException {
         System.out.println("Integrity : pruning");
+
         // Creation of the data
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph.ser");
-
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
-        String user = user_graphs.keySet().iterator().next();
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        LinkedList<String> user_list = handler.getUsers();
+        LinkedList<Graph<Request>> graphs =
+                handler.getUserGraphs(user_list.getFirst());
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
@@ -284,19 +234,12 @@ public class RequestHandlerTest extends TestCase {
     public void testIntegrityDomainCluster()
             throws IOException, ClassNotFoundException {
         System.out.println("Integrity : clusering");
+        
         // Creation of the data
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph.ser");
-
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
-        String user = user_graphs.keySet().iterator().next();
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        String user = handler.getUsers().getFirst();
+        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
@@ -332,19 +275,12 @@ public class RequestHandlerTest extends TestCase {
     public void testRemove()
             throws IOException, ClassNotFoundException {
         System.out.println("Test : remove");
+        
         // Creation of the data
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph.ser");
-
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
-        String user = user_graphs.keySet().iterator().next();
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        String user = handler.getUsers().getFirst();
+        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
@@ -369,19 +305,13 @@ public class RequestHandlerTest extends TestCase {
     public void testWhiteListing()
             throws IOException, ClassNotFoundException {
         System.out.println("Test : white listing");
+        
         // Creation of the data
-        InputStream graph_stream =
-                getClass().getResourceAsStream("/dummy_graph_whitelist.ser");
-
-        ObjectInputStream input = new ObjectInputStream(
-                new BufferedInputStream(graph_stream));
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-              (HashMap<String, LinkedList<Graph<Request>>>) input.readObject();
-        input.close();
-
-        RequestHandler handler = new RequestHandler(user_graphs);
-        String user = user_graphs.keySet().iterator().next();
-        LinkedList<Graph<Request>> graphs = user_graphs.get(user);
+        RequestHandler handler =
+                new RequestHandler(Paths
+                        .get("src/test/resources/dummyDir_whitelist"));
+        String user = handler.getUsers().getFirst();
+        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
@@ -392,7 +322,7 @@ public class RequestHandlerTest extends TestCase {
         ArrayList<Graph<Domain>> clusters = domain_graph.connectedComponents();
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
         for (Graph<Domain> subgraph : clusters) {
-            if (subgraph.size() < 100) {
+            if (subgraph.size() < 1000) {
                 filtered.add(subgraph);
             }
         }

@@ -1,8 +1,8 @@
 package aptgraph.server;
 
 //import java.awt.Desktop;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 //import java.io.IOException;
 //import java.net.URI;
 import org.apache.commons.cli.CommandLine;
@@ -34,7 +34,7 @@ public final class Main {
 
         // Parse command line arguments
         Options options = new Options();
-        options.addOption("i", true, "Input file (required)");
+        options.addOption("i", true, "Input directory (required)");
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
@@ -49,7 +49,7 @@ public final class Main {
 
         // Start the json-rpc server
         JsonRpcServer jsonrpc_server = new JsonRpcServer(
-                new FileInputStream(cmd.getOptionValue("i")));
+                Paths.get(cmd.getOptionValue("i")));
         jsonrpc_server.startInBackground();
 
         String url = "http://127.0.0.1:8000";

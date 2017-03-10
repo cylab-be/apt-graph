@@ -25,10 +25,11 @@ package aptgraph.integration;
 
 import aptgraph.batch.BatchProcessor;
 import aptgraph.server.JsonRpcServer;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.TestCase;
@@ -47,15 +48,14 @@ public class BatchServerIT extends TestCase {
     public void testSomeMethod() throws IOException, ClassNotFoundException, InterruptedException, Exception {
         System.out.println("Integration test for batch processor + JSON RPC Server");
         System.out.println("Test batch server with 1000 reqs");
-        File temp_file = File.createTempFile("tempfile", ".tmp");
+        Path temp_dir = Files.createTempDirectory("tempdir");
 
         BatchProcessor processor = new BatchProcessor();
         processor.analyze(20,
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
-                new FileOutputStream(temp_file));
+                temp_dir);
 
-        final JsonRpcServer server = new JsonRpcServer(
-                new FileInputStream(temp_file));
+        final JsonRpcServer server = new JsonRpcServer(temp_dir);
 
         // Start the server in a separate thread, so we can wait and stop it
         // from the main thread...
