@@ -68,6 +68,10 @@ public class RequestHandler {
     // Define stdout on UI
     private String stdout = "";
 
+    // User (Storage variable)
+    private String user_store = "";
+    private LinkedList<Graph<Request>> graphs = null;
+
     /**
      * A test json-rpc call, with no argument, that should return "hello".
      * @return
@@ -108,7 +112,7 @@ public class RequestHandler {
      */
     public final LinkedList<String> getUsers() {
         LinkedList<String> user_list = new LinkedList<String>();
-        LOGGER.info("Reading graphs of list of users from disk...");
+        LOGGER.info("Reading list of users from disk...");
         try {
             File file = new File(input_dir.toString(), "users.ser");
             FileInputStream input_stream =
@@ -159,7 +163,10 @@ public class RequestHandler {
         }
 
         // Choice of the graphs of the user
-        LinkedList<Graph<Request>> graphs = getUserGraphs(user);
+        if (user_store.isEmpty() || !user_store.equals(user)) {
+            graphs = getUserGraphs(user);
+            user_store = user;
+        }
 
         stdout = ("<pre>k-NN Graph : k = " + graphs.getFirst().getK());
 
@@ -252,20 +259,15 @@ public class RequestHandler {
             filtered = whiteListing(filtered, white_ongo);
         }
 
-        // Ranking list
+        // Ranking
         if (filtered.size() > 1) {
-            showRankingList(filtered, domains_total);
+            showRanking(filtered, domains_total);
         }
 
         // Output
         stdout = stdout.concat("<br>Found " + filtered.size()
                 + " clusters</pre>");
-        Output output = new Output();
-        output.setFiltered(filtered);
-        output.setStdout(stdout);
-        output.setHistPruning(hist_pruning);
-        output.setHistCluster(hist_cluster);
-        return output;
+        return createOutput(filtered, hist_pruning, hist_cluster);
     }
 
     /**
@@ -321,15 +323,16 @@ public class RequestHandler {
      * @return List of graphs
      */
     final LinkedList<Graph<Request>> getUserGraphs(final String user) {
-        LinkedList<Graph<Request>> graphs = new LinkedList<Graph<Request>>();
-        LOGGER.info("Reading graphs of user " + user + " from disk...");
+        LinkedList<Graph<Request>> user_graphs =
+                new LinkedList<Graph<Request>>();
+        LOGGER.log(Level.INFO, "Reading graphs of user {0} from disk...", user);
         try {
             File file = new File(input_dir.toString(), user + ".ser");
             FileInputStream input_stream =
                     new FileInputStream(file.toString());
             ObjectInputStream input = new ObjectInputStream(
                     new BufferedInputStream(input_stream));
-            graphs = (LinkedList<Graph<Request>>) input.readObject();
+            user_graphs = (LinkedList<Graph<Request>>) input.readObject();
             input.close();
         } catch (IOException ex) {
                 System.err.println(ex);
@@ -337,7 +340,7 @@ public class RequestHandler {
                 System.err.println(ex);
         }
 
-        return graphs;
+        return user_graphs;
     }
 
     /**
@@ -728,7 +731,7 @@ public class RequestHandler {
      * @param filtered
      * @param domains_total
      */
-    private void showRankingList(final LinkedList<Graph<Domain>> filtered,
+    private void showRanking(final LinkedList<Graph<Domain>> filtered,
             final int domains_total) {
         // Creation of a big graph with the result
         Graph<Domain> graph_all = new Graph<Domain>();
@@ -792,7 +795,7 @@ public class RequestHandler {
         } else {
             stdout = stdout.concat("<br>TOP for APT.FINDME.be : NOT FOUND");
         }
-        stdout = stdout.concat("<br>Ranking List :");
+        stdout = stdout.concat("<br>Ranking :");
         stdout = stdout.concat("<br>(#Children + #Parents / #Resquests)");
         for (Domain dom : sorted) {
             stdout = stdout.concat("<br>    (" + index_1.get(dom)
@@ -844,6 +847,25 @@ public class RequestHandler {
         }
 
         return sorted;
+    }
+
+    /**
+     * Create the output variable.
+     * @param filtered
+     * @param hist_pruning
+     * @param hist_cluster
+     * @return Output
+     */
+    private Output createOutput(
+            final LinkedList<Graph<Domain>> filtered,
+            final HistData hist_pruning,
+            final HistData hist_cluster) {
+        Output output = new Output();
+        output.setFiltered(filtered);
+        output.setStdout(stdout);
+        output.setHistPruning(hist_pruning);
+        output.setHistCluster(hist_cluster);
+        return output;
     }
 
     /**
