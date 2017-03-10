@@ -2,8 +2,8 @@ package aptgraph.batch;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -37,7 +37,7 @@ public final class Main {
         // Parse command line arguments
         Options options = new Options();
         options.addOption("i", true, "Input file (required)");
-        options.addOption("o", true, "Output file (required)");
+        options.addOption("o", true, "Output directory (required)");
         Option optionalargument = Option.builder("k")
                 .optionalArg(true)
                 .desc("Impose k value of k-NN graphs (default: 20)")
@@ -66,15 +66,14 @@ public final class Main {
         } catch (IllegalArgumentException ex) {
                 System.err.println(ex);
         }
-        FileOutputStream output_stream =
-                new FileOutputStream(cmd.getOptionValue("o"));
+
         try {
             BatchProcessor processor = new BatchProcessor();
             processor.analyze(k,
                     new FileInputStream(cmd.getOptionValue("i")),
-                    output_stream);
-        } finally {
-            output_stream.close();
+                    Paths.get(cmd.getOptionValue("o")));
+        } catch (IllegalArgumentException ex) {
+                System.err.println(ex);
         }
 
     }

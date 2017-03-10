@@ -8,6 +8,7 @@ import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,23 +55,41 @@ public class BatchProcessor {
      *
      * @param k
      * @param input_file
-     * @param output_file
+     * @param output_dir
      * @throws IOException if we cannot read the input file
      */
     public final void analyze(final int k,
-            final InputStream input_file, final FileOutputStream output_file)
+            final InputStream input_file, final Path output_dir)
             throws IOException {
 
-        saveGraphs(computeGraphs(k, input_file), output_file);
+        // Parsing of the log file and Split of the log file by users
+        LOGGER.info("Read and parse input file...");
+        HashMap<String, LinkedList<Request>> user_requests =
+                computeUserLog(parseFile(input_file));
+
+        // Build graphs for each user
+        LinkedList<String> user_list = new LinkedList<String>();
+        for (Map.Entry<String, LinkedList<Request>> entry
+                : user_requests.entrySet()) {
+            String user = entry.getKey();
+            LinkedList<Request> requests = entry.getValue();
+
+            LinkedList<Graph<Request>> graphs =
+                    computeUserGraphs(k, user, requests);
+
+            // Store of the list of graphs for one user on disk
+            saveGraphs(output_dir, user, graphs);
+            user_list.add(user);
+        }
+        saveUsers(output_dir, user_list);
     }
 
     /**
      * Read and parse the input file line by line.
-     *
      * @param file
-     * @return
+     * @return LinkedList<Request>
      */
-    private LinkedList<Request> parseFile(final InputStream file)
+    final LinkedList<Request> parseFile(final InputStream file)
             throws IOException {
 
         LinkedList<Request> requests = new LinkedList<Request>();
@@ -88,6 +109,11 @@ public class BatchProcessor {
         return requests;
     }
 
+    /**
+     * Parse a give line.
+     * @param line
+     * @return  Request
+     */
     private Request parseLine(final String line) {
 
         Matcher match = pattern.matcher(line);
@@ -127,7 +153,7 @@ public class BatchProcessor {
      * @return user_requests : HashMap<String, LinkedList<Request>
      * of the log file sorted by user
      */
-    private HashMap<String, LinkedList<Request>> computeUserLog(
+    final HashMap<String, LinkedList<Request>> computeUserLog(
         final LinkedList<Request> requests_temp) {
         HashMap<String, LinkedList<Request>> user_requests =
                 new HashMap<String, LinkedList<Request>>();
@@ -181,70 +207,103 @@ public class BatchProcessor {
         return domain;
     }
 
-    final HashMap<String, LinkedList<Graph<Request>>> computeGraphs(
-            final int k, final InputStream input_file) throws IOException {
+    /**
+     * Compute the feature graphs of a user.
+     * @param k
+     * @param user
+     * @param requests
+     * @return LinkedList<Graph<Request>>
+     * @throws IOException
+     */
+    final LinkedList<Graph<Request>> computeUserGraphs(
+            final int k,
+            final String user,
+            final LinkedList<Request> requests) {
 
-        // Parsing of the log file and Split of the log file by users
-        LOGGER.info("Read and parse input file...");
-        HashMap<String, LinkedList<Request>> user_requests =
-                computeUserLog(parseFile(input_file));
+        LOGGER.log(Level.INFO,
+                "Build the time based graph for user {0} ...", user);
+        ThreadedNNDescent<Request> nndes_time =
+                new ThreadedNNDescent<Request>();
+        nndes_time.setSimilarity(new TimeSimilarity());
+        nndes_time.setK(k);
+        Graph<Request> time_graph = nndes_time.computeGraph(requests);
 
-        // Build graphs for each user
-        HashMap<String, LinkedList<Graph<Request>>> user_graphs =
-                new HashMap<String, LinkedList<Graph<Request>>>();
-        for (Map.Entry<String, LinkedList<Request>> entry
-                : user_requests.entrySet()) {
-            String user = entry.getKey();
-            LinkedList<Request> requests = entry.getValue();
+        /*LOGGER.log(Level.INFO,
+                "Build the URL based graph for user {0} ...", user);
+        ThreadedNNDescent<Request> nndes_url =
+                new ThreadedNNDescent<Request>();
+        nndes_url.setSimilarity(new URLSimilarity());
+        nndes_url.setK(k);
+        Graph<Request> url_graph = nndes_url.computeGraph(requests);*/
 
-            LOGGER.log(Level.INFO,
-                    "Build the time based graph for user {0} ...", user);
-            ThreadedNNDescent<Request> nndes_time =
-                    new ThreadedNNDescent<Request>();
-            nndes_time.setSimilarity(new TimeSimilarity());
-            nndes_time.setK(k);
-            Graph<Request> time_graph = nndes_time.computeGraph(requests);
+        LOGGER.log(Level.INFO,
+                "Build the Domain based graph for user {0} ...", user);
+        ThreadedNNDescent<Request> nndes_domain =
+                new ThreadedNNDescent<Request>();
+        nndes_domain.setSimilarity(new DomainSimilarity());
+        nndes_domain.setK(k);
+        Graph<Request> domain_graph = nndes_domain.computeGraph(requests);
 
-            /*LOGGER.log(Level.INFO,
-                    "Build the URL based graph for user {0} ...", user);
-            ThreadedNNDescent<Request> nndes_url =
-                    new ThreadedNNDescent<Request>();
-            nndes_url.setSimilarity(new URLSimilarity());
-            nndes_url.setK(k);
-            Graph<Request> url_graph = nndes_url.computeGraph(requests);*/
+        // List of graphs
+        LinkedList<Graph<Request>> graphs =
+                new LinkedList<Graph<Request>>();
+        graphs.add(time_graph);
+        //graphs.add(url_graph);
+        graphs.add(domain_graph);
 
-            LOGGER.log(Level.INFO,
-                    "Build the Domain based graph for user {0} ...", user);
-            ThreadedNNDescent<Request> nndes_domain =
-                    new ThreadedNNDescent<Request>();
-            nndes_domain.setSimilarity(new DomainSimilarity());
-            nndes_domain.setK(k);
-            Graph<Request> domain_graph = nndes_domain.computeGraph(requests);
-
-            // List of graphs
-            LinkedList<Graph<Request>> graphs =
-                    new LinkedList<Graph<Request>>();
-            graphs.add(time_graph);
-            //graphs.add(url_graph);
-            graphs.add(domain_graph);
-
-            // Store of the list of graphs for one user
-            user_graphs.put(user, graphs);
-        }
-
-        return user_graphs;
+        return graphs;
     }
 
+    /**
+     * Save the feature graphs of a user.
+     * @param output_dir
+     * @param user
+     * @param graphs
+     * @throws IOException
+     */
     final void saveGraphs(
-            final HashMap<String, LinkedList<Graph<Request>>> user_graphs,
-            final FileOutputStream output_file)
-            throws IOException {
+        final Path output_dir,
+        final String user,
+        final LinkedList<Graph<Request>> graphs) {
 
-        LOGGER.info("Save graphs to disk...");
-        ObjectOutputStream output = new ObjectOutputStream(
-                new BufferedOutputStream(output_file));
-        output.writeObject(user_graphs);
-        output.close();
-        output_file.close();
+        try {
+            LOGGER.log(Level.INFO,
+                    "Save graphs of user {0} to disk...", user);
+            File file = new File(output_dir.toString(), user + ".ser");
+            if (Files.notExists(output_dir)) {
+                Files.createDirectory(output_dir);
+            }
+            FileOutputStream output_stream =
+                new FileOutputStream(file.toString());
+            ObjectOutputStream output = new ObjectOutputStream(
+                    new BufferedOutputStream(output_stream));
+            output.writeObject(graphs);
+            output.close();
+        } catch (IOException ex) {
+                System.err.println(ex);
+        }
+    }
+
+    /**
+     * Save the list of the users.
+     * @param output_dir
+     * @param user_list
+     */
+    final void saveUsers(
+            final Path output_dir,
+            final LinkedList<String>  user_list) {
+        try {
+            LOGGER.log(Level.INFO,
+                    "Save list of users to disk...");
+            File file = new File(output_dir.toString(), "users.ser");
+            FileOutputStream output_stream =
+                new FileOutputStream(file.toString());
+            ObjectOutputStream output = new ObjectOutputStream(
+                    new BufferedOutputStream(output_stream));
+            output.writeObject(user_list);
+            output.close();
+        } catch (IOException ex) {
+                System.err.println(ex);
+        }
     }
 }
