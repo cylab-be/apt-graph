@@ -75,7 +75,8 @@ public class RequestHandlerTest extends TestCase {
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         handler.analyze("253.115.106.54", new double[]{0.7, 0.1, 0.2},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, true, "");
+                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, true, "",
+                new double[]{0.45, 0.45, 0.1});
     }
 
     /**

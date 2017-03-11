@@ -142,6 +142,7 @@ public class RequestHandler {
      * @param cluster_z_bool
      * @param whitelist_bool
      * @param white_ongo
+     * @param ranking_weights
      * @return Output
      */
     public final Output analyze(
@@ -154,11 +155,12 @@ public class RequestHandler {
             final boolean prune_z_bool,
             final boolean cluster_z_bool,
             final boolean whitelist_bool,
-            final String white_ongo) {
+            final String white_ongo,
+            final double[] ranking_weights) {
         // Check input of the user
         if (!checkInputUser(feature_weights, feature_ordered_weights,
                 prune_threshold_temp, max_cluster_size_temp,
-                prune_z_bool, cluster_z_bool)) {
+                prune_z_bool, cluster_z_bool, ranking_weights)) {
             return null;
         }
 
@@ -261,7 +263,7 @@ public class RequestHandler {
 
         // Ranking
         if (filtered.size() > 1) {
-            showRanking(filtered, domains_total);
+            showRanking(filtered, domains_total, ranking_weights);
         }
 
         // Output
@@ -278,6 +280,7 @@ public class RequestHandler {
      * @param max_cluster_size_temp
      * @param prune_z_bool
      * @param cluster_z_bool
+     * @param ranking_weights
      * @return True if no problem
      */
     private boolean checkInputUser(
@@ -286,8 +289,10 @@ public class RequestHandler {
             final double prune_threshold_temp,
             final double max_cluster_size_temp,
             final boolean prune_z_bool,
-            final boolean cluster_z_bool) {
-        // Verify the non negativity of weights and the sum of the weights
+            final boolean cluster_z_bool,
+            final double[] ranking_weights) {
+        // Verify the non negativity of weights and
+        // the sum of the weights of features
         double sum_feature_weights = 0;
         for (double d : feature_weights) {
             sum_feature_weights += d;
@@ -314,6 +319,21 @@ public class RequestHandler {
         if (!cluster_z_bool && max_cluster_size_temp < 0) {
             return false;
         }
+
+        // Verify the non negativity of weights and
+        // the sum of the weights for ranking
+        double sum_ranking_weights = 0;
+        for (double d : ranking_weights) {
+            sum_ranking_weights += d;
+            if (d < 0) {
+                return false;
+            }
+        }
+
+        if (sum_ranking_weights != 1) {
+            return false;
+        }
+
         return true;
     }
 
@@ -730,9 +750,10 @@ public class RequestHandler {
      * Print of the ranking list.
      * @param filtered
      * @param domains_total
+     * @param ranking_weights
      */
     private void showRanking(final LinkedList<Graph<Domain>> filtered,
-            final int domains_total) {
+            final int domains_total, final double[] ranking_weights) {
         // Creation of a big graph with the result
         Graph<Domain> graph_all = new Graph<Domain>();
         for (Graph<Domain> graph : filtered) {
@@ -749,43 +770,54 @@ public class RequestHandler {
         stdout = stdout.concat("<br>Number of domains shown: "
                 + list_domain.size());
 
-        // Number of children & parents index
-        HashMap<Domain, Integer> index_1 = new HashMap<Domain, Integer>();
+        // Number of children
+        HashMap<Domain, Integer> index_children =
+                new HashMap<Domain, Integer>();
+        // Number of parents
+        HashMap<Domain, Integer> index_parents =
+                new HashMap<Domain, Integer>();
         // Number of requests index
-        HashMap<Domain, Integer> index_2 = new HashMap<Domain, Integer>();
+        HashMap<Domain, Integer> index_requests =
+                new HashMap<Domain, Integer>();
 
         // Number of children & Number of requests
         for (Domain dom : graph_all.getNodes()) {
-            index_1.put(dom, graph_all.getNeighbors(dom).size());
-            index_2.put(dom, dom.size());
+            index_children.put(dom, graph_all.getNeighbors(dom).size());
+            index_parents.put(dom, 0);
+            index_requests.put(dom, dom.size());
         }
 
         // Number of parents
         for (Domain parent : graph_all.getNodes()) {
             for (Neighbor<Domain> child : graph_all.getNeighbors(parent)) {
-                index_1.put(child.node, index_1.get(child.node) + 1);
+               index_parents.put(child.node, index_parents.get(child.node) + 1);
             }
         }
 
+        // Fusion of indexes
+        HashMap<Domain, Double> index = new HashMap<Domain, Double>();
+        for (Domain dom : graph_all.getNodes()) {
+            index.put(dom,
+                    ranking_weights[0] * index_parents.get(dom)
+                    + ranking_weights[1] * index_children.get(dom)
+                    + ranking_weights[2] * index_requests.get(dom));
+        }
+
         //Sort
-        ArrayList<Domain> sorted = sortByIndex(list_domain,
-                index_1, index_2);
+        ArrayList<Domain> sorted = sortByIndex(list_domain, index);
 
         // Print out
         double top = 0.0;
-        int rank_1 = Integer.MAX_VALUE;
-        int rank_2 = Integer.MAX_VALUE;
+        double rank = Double.MAX_VALUE;
         boolean founded = false;
         for (Domain dom : sorted) {
             if (dom.toString().equals("APT.FINDME.be")) {
-                rank_1 = index_1.get(dom);
-                rank_2 = index_2.get(dom);
+                rank = index.get(dom);
                 top++;
                 founded = true;
             }
             if (!dom.toString().equals("APT.FINDME.be")
-                    && index_1.get(dom) <= rank_1
-                    && index_2.get(dom) <= rank_2) {
+                    && index.get(dom) <= rank) {
                 top++;
             }
         }
@@ -798,52 +830,30 @@ public class RequestHandler {
         stdout = stdout.concat("<br>Ranking :");
         stdout = stdout.concat("<br>(#Children + #Parents / #Resquests)");
         for (Domain dom : sorted) {
-            stdout = stdout.concat("<br>    (" + index_1.get(dom)
-                + "/" + index_2.get(dom)
-                + ") : " + dom);
+            stdout = stdout.concat("<br>    ("
+                    + Math.round(index.get(dom) * 100) / 100.0 + ") : " + dom);
         }
     }
 
     /**
      * Sorting function, based on the given indexes.
      * @param list_domain
-     * @param index_1 Number of children
-     * @param index_2 Number of parents
-     * @param index_3 Number of requests
+     * @param index
      * @return ArrayList<Domain> sorted list
      */
     private ArrayList<Domain> sortByIndex(final List<Domain> list_domain,
-            final HashMap<Domain, Integer> index_1,
-            final HashMap<Domain, Integer> index_2) {
-        // Sort on first index
+            final HashMap<Domain, Double> index) {
         Domain selected;
-        ArrayList<Domain> sorted_temp = new ArrayList<Domain>();
+        ArrayList<Domain> sorted = new ArrayList<Domain>();
         while (!list_domain.isEmpty()) {
             selected = list_domain.get(0);
             for (Domain dom : list_domain) {
-                if (index_1.get(dom) < index_1.get(selected)) {
-                    selected = dom;
-                }
-            }
-            sorted_temp.add(selected);
-            list_domain.remove(selected);
-        }
-        // Sort on second index
-        ArrayList<Domain> sorted = new ArrayList<Domain>();
-        int index_iterator1 = index_1.get(sorted_temp.get(0));
-        while (!sorted_temp.isEmpty()) {
-            selected = sorted_temp.get(0);
-            for (Domain dom : sorted_temp) {
-                if (index_1.get(dom) == index_iterator1
-                        && index_2.get(dom) < index_2.get(selected)) {
+                if (index.get(dom) < index.get(selected)) {
                     selected = dom;
                 }
             }
             sorted.add(selected);
-            sorted_temp.remove(selected);
-            if (!sorted_temp.isEmpty()) {
-                index_iterator1 = index_1.get(sorted_temp.get(0));
-            }
+            list_domain.remove(selected);
         }
 
         return sorted;
