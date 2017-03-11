@@ -6,6 +6,7 @@ import aptgraph.core.TimeSimilarity;
 import aptgraph.core.DomainSimilarity;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
+import info.debatty.java.graphs.build.Brute;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -228,27 +229,51 @@ public class BatchProcessor {
 
         LOGGER.log(Level.INFO,
                 "Build the time based graph for user {0} ...", user);
-        ThreadedNNDescent<Request> nndes_time =
-                new ThreadedNNDescent<Request>();
-        nndes_time.setSimilarity(new TimeSimilarity());
-        nndes_time.setK(k);
-        Graph<Request> time_graph = nndes_time.computeGraph(requests);
+        Graph<Request> time_graph;
+        if (requests.size() < 50) {
+            Brute<Request> nndes_time = new Brute<Request>();
+            nndes_time.setSimilarity(new TimeSimilarity());
+            nndes_time.setK(k);
+            time_graph = nndes_time.computeGraph(requests);
+        } else {
+            ThreadedNNDescent<Request> nndes_time =
+                    new ThreadedNNDescent<Request>();
+            nndes_time.setSimilarity(new TimeSimilarity());
+            nndes_time.setK(k);
+            time_graph = nndes_time.computeGraph(requests);
+        }
 
         /*LOGGER.log(Level.INFO,
                 "Build the URL based graph for user {0} ...", user);
-        ThreadedNNDescent<Request> nndes_url =
-                new ThreadedNNDescent<Request>();
-        nndes_url.setSimilarity(new URLSimilarity());
-        nndes_url.setK(k);
-        Graph<Request> url_graph = nndes_url.computeGraph(requests);*/
+        Graph<Request> url_graph;
+        if (requests.size() < 50) {
+            Brute<Request> nndes_url = new Brute<Request>();
+            nndes_url.setSimilarity(new URLSimilarity());
+            nndes_url.setK(k);
+            url_graph = nndes_url.computeGraph(requests);
+        } else {
+            ThreadedNNDescent<Request> nndes_url =
+                    new ThreadedNNDescent<Request>();
+            nndes_url.setSimilarity(new URLSimilarity());
+            nndes_url.setK(k);
+            url_graph = nndes_url.computeGraph(requests);
+        }*/
 
         LOGGER.log(Level.INFO,
                 "Build the Domain based graph for user {0} ...", user);
-        ThreadedNNDescent<Request> nndes_domain =
-                new ThreadedNNDescent<Request>();
-        nndes_domain.setSimilarity(new DomainSimilarity());
-        nndes_domain.setK(k);
-        Graph<Request> domain_graph = nndes_domain.computeGraph(requests);
+        Graph<Request> domain_graph;
+        if (requests.size() < 50) {
+            Brute<Request> nndes_domain = new Brute<Request>();
+            nndes_domain.setSimilarity(new DomainSimilarity());
+            nndes_domain.setK(k);
+            domain_graph = nndes_domain.computeGraph(requests);
+        } else {
+            ThreadedNNDescent<Request> nndes_domain =
+                    new ThreadedNNDescent<Request>();
+            nndes_domain.setSimilarity(new DomainSimilarity());
+            nndes_domain.setK(k);
+            domain_graph = nndes_domain.computeGraph(requests);
+        }
 
         // List of graphs
         LinkedList<Graph<Request>> graphs =
