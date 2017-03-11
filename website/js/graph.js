@@ -110,6 +110,7 @@ function draw_graph(json_data, printRequests) {
 				.attr("font-size","30px")
 				.text(function(d) { 
 					return d.value; });
+			alert(Math.round(d.value * 100) / 100.0);
 		})
 		.on("mouseout", function() {
 		// Remove the info text on mouse out.
