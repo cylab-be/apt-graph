@@ -23,6 +23,8 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +70,7 @@ public class BatchProcessor {
                 computeUserLog(parseFile(input_file));
 
         // Build graphs for each user
-        LinkedList<String> user_list = new LinkedList<String>();
+        ArrayList<String> user_list = new ArrayList<String>();
         for (Map.Entry<String, LinkedList<Request>> entry
                 : user_requests.entrySet()) {
             String user = entry.getKey();
@@ -295,7 +297,7 @@ public class BatchProcessor {
      */
     final void saveUsers(
             final Path output_dir,
-            final LinkedList<String>  user_list) {
+            final ArrayList<String>  user_list) {
         try {
             LOGGER.log(Level.INFO,
                     "Save list of users to disk...");
@@ -304,6 +306,7 @@ public class BatchProcessor {
                 new FileOutputStream(file.toString());
             ObjectOutputStream output = new ObjectOutputStream(
                     new BufferedOutputStream(output_stream));
+            Collections.sort(user_list);
             output.writeObject(user_list);
             output.close();
         } catch (IOException ex) {

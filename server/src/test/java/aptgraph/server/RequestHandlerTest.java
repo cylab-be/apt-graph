@@ -90,7 +90,7 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        String user = handler.getUsers().getFirst();
+        String user = handler.getUsers().get(0);
         LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
@@ -125,7 +125,7 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        String user = handler.getUsers().getFirst();
+        String user = handler.getUsers().get(0);
         LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
@@ -161,7 +161,7 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        String user = handler.getUsers().getFirst();
+        String user = handler.getUsers().get(0);
         LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
@@ -198,9 +198,8 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        LinkedList<String> user_list = handler.getUsers();
-        LinkedList<Graph<Request>> graphs =
-                handler.getUserGraphs(user_list.getFirst());
+        String user = handler.getUsers().get(0);
+        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
@@ -238,7 +237,7 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        String user = handler.getUsers().getFirst();
+        String user = handler.getUsers().get(0);
         LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
@@ -279,7 +278,7 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        String user = handler.getUsers().getFirst();
+        String user = handler.getUsers().get(0);
         LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,
@@ -310,7 +309,7 @@ public class RequestHandlerTest extends TestCase {
         RequestHandler handler =
                 new RequestHandler(Paths
                         .get("src/test/resources/dummyDir_whitelist"));
-        String user = handler.getUsers().getFirst();
+        String user = handler.getUsers().get(0);
         LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
         Graph<Request> merged_graph =
                 handler.computeFusionFeatures(graphs,

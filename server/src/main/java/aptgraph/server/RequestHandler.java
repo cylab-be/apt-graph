@@ -110,8 +110,8 @@ public class RequestHandler {
      * Give the list of users available in the log.
      * @return List of users
      */
-    public final LinkedList<String> getUsers() {
-        LinkedList<String> user_list = new LinkedList<String>();
+    public final ArrayList<String> getUsers() {
+        ArrayList<String> user_list = new ArrayList<String>();
         LOGGER.info("Reading list of users from disk...");
         try {
             File file = new File(input_dir.toString(), "users.ser");
@@ -119,7 +119,7 @@ public class RequestHandler {
                     new FileInputStream(file.toString());
             ObjectInputStream input = new ObjectInputStream(
                     new BufferedInputStream(input_stream));
-            user_list = (LinkedList<String>) input.readObject();
+            user_list = (ArrayList<String>) input.readObject();
             input.close();
         } catch (IOException ex) {
                 System.err.println(ex);
