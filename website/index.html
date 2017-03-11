@@ -31,7 +31,7 @@
             <h4>CHOICE OF USER</h4>
               <div class="dropdown" id="user-list">
                 <a class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" href="#" id="selected-user">User List<span class="caret"></span></a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu scrollable-menu" id="user-list_menu">
                 </ul>
               </div> 
           </div>
@@ -76,7 +76,7 @@
             <div class="form-horizontal">
               <div class="form-group">
                 <div class="col-md-12">
-                  <input type="number" step="0.01" class="form-control" id="prune_threshold" value="-0.25" style="width: 80px; float: left; margin-right: 10px;">
+                  <input type="number" step="0.01" class="form-control" id="prune_threshold" value="0.19" style="width: 80px; float: left; margin-right: 10px;">
                   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#histogram_pruning" style="width: 100px; float: left; margin-right: 10px">
                     Histogram
                   </button>
@@ -101,13 +101,13 @@
                   <div class="col-md-12">
     	              <label for="prune_absolute" class="col-md-4 control-label" style="text-align: left; width: 150px;">Absolute value:</label>
     	              <div class="col-md-2">
-    	                <input type="checkbox" id="prune_absolute" value="">
+    	                <input type="checkbox" id="prune_absolute" value="" checked="">
     	              </div>
                   </div>
                   <div class="col-md-12">
     	              <label for="prune_z" class="col-md-4 control-label" style="text-align: left; width: 150px;">Z score:</label>
     	              <div class="col-md-2">
-    	                <input type="checkbox" id="prune_z" value="" checked="">
+    	                <input type="checkbox" id="prune_z" value="">
     	              </div>
                   </div>
                 </div>
@@ -117,7 +117,7 @@
             <div class="form-horizontal">
               <div class="form-group">
                 <div class="col-md-12">
-                  <input type="number" step="0.01" class="form-control" id="max_cluster_size" value="0" style="width: 80px; float: left; margin-right: 10px;">
+                  <input type="number" step="0.01" class="form-control" id="max_cluster_size" value="2" style="width: 80px; float: left; margin-right: 10px;">
                   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#histogram_cluster" style="width: 100px; float: left; margin-right: 10px;">
                     Histogram
                   </button>
@@ -141,13 +141,13 @@
                   <div class="col-md-12">
     	              <label for="cluster_absolute" class="col-md-4 control-label" style="text-align: left; width: 150px;">Absolute value:</label>
     	              <div class="col-md-2">
-    	                <input type="checkbox" id="cluster_absolute" value="">
+    	                <input type="checkbox" id="cluster_absolute" value="" checked="">
     	              </div>
                 	</div>
                 	<div class="col-md-12">
     	              <label for="cluster_z" class="col-md-4 control-label" style="text-align: left; width: 150px;">Z score:</label>
     	              <div class="col-md-2">
-    	                <input type="checkbox" id="cluster_z" value="" checked="">
+    	                <input type="checkbox" id="cluster_z" value="">
     	              </div>
                 	</div>
                 </div>

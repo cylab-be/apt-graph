@@ -114,3 +114,10 @@ textarea {
   height: 88%;
   overflow-y: scroll;
 }
+
+/*dropdown user list*/
+#user-list_menu {
+  max-height: 1000%;
+  height: auto;
+  overflow-y: scroll;
+}
