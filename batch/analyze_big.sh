@@ -1,0 +1,1 @@
+java -Xmx8G -jar target/batch-0.1-SNAPSHOT.jar $*
