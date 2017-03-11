@@ -70,6 +70,7 @@ public class RequestHandler {
 
     // User (Storage variable)
     private String user_store = "";
+    private ArrayList<String> user_list_store = null;
     private LinkedList<Graph<Request>> graphs = null;
 
     /**
@@ -121,6 +122,7 @@ public class RequestHandler {
                     new BufferedInputStream(input_stream));
             user_list = (ArrayList<String>) input.readObject();
             input.close();
+            user_list_store = user_list;
         } catch (IOException ex) {
                 System.err.println(ex);
         } catch (ClassNotFoundException ex) {
@@ -158,7 +160,7 @@ public class RequestHandler {
             final String white_ongo,
             final double[] ranking_weights) {
         // Check input of the user
-        if (!checkInputUser(feature_weights, feature_ordered_weights,
+        if (!checkInputUser(user, feature_weights, feature_ordered_weights,
                 prune_threshold_temp, max_cluster_size_temp,
                 prune_z_bool, cluster_z_bool, ranking_weights)) {
             return null;
@@ -274,6 +276,7 @@ public class RequestHandler {
 
     /**
      * Check input of user.
+     * @param user
      * @param feature_weights
      * @param feature_ordered_weights
      * @param prune_threshold_temp
@@ -284,6 +287,7 @@ public class RequestHandler {
      * @return True if no problem
      */
     private boolean checkInputUser(
+            final String user,
             final double[] feature_weights,
             final double[] feature_ordered_weights,
             final double prune_threshold_temp,
@@ -291,6 +295,10 @@ public class RequestHandler {
             final boolean prune_z_bool,
             final boolean cluster_z_bool,
             final double[] ranking_weights) {
+        // Check if user exists
+        if (!user_list_store.contains(user)) {
+            return false;
+        }
         // Verify the non negativity of weights and
         // the sum of the weights of features
         double sum_feature_weights = 0;
