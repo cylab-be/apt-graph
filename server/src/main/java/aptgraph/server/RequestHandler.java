@@ -539,8 +539,7 @@ public class RequestHandler {
                 }
             }
 
-            NeighborList this_domain_neighbors =
-                    new NeighborList(1000);
+            NeighborList this_domain_neighbors = new NeighborList(1000);
             for (Entry<Domain, Double> other_domain_entry
                     : other_domains_sim.entrySet()) {
                 this_domain_neighbors.add(new Neighbor(
