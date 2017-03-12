@@ -159,6 +159,9 @@ public class RequestHandler {
             final boolean whitelist_bool,
             final String white_ongo,
             final double[] ranking_weights) {
+
+        long start_time = System.currentTimeMillis();
+
         // Check input of the user
         if (!checkInputUser(user, feature_weights, feature_ordered_weights,
                 prune_threshold_temp, max_cluster_size_temp,
@@ -166,62 +169,65 @@ public class RequestHandler {
             return null;
         }
 
+        long estimated_time_1 = System.currentTimeMillis() - start_time;
+        System.out.println("1: " + estimated_time_1 + " (User input checked)");
+
         // Choice of the graphs of the user
         if (user_store.isEmpty() || !user_store.equals(user)) {
             graphs = getUserGraphs(user);
             user_store = user;
         }
 
-        stdout = ("<pre>k-NN Graph : k = " + graphs.getFirst().getK());
+        stdout = ("<pre>k-NN Graph: k = " + graphs.getFirst().getK());
+
+        long estimated_time_2 = System.currentTimeMillis() - start_time;
+        System.out.println("2: " + estimated_time_2 + " (Data loaded)");
+
+        // The json-rpc request was probably canceled by the user
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
 
         // Fusion of the features (Graph of Requests)
-        Graph<Request> merged_graph =
-                computeFusionFeatures(graphs,
+        Graph<Request> merged_graph = computeFusionFeatures(graphs,
                         feature_ordered_weights, feature_weights);
+
+        long estimated_time_3 = System.currentTimeMillis() - start_time;
+        System.out.println("3: " + estimated_time_3
+                + " (Fusion of features done)");
 
         // Selection of the temporal children only
         if (children_bool) {
             merged_graph = childrenSelection(merged_graph);
         }
 
-        // The json-rpc request was probably canceled by the user
-        if (Thread.currentThread().isInterrupted()) {
-            return null;
-        }
+        long estimated_time_4 = System.currentTimeMillis() - start_time;
+        System.out.println("4: " + estimated_time_4 + " (Children selected)");
 
         // Create the domain nodes
         // (it contains every requests of a specific domain, for each domain)
-        HashMap<String, Domain> domains =
-                computeDomainNodes(merged_graph);
+        HashMap<String, Domain> domains = computeDomainNodes(merged_graph);
         int domains_total = domains.keySet().size();
-        stdout = stdout.concat("<br>Total number of domains : "
+        stdout = stdout.concat("<br>Total number of domains: "
                 + domains_total);
+
+        long estimated_time_5 = System.currentTimeMillis() - start_time;
+        System.out.println("5: " + estimated_time_5 + " (Domains created)");
 
         // Compute similarity between domains and build domain graph
         Graph<Domain> domain_graph =
                 computeSimilarityDomain(merged_graph, domains);
 
-        // The json-rpc request was probably canceled by the user
-        if (Thread.currentThread().isInterrupted()) {
-            return null;
-        }
+        long estimated_time_6 = System.currentTimeMillis() - start_time;
+        System.out.println("6: " + estimated_time_6
+                + " (Domains Graph created)");
 
         // Prune
-        ArrayList<Double> similarities = listSimilarities(domain_graph);
-        ArrayList<Double> mean_var_prune = getMeanVariance(similarities);
-        double mean_prune = mean_var_prune.get(0);
-        double variance_prune = mean_var_prune.get(1);
-        HistData hist_pruning = computeHistData(similarities, mean_prune,
-                variance_prune, prune_z_bool, false);
-        double prune_threshold;
-        if (prune_z_bool) {
-            prune_threshold
-                = computePruneThreshold(mean_prune, variance_prune,
-                        prune_threshold_temp);
-        } else {
-            prune_threshold = prune_threshold_temp;
-        }
-        domain_graph.prune(prune_threshold);
+        HistData hist_pruning = doPruning(domain_graph,
+                start_time, prune_z_bool, prune_threshold_temp);
+
+        long estimated_time_8 = System.currentTimeMillis() - start_time;
+        System.out.println("8: " + estimated_time_8 + " (Pruning done)");
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
@@ -236,37 +242,38 @@ public class RequestHandler {
             return null;
         }
 
+        long estimated_time_9 = System.currentTimeMillis() - start_time;
+        System.out.println("9: " + estimated_time_9 + " (Clustering done)");
+
         // Filtering
-        ArrayList<Double> cluster_sizes = listClusterSizes(clusters);
-        ArrayList<Double> mean_var_cluster = getMeanVariance(cluster_sizes);
-        double mean_cluster = mean_var_cluster.get(0);
-        double variance_cluster = mean_var_cluster.get(1);
-        HistData hist_cluster = computeHistData(cluster_sizes, mean_cluster,
-                variance_cluster, cluster_z_bool, true);
-        double max_cluster_size;
-        if (prune_z_bool) {
-            max_cluster_size
-                = computeClusterSize(mean_cluster, variance_cluster,
-                        max_cluster_size_temp);
-        } else {
-            max_cluster_size = max_cluster_size_temp;
-        }
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
-        for (Graph<Domain> subgraph : clusters) {
-            if (subgraph.size() <= max_cluster_size) {
-                filtered.add(subgraph);
-            }
-        }
+        HistData hist_cluster = doFiltering(clusters, start_time,
+                cluster_z_bool, max_cluster_size_temp, filtered);
+
+        long estimated_time_11 = System.currentTimeMillis() - start_time;
+        System.out.println("11: " + estimated_time_11 + " (Filtering done)");
 
         // White listing
         if (whitelist_bool) {
             filtered = whiteListing(filtered, white_ongo);
         }
 
+        long estimated_time_12 = System.currentTimeMillis() - start_time;
+        System.out.println("12: " + estimated_time_12
+                + " (White listing done)");
+
+        // The json-rpc request was probably canceled by the user
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
+
         // Ranking
         if (filtered.size() > 1) {
             showRanking(filtered, domains_total, ranking_weights);
         }
+
+        long estimated_time_13 = System.currentTimeMillis() - start_time;
+        System.out.println("13: " + estimated_time_13 + " (Ranking printed)");
 
         // Output
         stdout = stdout.concat("<br>Found " + filtered.size()
@@ -548,6 +555,48 @@ public class RequestHandler {
     }
 
     /**
+     * Make the pruning on the graph and analyze the similarities.
+     * @param domain_graph
+     * @param start_time
+     * @param prune_z_bool
+     * @param prune_threshold_temp
+     * @return HistData
+     */
+    private HistData doPruning(
+            final Graph<Domain> domain_graph,
+            final long start_time,
+            final boolean prune_z_bool,
+            final double prune_threshold_temp) {
+        ArrayList<Double> similarities = listSimilarities(domain_graph);
+        ArrayList<Double> mean_var_prune = getMeanVariance(similarities);
+        double mean_prune = mean_var_prune.get(0);
+        double variance_prune = mean_var_prune.get(1);
+
+        HistData hist_pruning = computeHistData(similarities, mean_prune,
+                variance_prune, prune_z_bool, false);
+
+        long estimated_time_7 = System.currentTimeMillis() - start_time;
+        System.out.println("7: " + estimated_time_7
+                + " (Similarities hist. created)");
+
+        // The json-rpc request was probably canceled by the user
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
+
+        double prune_threshold;
+        if (prune_z_bool) {
+            prune_threshold
+                = computePruneThreshold(mean_prune, variance_prune,
+                        prune_threshold_temp);
+        } else {
+            prune_threshold = prune_threshold_temp;
+        }
+        domain_graph.prune(prune_threshold);
+        return hist_pruning;
+    }
+
+    /**
      * Compute the list of all the similarities of domain graph.
      * @param domain_graph
      * @return similarities
@@ -641,6 +690,53 @@ public class RequestHandler {
     }
 
     /**
+     * Make the filtering and analyze the cluster sizes.
+     * @param clusters
+     * @param start_time
+     * @param cluster_z_bool
+     * @param max_cluster_size_temp
+     * @param filtered
+     * @return HistData
+     */
+    private HistData doFiltering(
+            final ArrayList<Graph<Domain>> clusters,
+            final long start_time,
+            final boolean cluster_z_bool,
+            final double max_cluster_size_temp,
+            final LinkedList<Graph<Domain>> filtered) {
+        ArrayList<Double> cluster_sizes = listClusterSizes(clusters);
+        ArrayList<Double> mean_var_cluster = getMeanVariance(cluster_sizes);
+        double mean_cluster = mean_var_cluster.get(0);
+        double variance_cluster = mean_var_cluster.get(1);
+
+        HistData hist_cluster = computeHistData(cluster_sizes, mean_cluster,
+                variance_cluster, cluster_z_bool, true);
+
+        long estimated_time_10 = System.currentTimeMillis() - start_time;
+        System.out.println("10: " + estimated_time_10
+                + " (Clusters hist. created)");
+
+        // The json-rpc request was probably canceled by the user
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
+
+        double max_cluster_size;
+        if (cluster_z_bool) {
+            max_cluster_size = computeClusterSize(mean_cluster,
+                    variance_cluster, max_cluster_size_temp);
+        } else {
+            max_cluster_size = max_cluster_size_temp;
+        }
+        for (Graph<Domain> subgraph : clusters) {
+            if (subgraph.size() <= max_cluster_size) {
+                filtered.add(subgraph);
+            }
+        }
+        return hist_cluster;
+    }
+
+    /**
      * Compute the list of the sizes of clusters.
      * @param clusters
      * @return cluster_sizes
@@ -716,7 +812,7 @@ public class RequestHandler {
             remove(domain_graph, whitelisted);
         }
 
-        stdout = stdout.concat("<br>Number of white listed domains = "
+        stdout = stdout.concat("<br>Number of white listed domains: "
                 + whitelisted.size());
         return filtered_new;
     }
@@ -833,13 +929,13 @@ public class RequestHandler {
             stdout = stdout.concat("<br>TOP for APT.FINDME.be: "
                    + Math.round(top / domains_total * 100 * 100) / 100.0 + "%");
         } else {
-            stdout = stdout.concat("<br>TOP for APT.FINDME.be : NOT FOUND");
+            stdout = stdout.concat("<br>TOP for APT.FINDME.be: NOT FOUND");
         }
-        stdout = stdout.concat("<br>Ranking :");
+        stdout = stdout.concat("<br>Ranking:");
         stdout = stdout.concat("<br>(#Children + #Parents / #Resquests)");
         for (Domain dom : sorted) {
             stdout = stdout.concat("<br>    ("
-                    + Math.round(index.get(dom) * 100) / 100.0 + ") : " + dom);
+                    + Math.round(index.get(dom) * 100) / 100.0 + ") " + dom);
         }
     }
 
