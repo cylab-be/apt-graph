@@ -1,10 +1,10 @@
 package aptgraph.server;
 
-//import java.awt.Desktop;
+import java.awt.Desktop;
 import java.io.FileNotFoundException;
 import java.nio.file.Paths;
-//import java.io.IOException;
-//import java.net.URI;
+import java.io.IOException;
+import java.net.URI;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -54,7 +54,7 @@ public final class Main {
 
         String url = "http://127.0.0.1:8000";
 
-        /*if (Desktop.isDesktopSupported()) {
+        if (Desktop.isDesktopSupported()) {
             Desktop desktop = Desktop.getDesktop();
             try {
                 desktop.browse(new URI(url));
@@ -72,7 +72,7 @@ public final class Main {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }*/
+        }
 
         // Start the file server
         FileServer file_server = new FileServer();
