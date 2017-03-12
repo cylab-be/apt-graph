@@ -192,6 +192,10 @@ public class BatchProcessor {
             String[] url_split = url_temp.split("[:]//");
             url_temp = url_split[1];
         }
+        if (url_temp.startsWith("-://")) {
+            String[] url_split = url_temp.split("[:]//");
+            url_temp = url_split[1];
+        }
         if (!url_temp.startsWith("http://")
                 && !url_temp.startsWith("https://")) {
          url_temp = "http://" + url_temp;
