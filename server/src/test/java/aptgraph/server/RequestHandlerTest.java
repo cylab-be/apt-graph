@@ -95,7 +95,7 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
 
         // Test
@@ -130,7 +130,7 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         Graph<Domain> merged_graph_old = merged_graph;
         merged_graph.prune(0.5);
@@ -165,7 +165,7 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         merged_graph.prune(0.5);
         ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
@@ -202,7 +202,7 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
         
         // Test 
@@ -229,7 +229,7 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
         ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();

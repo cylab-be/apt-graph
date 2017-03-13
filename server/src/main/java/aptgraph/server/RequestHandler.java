@@ -68,10 +68,11 @@ public class RequestHandler {
     // Define stdout on UI
     private String stdout = "";
 
-    // User (Storage variable)
+    // Data (Storage variable)
     private String user_store = "";
     private ArrayList<String> user_list_store = null;
     private LinkedList<Graph<Domain>> graphs = null;
+    private int k_store = 0;
 
     /**
      * A test json-rpc call, with no argument, that should return "hello".
@@ -173,12 +174,22 @@ public class RequestHandler {
         System.out.println("1: " + estimated_time_1 + " (User input checked)");
 
         // Choice of the graphs of the user
-        if (user_store.isEmpty() || !user_store.equals(user)) {
+        if (user_store.isEmpty() || graphs.isEmpty()
+                || k_store == 0 || !user_store.equals(user)) {
             graphs = getUserGraphs(user);
             user_store = user;
+            k_store = getK();
         }
 
-        stdout = ("<pre>k-NN Graph: k = " + graphs.getFirst().getK());
+        stdout = ("<pre>k-NN Graph: k = " + k_store);
+
+        // Count number of domains
+        int domains_total = 0;
+        for (Domain dom : graphs.getFirst().getNodes()) {
+            domains_total += 1;
+        }
+        stdout = stdout.concat("<br>Total number of domains: "
+                + domains_total);
 
         long estimated_time_2 = System.currentTimeMillis() - start_time;
         System.out.println("2: " + estimated_time_2 + " (Data loaded)");
@@ -189,16 +200,12 @@ public class RequestHandler {
         }
 
         // Fusion of the features (Graph of Requests)
-        Graph<Domain> merged_graph = computeFusionFeatures(graphs,
+        Graph<Domain> merged_graph = computeFusionFeatures(k_store, graphs,
                         feature_ordered_weights, feature_weights);
 
         long estimated_time_3 = System.currentTimeMillis() - start_time;
         System.out.println("3: " + estimated_time_3
                 + " (Fusion of features done)");
-
-        /*int domains_total = domains.keySet().size();
-        stdout = stdout.concat("<br>Total number of domains: "
-                + domains_total);*/
 
         // Prune
         HistData hist_pruning = doPruning(merged_graph,
@@ -247,7 +254,7 @@ public class RequestHandler {
 
         // Ranking
         if (filtered.size() > 1) {
-            showRanking(filtered, 0, ranking_weights);
+            showRanking(filtered, domains_total, ranking_weights);
         }
 
         long estimated_time_13 = System.currentTimeMillis() - start_time;
@@ -331,7 +338,7 @@ public class RequestHandler {
     }
 
     /**
-     * Give the list of graphs for a given user.
+     * Load the list of graphs for a given user.
      * @param user
      * @return List of graphs
      */
@@ -357,22 +364,44 @@ public class RequestHandler {
     }
 
     /**
+     * Load the value of k used for k-NN Graphs.
+     * @return List of graphs
+     */
+    final int getK() {
+        int k = 0;
+        LOGGER.log(Level.INFO, "Reading k value from disk...");
+        try {
+            File file = new File(input_dir.toString(), "k.ser");
+            FileInputStream input_stream =
+                    new FileInputStream(file.toString());
+            ObjectInputStream input = new ObjectInputStream(
+                    new BufferedInputStream(input_stream));
+            k = (int) input.readInt();
+            input.close();
+        } catch (IOException ex) {
+                System.err.println(ex);
+        }
+
+        return k;
+    }
+
+    /**
      * Compute the fusion of the feature graphs.
+     * @param k
      * @param graphs
      * @param feature_ordered_weights
      * @param feature_weights
      * @return merged_graph
      */
     final Graph<Domain> computeFusionFeatures(
+            final int k,
             final LinkedList<Graph<Domain>> graphs,
             final double[] feature_ordered_weights,
             final double[] feature_weights) {
 
-        int k = graphs.getFirst().getK();
-
         // Feature Fusion
         // Weighted average using parameter feature_weights
-        Graph<Domain> merged_graph = new Graph<Domain>(k);
+        Graph<Domain> merged_graph = new Graph<Domain>();
         for (Domain node : graphs.getFirst().getNodes()) {
 
             // The json-rpc request was probably canceled by the user

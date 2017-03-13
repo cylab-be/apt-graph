@@ -63,10 +63,12 @@ public class BatchProcessor {
      * @param k
      * @param input_file
      * @param output_dir
+     * @param children_bool
      * @throws IOException if we cannot read the input file
      */
     public final void analyze(final int k,
-            final InputStream input_file, final Path output_dir)
+            final InputStream input_file, final Path output_dir,
+            final boolean children_bool)
             throws IOException {
 
         // Parsing of the log file and Split of the log file by users
@@ -82,13 +84,14 @@ public class BatchProcessor {
             LinkedList<Request> requests = entry.getValue();
 
             LinkedList<Graph<Domain>> graphs =
-                    computeUserGraphs(k, user, requests, true);
+                    computeUserGraphs(k, user, requests, children_bool);
 
             // Store of the list of graphs for one user on disk
             saveGraphs(output_dir, user, graphs);
             user_list.add(user);
         }
         saveUsers(output_dir, user_list);
+        saveK(output_dir, k);
     }
 
     /**
@@ -490,6 +493,29 @@ public class BatchProcessor {
                     new BufferedOutputStream(output_stream));
             Collections.sort(user_list);
             output.writeObject(user_list);
+            output.close();
+        } catch (IOException ex) {
+                System.err.println(ex);
+        }
+    }
+
+    /**
+     * Save the value of k (of k-NN Graphs).
+     * @param output_dir
+     * @param k
+     */
+    final void saveK(
+            final Path output_dir,
+            final int k) {
+        try {
+            LOGGER.log(Level.INFO,
+                    "Save list of k value to disk...");
+            File file = new File(output_dir.toString(), "k.ser");
+            FileOutputStream output_stream =
+                new FileOutputStream(file.toString());
+            ObjectOutputStream output = new ObjectOutputStream(
+                    new BufferedOutputStream(output_stream));
+            output.writeInt(k);
             output.close();
         } catch (IOException ex) {
                 System.err.println(ex);

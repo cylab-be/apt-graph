@@ -33,18 +33,27 @@ public final class Main {
             IllegalArgumentException {
         // Default value of k (if no user input)
         int k = DEFAULT_K;
+        // Default value of children_bool
+        boolean children_bool = true;
 
         // Parse command line arguments
         Options options = new Options();
         options.addOption("i", true, "Input file (required)");
         options.addOption("o", true, "Output directory (required)");
-        Option optionalargument = Option.builder("k")
+        Option arg_k = Option.builder("k")
                 .optionalArg(true)
                 .desc("Impose k value of k-NN graphs (default: 20)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
-        options.addOption(optionalargument);
+        options.addOption(arg_k);
+        Option arg_child = Option.builder("c")
+                .optionalArg(true)
+                .desc("Select only temporal children (default: true)")
+                .hasArg(true)
+                .numberOfArgs(1)
+                .build();
+        options.addOption(arg_child);
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
@@ -68,10 +77,18 @@ public final class Main {
         }
 
         try {
+            if (cmd.hasOption("c")) {
+                children_bool = Boolean.parseBoolean(cmd.getOptionValue("c"));
+            }
+        } catch (IllegalArgumentException ex) {
+                System.err.println(ex);
+        }
+
+        try {
             BatchProcessor processor = new BatchProcessor();
             processor.analyze(k,
                     new FileInputStream(cmd.getOptionValue("i")),
-                    Paths.get(cmd.getOptionValue("o")));
+                    Paths.get(cmd.getOptionValue("o")), children_bool);
         } catch (IllegalArgumentException ex) {
                 System.err.println(ex);
         }
