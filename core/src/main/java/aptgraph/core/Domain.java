@@ -21,9 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package aptgraph.server;
+package aptgraph.core;
 
-import aptgraph.core.Request;
 import java.util.LinkedList;
 
 /**

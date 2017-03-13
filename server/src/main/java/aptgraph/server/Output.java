@@ -23,6 +23,7 @@
  */
 package aptgraph.server;
 
+import aptgraph.core.Domain;
 import info.debatty.java.graphs.Graph;
 import java.io.Serializable;
 import java.util.LinkedList;

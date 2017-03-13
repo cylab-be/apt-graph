@@ -23,7 +23,7 @@
  */
 package aptgraph.server;
 
-import aptgraph.core.Request;
+import aptgraph.core.Domain;
 import info.debatty.java.graphs.Graph;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -93,95 +93,22 @@ public class RequestHandlerTest extends TestCase {
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         String user = handler.getUsers().get(0);
-        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
-        Graph<Request> merged_graph =
+        LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+        Graph<Domain> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
 
         // Test
         boolean indicator = false;
-        for (Graph<Request> graph_temp : graphs) {
+        for (Graph<Domain> graph_temp : graphs) {
             System.out.println("Before fusion = " + graph_temp.getNodes());
             System.out.println("After fusion = " + merged_graph.getNodes());
-            for (Request req : graph_temp.getNodes()) {
-                indicator = merged_graph.containsKey(req);
+            for (Domain dom : graph_temp.getNodes()) {
+                indicator = merged_graph.containsKey(dom);
                 if (!indicator) {
                     System.out.println("OUT !");
                     break;
                 }
-            }
-        }
-
-        assertTrue(indicator);
-    }
-
-    /**
-     * Test of the integrity of domains during computation of domains
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    public void testIntegrityComputeDomains()
-            throws IOException, ClassNotFoundException {
-        System.out.println("Integrity : computation of domains");
-        
-        // Creation of the data
-        RequestHandler handler =
-                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        String user = handler.getUsers().get(0);
-        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
-        Graph<Request> merged_graph =
-                handler.computeFusionFeatures(graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
-        HashMap<String, Domain> domains =
-                handler.computeDomainNodes(merged_graph);
-
-        // Test
-        System.out.println("Before computation = " + merged_graph.getNodes());
-        System.out.println("After computation = " + domains.keySet());
-        boolean indicator = false;
-        for (Request req : merged_graph.getNodes()) {
-            Domain dom = domains.get(req.getDomain());
-            indicator = dom.contains(req);
-            if (!indicator) {
-                System.out.println("OUT !");
-                break;
-            }
-        }
-
-        assertTrue(indicator);
-    }
-
-    /**
-     * Test of the integrity of domains during computation of domain similarity
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    public void testIntegrityDomainSimilarity()
-            throws IOException, ClassNotFoundException {
-        System.out.println("Integrity : computation of domain similarity");
-        
-        // Creation of the data
-        RequestHandler handler =
-                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        String user = handler.getUsers().get(0);
-        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
-        Graph<Request> merged_graph =
-                handler.computeFusionFeatures(graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
-        HashMap<String, Domain> domains =
-                handler.computeDomainNodes(merged_graph);
-        Graph<Domain> domain_graph =
-                handler.computeSimilarityDomain(merged_graph, domains);
-
-        // Test
-        System.out.println("Before computation = " + domains.keySet());
-        System.out.println("After computation = " + domain_graph.getNodes());
-        boolean indicator = false;
-        for (Domain dom : domains.values()) {
-            indicator = domain_graph.containsKey(dom);
-            if (!indicator) {
-                System.out.println("FAIL !");
-                break;
             }
         }
 
@@ -201,23 +128,19 @@ public class RequestHandlerTest extends TestCase {
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         String user = handler.getUsers().get(0);
-        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
-        Graph<Request> merged_graph =
+        LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+        Graph<Domain> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
-        HashMap<String, Domain> domains =
-                handler.computeDomainNodes(merged_graph);
-        Graph<Domain> domain_graph =
-                handler.computeSimilarityDomain(merged_graph, domains);
-        Graph<Domain> domain_graph_old = domain_graph;
-        domain_graph.prune(0.5);
+        Graph<Domain> merged_graph_old = merged_graph;
+        merged_graph.prune(0.5);
 
         // Test
-        System.out.println("Before pruning = " + domain_graph_old.getNodes());
-        System.out.println("After pruning = " + domain_graph.getNodes());
+        System.out.println("Before pruning = " + merged_graph_old.getNodes());
+        System.out.println("After pruning = " + merged_graph.getNodes());
         boolean indicator = false;
-        for (Domain dom : domain_graph_old.getNodes()) {
-            indicator = domain_graph.containsKey(dom);
+        for (Domain dom : merged_graph_old.getNodes()) {
+            indicator = merged_graph.containsKey(dom);
             if (!indicator) {
                 System.out.println("FAIL !");
                 break;
@@ -240,22 +163,18 @@ public class RequestHandlerTest extends TestCase {
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         String user = handler.getUsers().get(0);
-        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
-        Graph<Request> merged_graph =
+        LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+        Graph<Domain> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
-        HashMap<String, Domain> domains =
-                handler.computeDomainNodes(merged_graph);
-        Graph<Domain> domain_graph =
-                handler.computeSimilarityDomain(merged_graph, domains);
-        domain_graph.prune(0.5);
-        ArrayList<Graph<Domain>> clusters = domain_graph.connectedComponents();
+        merged_graph.prune(0.5);
+        ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
 
         // Test
-        System.out.println("After prune = " + domain_graph.getNodes());
+        System.out.println("After prune = " + merged_graph.getNodes());
         System.out.println("Clusters = " + clusters);
-        boolean found_node = false;
-        for (Domain dom : domain_graph.getNodes()) {
+        boolean found_node;
+        for (Domain dom : merged_graph.getNodes()) {
             found_node = false;
             for (Graph<Domain> graph : clusters) {
                 found_node = graph.containsKey(dom);
@@ -281,21 +200,17 @@ public class RequestHandlerTest extends TestCase {
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         String user = handler.getUsers().get(0);
-        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
-        Graph<Request> merged_graph =
+        LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+        Graph<Domain> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
-        HashMap<String, Domain> domains =
-                handler.computeDomainNodes(merged_graph);
-        Graph<Domain> domain_graph =
-                handler.computeSimilarityDomain(merged_graph, domains);
         
         // Test 
-        Domain first_node = domain_graph.first();
+        Domain first_node = merged_graph.first();
         LinkedList<Domain> nodes = new LinkedList<Domain>();
         nodes.add(first_node);
-        RequestHandler.remove(domain_graph, nodes);
-        assertFalse(domain_graph.containsKey(first_node));
+        RequestHandler.remove(merged_graph, nodes);
+        assertFalse(merged_graph.containsKey(first_node));
     }
 
     /**
@@ -312,15 +227,11 @@ public class RequestHandlerTest extends TestCase {
                 new RequestHandler(Paths
                         .get("src/test/resources/dummyDir_whitelist"));
         String user = handler.getUsers().get(0);
-        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
-        Graph<Request> merged_graph =
+        LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+        Graph<Domain> merged_graph =
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
-        HashMap<String, Domain> domains =
-                handler.computeDomainNodes(merged_graph);
-        Graph<Domain> domain_graph =
-                handler.computeSimilarityDomain(merged_graph, domains);
-        ArrayList<Graph<Domain>> clusters = domain_graph.connectedComponents();
+        ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
         for (Graph<Domain> subgraph : clusters) {
             if (subgraph.size() < 1000) {
@@ -329,28 +240,29 @@ public class RequestHandlerTest extends TestCase {
         }
         
         // Test 
-        LinkedList<Graph<Domain>> filtered_new = filtered;
-        Graph<Domain> domain_graph_new = filtered_new.getFirst();
+        Graph<Domain> domain_graph = filtered.getFirst();
         Domain domain_node_1 = new Domain();
         Domain domain_node_2 = new Domain();
         Domain domain_node_3 = new Domain();
-        for (Domain dom : domain_graph_new.getNodes()) {
+        for (Domain dom : domain_graph.getNodes()) {
             if (dom.toString().equals("stats.g.doubleclick.net")) {
               domain_node_1 = dom;
             }
             if (dom.toString().equals("ad.doubleclick.net")) {
                 domain_node_2 = dom;
             }
-            if (dom.toString().equals("google-analytics.com")) {
+            if (dom.toString().equals("ss.symcd.com")) {
                 domain_node_3 = dom;
             }
         }
 
-        filtered_new = handler.whiteListing(filtered, "google-analytics.com");
-        Graph<Domain> domain_graph_new_bis = filtered_new.getFirst();
+        System.out.println("Before whitelisting = " + filtered);
+        filtered = handler.whiteListing(filtered, "ss.symcd.com");
+        System.out.println("After whitelisting = " + filtered);
+        Graph<Domain> domain_graph_new = filtered.getFirst();
 
-        assertFalse(domain_graph_new_bis.containsKey(domain_node_1));
-        assertFalse(domain_graph_new_bis.containsKey(domain_node_2));
-        assertFalse(domain_graph_new_bis.containsKey(domain_node_3));
+        assertFalse(domain_graph_new.containsKey(domain_node_1));
+        assertFalse(domain_graph_new.containsKey(domain_node_2));
+        assertFalse(domain_graph_new.containsKey(domain_node_3));
     }
 }

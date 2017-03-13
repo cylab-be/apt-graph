@@ -23,6 +23,7 @@
  */
 package aptgraph.server;
 
+import aptgraph.core.Domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import info.debatty.java.graphs.Graph;
