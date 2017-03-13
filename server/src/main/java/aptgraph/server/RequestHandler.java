@@ -426,7 +426,9 @@ public class RequestHandler {
                                 all_neighbors.get(feature_neighbor.node);
                     }
 
-                    all_neighbors.put(feature_neighbor.node, new_similarity);
+                    if (new_similarity != 0.0) {
+                       all_neighbors.put(feature_neighbor.node, new_similarity);
+                    }
 
                 }
             }

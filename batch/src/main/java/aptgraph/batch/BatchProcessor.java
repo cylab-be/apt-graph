@@ -256,22 +256,6 @@ public class BatchProcessor {
         Graph<Domain> time_domain_graph =
                 computeSimilarityDomain(time_graph, time_domains);
 
-        /*LOGGER.log(Level.INFO,
-                "Build the URL based graph for user {0} ...", user);
-        Graph<Request> url_graph =
-                computeRequestGraph(requests, k, new URLSimilarity());
-        // Selection of the temporal children only
-        // (could be optional with command line)
-        if (children_bool) {
-            url_graph = childrenSelection(url_graph);
-        }
-        // Create the domain nodes
-        // (it contains every requests of a specific domain, for each domain)
-        HashMap<String, Domain> url_domains = computeDomainNodes(url_graph);
-        // Compute similarity between domains and build domain graph
-        Graph<Domain> url_domain_graph =
-                computeSimilarityDomain(url_graph, url_domains);*/
-
         LOGGER.log(Level.INFO,
                 "Build the Domain based graph for user {0} ...", user);
         Graph<Request> domain_graph =
@@ -289,12 +273,28 @@ public class BatchProcessor {
         Graph<Domain> domain_domain_graph =
                 computeSimilarityDomain(domain_graph, domain_domains);
 
+        /*LOGGER.log(Level.INFO,
+                "Build the URL based graph for user {0} ...", user);
+        Graph<Request> url_graph =
+                computeRequestGraph(requests, k, new URLSimilarity());
+        // Selection of the temporal children only
+        // (could be optional with command line)
+        if (children_bool) {
+            url_graph = childrenSelection(url_graph);
+        }
+        // Create the domain nodes
+        // (it contains every requests of a specific domain, for each domain)
+        HashMap<String, Domain> url_domains = computeDomainNodes(url_graph);
+        // Compute similarity between domains and build domain graph
+        Graph<Domain> url_domain_graph =
+                computeSimilarityDomain(url_graph, url_domains);*/
+
         // List of graphs
         LinkedList<Graph<Domain>> graphs =
                 new LinkedList<Graph<Domain>>();
         graphs.add(time_domain_graph);
-        //graphs.add(url_domain_graph);
         graphs.add(domain_domain_graph);
+        //graphs.add(url_domain_graph);
 
         return graphs;
     }
