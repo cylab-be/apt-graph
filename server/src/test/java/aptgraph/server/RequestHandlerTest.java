@@ -134,7 +134,9 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         Graph<Domain> merged_graph_old = merged_graph;
-        merged_graph.prune(0.5);
+        // Test both method to prune
+        handler.doPruning(merged_graph, (long) 0, true, 0.0);
+        handler.doPruning(merged_graph, (long) 0, false, 0.5);
 
         // Test
         System.out.println("Before pruning = " + merged_graph_old.getNodes());
@@ -168,7 +170,7 @@ public class RequestHandlerTest extends TestCase {
         Graph<Domain> merged_graph =
                 handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
-        merged_graph.prune(0.5);
+        handler.doPruning(merged_graph, (long) 0, false, 0.5);
         ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
 
         // Test

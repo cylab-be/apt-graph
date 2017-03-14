@@ -452,7 +452,7 @@ public class RequestHandler {
      * @param prune_threshold_temp
      * @return HistData
      */
-    private HistData doPruning(
+    final HistData doPruning(
             final Graph<Domain> domain_graph,
             final long start_time,
             final boolean prune_z_bool,
@@ -512,7 +512,7 @@ public class RequestHandler {
      * @param int_bool
      * @return HashMap<Double, Integer>
      */
-    final HistData computeHistData(
+    private HistData computeHistData(
             final ArrayList<Double> list,
             final double mean, final double variance, final boolean z_bool,
             final boolean int_bool) {
