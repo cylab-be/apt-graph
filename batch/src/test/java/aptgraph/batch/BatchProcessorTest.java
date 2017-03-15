@@ -86,16 +86,15 @@ public class BatchProcessorTest extends TestCase {
 
             for (Map.Entry<String, LinkedList<Request>> entry :
                     user_requests.entrySet()) {
-                String user = entry.getKey();
                 LinkedList<Request> requests = entry.getValue();
-                LinkedList<Graph<Domain>> user_graphs =
-                    processor.computeUserGraphs(k, user, requests, false);
-                for (Graph<Domain> graph : user_graphs) {
-                    for (Domain dom : graph.getNodes()) {
-                        NeighborList neighbors = graph.getNeighbors(dom);
-                        System.out.println(neighbors);
-                        assertEquals(k, neighbors.size());
-                    }
+                Graph<Request> user_graph = 
+                        processor.computeRequestGraph(requests,
+                                k, new TimeSimilarity());
+                    
+                for (Request req : user_graph.getNodes()) {
+                    NeighborList neighbors = user_graph.getNeighbors(req);
+                    System.out.println(neighbors);
+                    assertEquals(k, neighbors.size());
                 }
             }
         }

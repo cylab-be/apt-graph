@@ -401,7 +401,7 @@ public class RequestHandler {
 
         // Feature Fusion
         // Weighted average using parameter feature_weights
-        Graph<Domain> merged_graph = new Graph<Domain>();
+        Graph<Domain> merged_graph = new Graph<Domain>(1000);
         for (Domain node : graphs.getFirst().getNodes()) {
 
             // The json-rpc request was probably canceled by the user
@@ -426,7 +426,7 @@ public class RequestHandler {
                                 all_neighbors.get(feature_neighbor.node);
                     }
 
-                    if (new_similarity != 0.0) {
+                    if (new_similarity != 0) {
                        all_neighbors.put(feature_neighbor.node, new_similarity);
                     }
 
@@ -749,7 +749,7 @@ public class RequestHandler {
     private void showRanking(final LinkedList<Graph<Domain>> filtered,
             final int domains_total, final double[] ranking_weights) {
         // Creation of a big graph with the result
-        Graph<Domain> graph_all = new Graph<Domain>();
+        Graph<Domain> graph_all = new Graph<Domain>(1000);
         for (Graph<Domain> graph : filtered) {
             for (Domain dom : graph.getNodes()) {
                 graph_all.put(dom, graph.getNeighbors(dom));
