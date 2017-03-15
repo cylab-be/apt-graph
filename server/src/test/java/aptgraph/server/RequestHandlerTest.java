@@ -25,11 +25,14 @@ package aptgraph.server;
 
 import aptgraph.core.Request;
 import info.debatty.java.graphs.Graph;
+import info.debatty.java.graphs.Neighbor;
+import info.debatty.java.graphs.NeighborList;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import static junit.framework.Assert.assertTrue;
 import junit.framework.TestCase;
 
 /**
@@ -210,7 +213,9 @@ public class RequestHandlerTest extends TestCase {
         Graph<Domain> domain_graph =
                 handler.computeSimilarityDomain(merged_graph, domains);
         Graph<Domain> domain_graph_old = domain_graph;
-        domain_graph.prune(0.5);
+        // Test both method to prune
+        handler.doPruning(domain_graph, (long) 0, true, 0.0);
+        handler.doPruning(domain_graph, (long) 0, false, 0.5);
 
         // Test
         System.out.println("Before pruning = " + domain_graph_old.getNodes());
@@ -248,7 +253,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeDomainNodes(merged_graph);
         Graph<Domain> domain_graph =
                 handler.computeSimilarityDomain(merged_graph, domains);
-        domain_graph.prune(0.5);
+        handler.doPruning(domain_graph, (long) 0, false, 0.5); 
         ArrayList<Graph<Domain>> clusters = domain_graph.connectedComponents();
 
         // Test
@@ -352,5 +357,59 @@ public class RequestHandlerTest extends TestCase {
         assertFalse(domain_graph_new_bis.containsKey(domain_node_1));
         assertFalse(domain_graph_new_bis.containsKey(domain_node_2));
         assertFalse(domain_graph_new_bis.containsKey(domain_node_3));
+    }
+
+    /**
+     * Test the good transmission of the weights.
+     */
+    public void testWeightsFeatures() {
+        System.out.println("Fusion : test weights");
+
+        // Creation of the data
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        String user = handler.getUsers().get(0);
+        LinkedList<Graph<Request>> graphs = handler.getUserGraphs(user);
+
+        // Test time weight
+        Graph<Request> time_graph = graphs.get(0);
+        Graph<Request> merged_graph_time =
+                handler.computeFusionFeatures(graphs,
+                        new double[]{0.8, 0.2}, new double[]{1.0, 0.0, 0.0});
+        for (Request req : merged_graph_time.getNodes()) {
+            assertTrue(time_graph.containsKey(req));
+            NeighborList nb_list = time_graph.getNeighbors(req);
+            for (Neighbor nb : merged_graph_time.getNeighbors(req)) {
+                assertTrue(nb_list.contains(nb));   
+            }
+        }
+
+        // Test domain weight
+        Graph<Request> domain_graph = graphs.get(1);
+        Graph<Request> merged_graph_domain =
+                handler.computeFusionFeatures(graphs,
+                        new double[]{0.8, 0.2}, new double[]{0.0, 1.0, 0.0});
+        for (Request req : merged_graph_domain.getNodes()) {
+            assertTrue(domain_graph.containsKey(req));
+            NeighborList nb_list = domain_graph.getNeighbors(req);
+            for (Neighbor nb : merged_graph_domain.getNeighbors(req)) {
+                assertTrue(nb_list.contains(nb));
+            }
+        }
+
+        // Test URL weight (if activated)
+        if (graphs.size() == 3) {
+            Graph<Request> url_graph = graphs.get(2);
+            Graph<Request> merged_graph_url =
+                handler.computeFusionFeatures(graphs,
+                        new double[]{0.8, 0.2}, new double[]{0.0, 0.0, 1.0});
+            for (Request req : merged_graph_url.getNodes()) {
+                assertTrue(url_graph.containsKey(req));
+                NeighborList nb_list = url_graph.getNeighbors(req);
+                for (Neighbor nb : merged_graph_url.getNeighbors(req)) {
+                    assertTrue(nb_list.contains(nb));
+                }
+            }
+        }
     }
 }
