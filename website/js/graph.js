@@ -96,30 +96,31 @@ function draw_graph(json_data, printRequests) {
 			return path_index;
 		} )
 		.on("mouseover", function(d){
-			var g = d3.select(this); // The node
-			// The class is used to remove the additional text later
-	//			if (d3.select(this).select('text.info')[0][0] == null){
-			var info = g.append('text')
-				.append('textPath')
-				.attr("xlink:href", function (d,i) {
-					var path_id = g[0][0].id;
-					return path_id; })
-				.classed('info', true)
-				.attr('x', 20)
-				.attr('y', 10)
-				.attr("font-size","30px")
-				.text(function(d) { 
-					return d.value; });
-			alert(Math.round(d.value * 100) / 100.0);
-		})
-		.on("mouseout", function() {
-		// Remove the info text on mouse out.
-			//d3.select(this).select('text.info').remove();
-		})
-		.attr("marker-end", function(d) {if (d.value === 0){
-											return "";
-										} else {
-											return "url(#end)";}});
+            var g = d3.select(this); // The node
+            var path_info = d;
+            var tooltip = svg.append("g")
+                                .attr("id", "tooltip");
+            tooltip.append('rect')
+                .attr('x', Math.abs((path_info.source.x + path_info.target.x)/2))
+                .attr('y', Math.abs((path_info.source.y + path_info.target.y)/2))
+                .attr('height',40)
+                .attr('width', 80)
+                .attr("stroke-width", 2)
+                .attr('stroke', "black")
+                .style('fill', "white");
+            tooltip.append('text')
+                .attr('x', Math.abs((path_info.source.x + path_info.target.x)/2) + 25 )
+                .attr('y', Math.abs((path_info.source.y + path_info.target.y)/2) + 25 )
+                .text(function(){return Math.round(path_info.value * 100) / 100.0; });
+        })
+        .on("mouseout", function() {
+        // Remove the tooltip text on mouse out.
+            svg.selectAll('#tooltip').remove();
+        })
+        .attr("marker-end", function(d) {if (d.value === 0){
+                                            return "";
+                                        } else {
+                                            return "url(#end)";}});
 
 	// define the nodes
 	var node = svg.selectAll(".node")
