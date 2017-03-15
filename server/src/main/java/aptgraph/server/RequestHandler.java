@@ -390,11 +390,9 @@ public class RequestHandler {
             final double[] feature_ordered_weights,
             final double[] feature_weights) {
 
-        int k = graphs.getFirst().getK();
-
         // Feature Fusion
         // Weighted average using parameter feature_weights
-        Graph<Request> merged_graph = new Graph<Request>(k);
+        Graph<Request> merged_graph = new Graph<Request>(1000);
         for (Request node : graphs.getFirst().getNodes()) {
 
             // The json-rpc request was probably canceled by the user
@@ -419,12 +417,13 @@ public class RequestHandler {
                                 all_neighbors.get(feature_neighbor.node);
                     }
 
-                    all_neighbors.put(feature_neighbor.node, new_similarity);
-
+                    if (new_similarity != 0) {
+                       all_neighbors.put(feature_neighbor.node, new_similarity);
+                    }
                 }
             }
 
-            NeighborList nl = new NeighborList(k);
+            NeighborList nl = new NeighborList(1000);
             for (Entry<Request, Double> entry : all_neighbors.entrySet()) {
                 nl.add(new Neighbor(entry.getKey(), entry.getValue()));
             }
@@ -442,7 +441,7 @@ public class RequestHandler {
      */
     private Graph<Request> childrenSelection(
             final Graph<Request> graph) {
-        Graph<Request> graph_new = new Graph<Request>();
+        Graph<Request> graph_new = new Graph<Request>(1000);
         for (Request req : graph.getNodes()) {
             NeighborList neighbors_new = new NeighborList(1000);
             NeighborList neighbors = graph.getNeighbors(req);
@@ -497,7 +496,7 @@ public class RequestHandler {
             final Graph<Request> merged_graph,
             final HashMap<String, Domain> domains) {
         // A domain is (for now) a list of Request.
-        Graph<Domain> domain_graph = new Graph<Domain>(Integer.MAX_VALUE);
+        Graph<Domain> domain_graph = new Graph<Domain>(1000);
 
         // For each domain
         for (Entry<String, Domain> domain_entry : domains.entrySet()) {
@@ -535,7 +534,9 @@ public class RequestHandler {
                                 other_domains_sim.get(other_domain);
                     }
 
-                    other_domains_sim.put(other_domain, new_similarity);
+                    if (new_similarity != 0) {
+                        other_domains_sim.put(other_domain, new_similarity);
+                    }
                 }
             }
 
@@ -858,7 +859,7 @@ public class RequestHandler {
     private void showRanking(final LinkedList<Graph<Domain>> filtered,
             final int domains_total, final double[] ranking_weights) {
         // Creation of a big graph with the result
-        Graph<Domain> graph_all = new Graph<Domain>();
+        Graph<Domain> graph_all = new Graph<Domain>(1000);
         for (Graph<Domain> graph : filtered) {
             for (Domain dom : graph.getNodes()) {
                 graph_all.put(dom, graph.getNeighbors(dom));
