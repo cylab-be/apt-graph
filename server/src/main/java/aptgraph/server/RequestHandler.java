@@ -542,7 +542,9 @@ public class RequestHandler {
             min = Math.round(min);
             step = 1.0;
         } else {
-            max = Math.min(5.0, max);
+            if (!z_bool) {
+                max = Math.min(5.0, max);
+            }
             step = 0.01;
         }
         HistData hist_data = new HistData();
