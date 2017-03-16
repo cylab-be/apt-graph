@@ -4,6 +4,7 @@ import aptgraph.core.Domain;
 import aptgraph.core.Request;
 import aptgraph.core.TimeSimilarity;
 import info.debatty.java.graphs.Graph;
+import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
 import java.io.File;
 import java.io.FileInputStream;
@@ -125,17 +126,9 @@ public class BatchProcessorTest extends TestCase {
         // Test
         System.out.println("Before computation = " + time_graph.getNodes());
         System.out.println("After computation = " + time_domains.keySet());
-        boolean indicator = false;
         for (Request req : time_graph.getNodes()) {
-            Domain dom = time_domains.get(req.getDomain());
-            indicator = dom.contains(req);
-            if (!indicator) {
-                System.out.println("OUT !");
-                break;
-            }
+            assertTrue(time_domains.get(req.getDomain()).contains(req));
         }
-
-        assertTrue(indicator);
     }
 
     /**
@@ -164,18 +157,26 @@ public class BatchProcessorTest extends TestCase {
                 processor.computeSimilarityDomain(time_graph, time_domains);
 
 
-        // Test
+        // Test presence of all domains
         System.out.println("Before computation = " + time_domains.keySet());
         System.out.println("After computation = " + time_domain_graph.getNodes());
-        boolean indicator = false;
         for (Domain dom : time_domains.values()) {
-            indicator = time_domain_graph.containsKey(dom);
-            if (!indicator) {
-                System.out.println("FAIL !");
-                break;
-            }
+            assertTrue(time_domain_graph.containsKey(dom));
         }
-
-        assertTrue(indicator);
+        
+        // Test the lost of neighbors
+        for (Request req : time_graph.getNodes()) {
+            NeighborList nl_req = time_graph.getNeighbors(req);
+            NeighborList nl_dom =
+                    time_domain_graph.getNeighbors(
+                            time_domains.get(req.getDomain()));
+            for (Neighbor<Request> nb : nl_req) {
+                if(nb.similarity != 0
+                        && !nb.node.getDomain().equals(req.getDomain())) {
+                    assertTrue(nl_dom.containsNode(
+                            time_domains.get(nb.node.getDomain())));
+                }
+            } 
+        }
     }
 }

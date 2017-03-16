@@ -179,6 +179,11 @@ public class RequestHandler {
             graphs = getUserGraphs(user);
             user_store = user;
             k_store = getK();
+
+            // Check for the size of the NeighborList
+            if (k_store * graphs.size() >= 1000) {
+                return null;
+            }
         }
 
         stdout = ("<pre>k-NN Graph: k = " + k_store);

@@ -381,12 +381,12 @@ public class BatchProcessor {
 
     /**
      * Compute the similarity between domains and build domain graph.
-     * @param merged_graph
+     * @param graph
      * @param domains
      * @return domain_graph
      */
     final Graph<Domain> computeSimilarityDomain(
-            final Graph<Request> merged_graph,
+            final Graph<Request> graph,
             final HashMap<String, Domain> domains) {
         // A domain is (for now) a list of Request.
         Graph<Domain> domain_graph = new Graph<Domain>(1000);
@@ -410,7 +410,7 @@ public class BatchProcessor {
 
                 // Check each neighbor
                 NeighborList neighbors =
-                        merged_graph.getNeighbors(request_node);
+                        graph.getNeighbors(request_node);
                 for (Neighbor<Request> neighbor : neighbors) {
                     Request target_request = neighbor.node;
 

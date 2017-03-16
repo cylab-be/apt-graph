@@ -99,21 +99,27 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
 
-        // Test
-        boolean indicator = false;
+        // Test presence of all the domains
         for (Graph<Domain> graph_temp : graphs) {
             System.out.println("Before fusion = " + graph_temp.getNodes());
             System.out.println("After fusion = " + merged_graph.getNodes());
             for (Domain dom : graph_temp.getNodes()) {
-                indicator = merged_graph.containsKey(dom);
-                if (!indicator) {
-                    System.out.println("OUT !");
-                    break;
-                }
+                assertTrue(merged_graph.containsKey(dom));
             }
         }
 
-        assertTrue(indicator);
+        // Test the lost of neighbors
+        for (Graph<Domain> graph_temp : graphs) {
+            for (Domain dom : graph_temp.getNodes()) {
+                NeighborList nl_temp = graph_temp.getNeighbors(dom);
+                NeighborList nl_merged = merged_graph.getNeighbors(dom);
+                for (Neighbor<Domain> nb : nl_temp) {
+                    if (nb.similarity != 0) {
+                        assertTrue(nl_merged.containsNode(nb.node));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -141,16 +147,9 @@ public class RequestHandlerTest extends TestCase {
         // Test
         System.out.println("Before pruning = " + merged_graph_old.getNodes());
         System.out.println("After pruning = " + merged_graph.getNodes());
-        boolean indicator = false;
         for (Domain dom : merged_graph_old.getNodes()) {
-            indicator = merged_graph.containsKey(dom);
-            if (!indicator) {
-                System.out.println("FAIL !");
-                break;
-            }
+            assertTrue(merged_graph.containsKey(dom));
         }
-
-        assertTrue(indicator);
     }
 
     /**
