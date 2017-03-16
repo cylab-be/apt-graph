@@ -1,10 +1,14 @@
 package aptgraph.batch;
 
 import aptgraph.core.Request;
+import aptgraph.core.Domain;
 import aptgraph.core.TimeSimilarity;
 //import aptgraph.core.URLSimilarity;
 import aptgraph.core.DomainSimilarity;
 import info.debatty.java.graphs.Graph;
+import info.debatty.java.graphs.Neighbor;
+import info.debatty.java.graphs.NeighborList;
+import info.debatty.java.graphs.SimilarityInterface;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
 import info.debatty.java.graphs.build.Brute;
 import java.io.BufferedOutputStream;
@@ -59,10 +63,12 @@ public class BatchProcessor {
      * @param k
      * @param input_file
      * @param output_dir
+     * @param children_bool
      * @throws IOException if we cannot read the input file
      */
     public final void analyze(final int k,
-            final InputStream input_file, final Path output_dir)
+            final InputStream input_file, final Path output_dir,
+            final boolean children_bool)
             throws IOException {
 
         // Parsing of the log file and Split of the log file by users
@@ -77,14 +83,15 @@ public class BatchProcessor {
             String user = entry.getKey();
             LinkedList<Request> requests = entry.getValue();
 
-            LinkedList<Graph<Request>> graphs =
-                    computeUserGraphs(k, user, requests);
+            LinkedList<Graph<Domain>> graphs =
+                    computeUserGraphs(k, user, requests, children_bool);
 
             // Store of the list of graphs for one user on disk
             saveGraphs(output_dir, user, graphs);
             user_list.add(user);
         }
         saveUsers(output_dir, user_list);
+        saveK(output_dir, k);
     }
 
     /**
@@ -223,70 +230,222 @@ public class BatchProcessor {
      * @param k
      * @param user
      * @param requests
-     * @return LinkedList<Graph<Request>>
+     * @param children_bool
+     * @return LinkedList<Graph<Domain>>
      * @throws IOException
      */
-    final LinkedList<Graph<Request>> computeUserGraphs(
+    final LinkedList<Graph<Domain>> computeUserGraphs(
             final int k,
             final String user,
-            final LinkedList<Request> requests) {
+            final LinkedList<Request> requests,
+            final boolean children_bool) {
 
         LOGGER.log(Level.INFO,
                 "Build the time based graph for user {0} ...", user);
-        Graph<Request> time_graph;
-        if (requests.size() < 50) {
-            Brute<Request> nndes_time = new Brute<Request>();
-            nndes_time.setSimilarity(new TimeSimilarity());
-            nndes_time.setK(k);
-            time_graph = nndes_time.computeGraph(requests);
-        } else {
-            ThreadedNNDescent<Request> nndes_time =
-                    new ThreadedNNDescent<Request>();
-            nndes_time.setSimilarity(new TimeSimilarity());
-            nndes_time.setK(k);
-            time_graph = nndes_time.computeGraph(requests);
+        Graph<Request> time_graph =
+                computeRequestGraph(requests, k, new TimeSimilarity());
+        // Selection of the temporal children only
+        // (could be optional with command line)
+        if (children_bool) {
+            time_graph = childrenSelection(time_graph);
         }
-
-        /*LOGGER.log(Level.INFO,
-                "Build the URL based graph for user {0} ...", user);
-        Graph<Request> url_graph;
-        if (requests.size() < 50) {
-            Brute<Request> nndes_url = new Brute<Request>();
-            nndes_url.setSimilarity(new URLSimilarity());
-            nndes_url.setK(k);
-            url_graph = nndes_url.computeGraph(requests);
-        } else {
-            ThreadedNNDescent<Request> nndes_url =
-                    new ThreadedNNDescent<Request>();
-            nndes_url.setSimilarity(new URLSimilarity());
-            nndes_url.setK(k);
-            url_graph = nndes_url.computeGraph(requests);
-        }*/
+        // Create the domain nodes
+        // (it contains every requests of a specific domain, for each domain)
+        HashMap<String, Domain> time_domains = computeDomainNodes(time_graph);
+        // Compute similarity between domains and build domain graph
+        Graph<Domain> time_domain_graph =
+                computeSimilarityDomain(time_graph, time_domains);
 
         LOGGER.log(Level.INFO,
                 "Build the Domain based graph for user {0} ...", user);
-        Graph<Request> domain_graph;
-        if (requests.size() < 50) {
-            Brute<Request> nndes_domain = new Brute<Request>();
-            nndes_domain.setSimilarity(new DomainSimilarity());
-            nndes_domain.setK(k);
-            domain_graph = nndes_domain.computeGraph(requests);
-        } else {
-            ThreadedNNDescent<Request> nndes_domain =
-                    new ThreadedNNDescent<Request>();
-            nndes_domain.setSimilarity(new DomainSimilarity());
-            nndes_domain.setK(k);
-            domain_graph = nndes_domain.computeGraph(requests);
+        Graph<Request> domain_graph =
+                computeRequestGraph(requests, k, new DomainSimilarity());
+        // Selection of the temporal children only
+        // (could be optional with command line)
+        if (children_bool) {
+            domain_graph = childrenSelection(domain_graph);
         }
+        // Create the domain nodes
+        // (it contains every requests of a specific domain, for each domain)
+        HashMap<String, Domain> domain_domains =
+                computeDomainNodes(domain_graph);
+        // Compute similarity between domains and build domain graph
+        Graph<Domain> domain_domain_graph =
+                computeSimilarityDomain(domain_graph, domain_domains);
+
+        /*LOGGER.log(Level.INFO,
+                "Build the URL based graph for user {0} ...", user);
+        Graph<Request> url_graph =
+                computeRequestGraph(requests, k, new URLSimilarity());
+        // Selection of the temporal children only
+        // (could be optional with command line)
+        if (children_bool) {
+            url_graph = childrenSelection(url_graph);
+        }
+        // Create the domain nodes
+        // (it contains every requests of a specific domain, for each domain)
+        HashMap<String, Domain> url_domains = computeDomainNodes(url_graph);
+        // Compute similarity between domains and build domain graph
+        Graph<Domain> url_domain_graph =
+                computeSimilarityDomain(url_graph, url_domains);*/
 
         // List of graphs
-        LinkedList<Graph<Request>> graphs =
-                new LinkedList<Graph<Request>>();
-        graphs.add(time_graph);
-        //graphs.add(url_graph);
-        graphs.add(domain_graph);
+        LinkedList<Graph<Domain>> graphs =
+                new LinkedList<Graph<Domain>>();
+        graphs.add(time_domain_graph);
+        graphs.add(domain_domain_graph);
+        //graphs.add(url_domain_graph);
 
         return graphs;
+    }
+
+    /**
+     * Compute the graph of requests based on given similarity definition.
+     * @param requests
+     * @param k
+     * @param Similarity
+     * @return Graph<Request>
+     */
+    final Graph<Request> computeRequestGraph(
+            final LinkedList<Request> requests,
+            final int k,
+            final SimilarityInterface<Request> similarity) {
+        Graph<Request> graph;
+        if (requests.size() < 50) {
+            Brute<Request> nndes = new Brute<Request>();
+            nndes.setSimilarity(similarity);
+            nndes.setK(k);
+            graph = nndes.computeGraph(requests);
+        } else {
+            ThreadedNNDescent<Request> nndes =
+                    new ThreadedNNDescent<Request>();
+            nndes.setSimilarity(similarity);
+            nndes.setK(k);
+            graph = nndes.computeGraph(requests);
+        }
+
+        return graph;
+    }
+
+    /**
+     * Select only the temporal children.
+     * @param graph
+     * @return graph
+     */
+    private Graph<Request> childrenSelection(
+            final Graph<Request> graph) {
+        Graph<Request> graph_new = new Graph<Request>(Integer.MAX_VALUE);
+        for (Request req : graph.getNodes()) {
+            NeighborList neighbors_new = new NeighborList(Integer.MAX_VALUE);
+            NeighborList neighbors = graph.getNeighbors(req);
+            for (Neighbor<Request> neighbor : neighbors) {
+                if (req.getTime() <= neighbor.node.getTime()) {
+                    neighbors_new.add(neighbor);
+                }
+            }
+            graph_new.put(req, neighbors_new);
+        }
+        return graph_new;
+    }
+
+    /**
+     * Group the requests by domain to create domain nodes.
+     * @param merged_graph
+     * @return domains
+     */
+    final HashMap<String, Domain> computeDomainNodes(
+            final Graph<Request> merged_graph) {
+        // URL/Domain clustering
+        // Associate each domain_name (String) to a Node<Domain>
+        HashMap<String, Domain> domains =
+                new HashMap<String, Domain>();
+        for (Request node : merged_graph.getNodes()) {
+            String domain_name = node.getDomain();
+
+            Domain domain_node;
+            if (domains.containsKey(domain_name)) {
+                domain_node = domains.get(domain_name);
+
+            } else {
+                domain_node = new Domain();
+                domain_node.setName(domain_name);
+                domains.put(domain_name, domain_node);
+            }
+
+            domain_node.add(node);
+
+        }
+
+        return domains;
+    }
+
+    /**
+     * Compute the similarity between domains and build domain graph.
+     * @param graph
+     * @param domains
+     * @return domain_graph
+     */
+    final Graph<Domain> computeSimilarityDomain(
+            final Graph<Request> graph,
+            final HashMap<String, Domain> domains) {
+        // A domain is (for now) a list of Request.
+        Graph<Domain> domain_graph = new Graph<Domain>(Integer.MAX_VALUE);
+
+        // For each domain
+        for (Map.Entry<String, Domain> domain_entry : domains.entrySet()) {
+
+            // The json-rpc request was probably canceled by the user
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
+
+            String domain_name = domain_entry.getKey();
+            Domain domain_node = domain_entry.getValue();
+
+            HashMap<Domain, Double> other_domains_sim =
+                    new HashMap<Domain, Double>();
+
+            // For each request in this domain
+            for (Request request_node : domain_node) {
+
+                // Check each neighbor
+                NeighborList neighbors =
+                        graph.getNeighbors(request_node);
+                for (Neighbor<Request> neighbor : neighbors) {
+                    Request target_request = neighbor.node;
+
+                    // Find the corresponding domain name
+                    String other_domain_name = target_request.getDomain();
+                    if (other_domain_name.equals(domain_name)) {
+                        continue;
+                    }
+
+                    Domain other_domain = domains.get(other_domain_name);
+                    double new_similarity = neighbor.similarity;
+                    if (other_domains_sim.containsKey(other_domain)) {
+                        new_similarity +=
+                                other_domains_sim.get(other_domain);
+                    }
+
+                    if (new_similarity != 0) {
+                        other_domains_sim.put(other_domain, new_similarity);
+                    }
+                }
+            }
+
+            NeighborList this_domain_neighbors =
+                    new NeighborList(Integer.MAX_VALUE);
+            for (Map.Entry<Domain, Double> other_domain_entry
+                    : other_domains_sim.entrySet()) {
+                this_domain_neighbors.add(new Neighbor(
+                        other_domain_entry.getKey(),
+                        other_domain_entry.getValue()));
+            }
+
+            domain_graph.put(domain_node, this_domain_neighbors);
+
+        }
+        return domain_graph;
     }
 
     /**
@@ -299,7 +458,7 @@ public class BatchProcessor {
     final void saveGraphs(
         final Path output_dir,
         final String user,
-        final LinkedList<Graph<Request>> graphs) {
+        final LinkedList<Graph<Domain>> graphs) {
 
         try {
             LOGGER.log(Level.INFO,
@@ -337,6 +496,29 @@ public class BatchProcessor {
                     new BufferedOutputStream(output_stream));
             Collections.sort(user_list);
             output.writeObject(user_list);
+            output.close();
+        } catch (IOException ex) {
+                System.err.println(ex);
+        }
+    }
+
+    /**
+     * Save the value of k (of k-NN Graphs).
+     * @param output_dir
+     * @param k
+     */
+    final void saveK(
+            final Path output_dir,
+            final int k) {
+        try {
+            LOGGER.log(Level.INFO,
+                    "Save list of k value to disk...");
+            File file = new File(output_dir.toString(), "k.ser");
+            FileOutputStream output_stream =
+                new FileOutputStream(file.toString());
+            ObjectOutputStream output = new ObjectOutputStream(
+                    new BufferedOutputStream(output_stream));
+            output.writeInt(k);
             output.close();
         } catch (IOException ex) {
                 System.err.println(ex);

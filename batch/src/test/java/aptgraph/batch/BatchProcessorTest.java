@@ -1,7 +1,10 @@
 package aptgraph.batch;
 
+import aptgraph.core.Domain;
 import aptgraph.core.Request;
+import aptgraph.core.TimeSimilarity;
 import info.debatty.java.graphs.Graph;
+import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +35,7 @@ public class BatchProcessorTest extends TestCase {
         BatchProcessor processor = new BatchProcessor();
         processor.analyze(20,
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
-                temp_dir);
+                temp_dir, true);
 
     }
 
@@ -51,9 +54,9 @@ public class BatchProcessorTest extends TestCase {
         HashMap<String, LinkedList<Request>> user_requests =
                 processor.computeUserLog(processor.parseFile(getClass()
                         .getResourceAsStream("/1000_http_requests.txt")));
-        LinkedList<Graph<Request>> original_user_graphs =
+        LinkedList<Graph<Domain>> original_user_graphs =
                     processor.computeUserGraphs(20, "test_user",
-                            user_requests.values().iterator().next());
+                           user_requests.values().iterator().next(), true);
         processor.saveGraphs(temp_dir, "test_user", original_user_graphs);
 
         File temp_file =
@@ -84,18 +87,96 @@ public class BatchProcessorTest extends TestCase {
 
             for (Map.Entry<String, LinkedList<Request>> entry :
                     user_requests.entrySet()) {
-                String user = entry.getKey();
                 LinkedList<Request> requests = entry.getValue();
-                LinkedList<Graph<Request>> user_graphs =
-                    processor.computeUserGraphs(k, user, requests);
-                for (Graph<Request> graph : user_graphs) {
-                    for (Request req : graph.getNodes()) {
-                        NeighborList neighbors = graph.getNeighbors(req);
-                        System.out.println(neighbors);
-                        assertEquals(k, neighbors.size());
-                    }
+                Graph<Request> user_graph = 
+                        processor.computeRequestGraph(requests,
+                                k, new TimeSimilarity());
+                    
+                for (Request req : user_graph.getNodes()) {
+                    NeighborList neighbors = user_graph.getNeighbors(req);
+                    System.out.println(neighbors);
+                    assertEquals(k, neighbors.size());
                 }
             }
+        }
+    }
+
+    /**
+     * Test of the integrity of domains during computation of domains
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public void testIntegrityComputeDomains()
+            throws IOException, ClassNotFoundException {
+        System.out.println("Integrity : computation of domains");
+
+        // Creation of the data
+        BatchProcessor processor = new BatchProcessor();
+        HashMap<String, LinkedList<Request>> user_requests =
+                processor.computeUserLog(processor.parseFile(getClass()
+                        .getResourceAsStream("/1000_http_requests.txt")));
+        LinkedList<Request> requests = user_requests.get("198.36.158.8");
+        Graph<Request> time_graph = processor.computeRequestGraph(
+                requests, 20, new TimeSimilarity());
+        // Create the domain nodes
+        // (it contains every requests of a specific domain, for each domain)
+        HashMap<String, Domain> time_domains =
+                processor.computeDomainNodes(time_graph);
+
+        // Test
+        System.out.println("Before computation = " + time_graph.getNodes());
+        System.out.println("After computation = " + time_domains.keySet());
+        for (Request req : time_graph.getNodes()) {
+            assertTrue(time_domains.get(req.getDomain()).contains(req));
+        }
+    }
+
+    /**
+     * Test of the integrity of domains during computation of domain similarity
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public void testIntegrityDomainSimilarity()
+            throws IOException, ClassNotFoundException {
+        System.out.println("Integrity : computation of domain similarity");
+        
+        // Creation of the data
+        BatchProcessor processor = new BatchProcessor();
+        HashMap<String, LinkedList<Request>> user_requests =
+                processor.computeUserLog(processor.parseFile(getClass()
+                        .getResourceAsStream("/1000_http_requests.txt")));
+        LinkedList<Request> requests = user_requests.get("198.36.158.8");
+        Graph<Request> time_graph = processor.computeRequestGraph(
+                requests, 20, new TimeSimilarity());
+        // Create the domain nodes
+        // (it contains every requests of a specific domain, for each domain)
+        HashMap<String, Domain> time_domains =
+                processor.computeDomainNodes(time_graph);
+        // Compute similarity between domains and build domain graph
+        Graph<Domain> time_domain_graph =
+                processor.computeSimilarityDomain(time_graph, time_domains);
+
+
+        // Test presence of all domains
+        System.out.println("Before computation = " + time_domains.keySet());
+        System.out.println("After computation = " + time_domain_graph.getNodes());
+        for (Domain dom : time_domains.values()) {
+            assertTrue(time_domain_graph.containsKey(dom));
+        }
+        
+        // Test the lost of neighbors
+        for (Request req : time_graph.getNodes()) {
+            NeighborList nl_req = time_graph.getNeighbors(req);
+            NeighborList nl_dom =
+                    time_domain_graph.getNeighbors(
+                            time_domains.get(req.getDomain()));
+            for (Neighbor<Request> nb : nl_req) {
+                if(nb.similarity != 0
+                        && !nb.node.getDomain().equals(req.getDomain())) {
+                    assertTrue(nl_dom.containsNode(
+                            time_domains.get(nb.node.getDomain())));
+                }
+            } 
         }
     }
 }
