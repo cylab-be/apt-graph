@@ -101,21 +101,27 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionFeatures(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
 
-        // Test
-        boolean indicator = false;
+        // Test presence of all the domains
         for (Graph<Request> graph_temp : graphs) {
             System.out.println("Before fusion = " + graph_temp.getNodes());
             System.out.println("After fusion = " + merged_graph.getNodes());
             for (Request req : graph_temp.getNodes()) {
-                indicator = merged_graph.containsKey(req);
-                if (!indicator) {
-                    System.out.println("OUT !");
-                    break;
-                }
+                assertTrue(merged_graph.containsKey(req));
             }
         }
 
-        assertTrue(indicator);
+        // Test the lost of neighbors
+        for (Graph<Request> graph_temp : graphs) {
+            for (Request req : graph_temp.getNodes()) {
+                NeighborList nl_temp = graph_temp.getNeighbors(req);
+                NeighborList nl_merged = merged_graph.getNeighbors(req);
+                for (Neighbor<Request> nb : nl_temp) {
+                    if (nb.similarity != 0) {
+                        assertTrue(nl_merged.containsNode(nb.node));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -141,17 +147,9 @@ public class RequestHandlerTest extends TestCase {
         // Test
         System.out.println("Before computation = " + merged_graph.getNodes());
         System.out.println("After computation = " + domains.keySet());
-        boolean indicator = false;
         for (Request req : merged_graph.getNodes()) {
-            Domain dom = domains.get(req.getDomain());
-            indicator = dom.contains(req);
-            if (!indicator) {
-                System.out.println("OUT !");
-                break;
-            }
+            assertTrue(domains.get(req.getDomain()).contains(req));
         }
-
-        assertTrue(indicator);
     }
 
     /**
@@ -176,19 +174,27 @@ public class RequestHandlerTest extends TestCase {
         Graph<Domain> domain_graph =
                 handler.computeSimilarityDomain(merged_graph, domains);
 
-        // Test
+        // Test presence of all domains
         System.out.println("Before computation = " + domains.keySet());
         System.out.println("After computation = " + domain_graph.getNodes());
-        boolean indicator = false;
         for (Domain dom : domains.values()) {
-            indicator = domain_graph.containsKey(dom);
-            if (!indicator) {
-                System.out.println("FAIL !");
-                break;
-            }
+            assertTrue(domain_graph.containsKey(dom));
         }
 
-        assertTrue(indicator);
+        // Test the lost of neighbors
+        for (Request req : merged_graph.getNodes()) {
+            NeighborList nl_req = merged_graph.getNeighbors(req);
+            NeighborList nl_dom =
+                    domain_graph.getNeighbors(
+                            domains.get(req.getDomain()));
+            for (Neighbor<Request> nb : nl_req) {
+                if(nb.similarity != 0
+                        && !nb.node.getDomain().equals(req.getDomain())) {
+                    assertTrue(nl_dom.containsNode(
+                            domains.get(nb.node.getDomain())));
+                }
+            } 
+        }
     }
 
     /**
@@ -220,16 +226,9 @@ public class RequestHandlerTest extends TestCase {
         // Test
         System.out.println("Before pruning = " + domain_graph_old.getNodes());
         System.out.println("After pruning = " + domain_graph.getNodes());
-        boolean indicator = false;
         for (Domain dom : domain_graph_old.getNodes()) {
-            indicator = domain_graph.containsKey(dom);
-            if (!indicator) {
-                System.out.println("FAIL !");
-                break;
-            }
+            assertTrue(domain_graph.containsKey(dom));
         }
-
-        assertTrue(indicator);
     }
 
     /**
