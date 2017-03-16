@@ -70,8 +70,8 @@ public class RequestHandler {
 
     // Data (Storage variable)
     private String user_store = "";
-    private ArrayList<String> user_list_store = null;
-    private LinkedList<Graph<Domain>> graphs = null;
+    private ArrayList<String> user_list_store = new ArrayList<String>();
+    private LinkedList<Graph<Domain>> graphs = new LinkedList<Graph<Domain>>();
     private int k_store = 0;
 
     /**
@@ -163,6 +163,11 @@ public class RequestHandler {
 
         long start_time = System.currentTimeMillis();
 
+        // Update user list if needed
+        if (user_list_store.isEmpty()) {
+            user_list_store = getUsers();
+        }
+
         // Check input of the user
         if (!checkInputUser(user, feature_weights, feature_ordered_weights,
                 prune_threshold_temp, max_cluster_size_temp,
@@ -180,10 +185,6 @@ public class RequestHandler {
             user_store = user;
             k_store = getK();
 
-            // Check for the size of the NeighborList
-            if (k_store * graphs.size() >= 1000) {
-                return null;
-            }
         }
 
         stdout = ("<pre>k-NN Graph: k = " + k_store);
@@ -193,6 +194,7 @@ public class RequestHandler {
         for (Domain dom : graphs.getFirst().getNodes()) {
             domains_total += 1;
         }
+
         stdout = stdout.concat("<br>Total number of domains: "
                 + domains_total);
 
@@ -296,6 +298,7 @@ public class RequestHandler {
         if (!user_list_store.contains(user)) {
             return false;
         }
+
         // Verify the non negativity of weights and
         // the sum of the weights of features
         double sum_feature_weights = 0;
@@ -406,7 +409,7 @@ public class RequestHandler {
 
         // Feature Fusion
         // Weighted average using parameter feature_weights
-        Graph<Domain> merged_graph = new Graph<Domain>(1000);
+        Graph<Domain> merged_graph = new Graph<Domain>(Integer.MAX_VALUE);
         for (Domain node : graphs.getFirst().getNodes()) {
 
             // The json-rpc request was probably canceled by the user
@@ -438,7 +441,7 @@ public class RequestHandler {
                 }
             }
 
-            NeighborList nl = new NeighborList(1000);
+            NeighborList nl = new NeighborList(Integer.MAX_VALUE);
             for (Entry<Domain, Double> entry : all_neighbors.entrySet()) {
                 nl.add(new Neighbor(entry.getKey(), entry.getValue()));
             }

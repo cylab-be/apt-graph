@@ -334,9 +334,9 @@ public class BatchProcessor {
      */
     private Graph<Request> childrenSelection(
             final Graph<Request> graph) {
-        Graph<Request> graph_new = new Graph<Request>(1000);
+        Graph<Request> graph_new = new Graph<Request>(Integer.MAX_VALUE);
         for (Request req : graph.getNodes()) {
-            NeighborList neighbors_new = new NeighborList(1000);
+            NeighborList neighbors_new = new NeighborList(Integer.MAX_VALUE);
             NeighborList neighbors = graph.getNeighbors(req);
             for (Neighbor<Request> neighbor : neighbors) {
                 if (req.getTime() <= neighbor.node.getTime()) {
@@ -389,7 +389,7 @@ public class BatchProcessor {
             final Graph<Request> graph,
             final HashMap<String, Domain> domains) {
         // A domain is (for now) a list of Request.
-        Graph<Domain> domain_graph = new Graph<Domain>(1000);
+        Graph<Domain> domain_graph = new Graph<Domain>(Integer.MAX_VALUE);
 
         // For each domain
         for (Map.Entry<String, Domain> domain_entry : domains.entrySet()) {
@@ -433,7 +433,8 @@ public class BatchProcessor {
                 }
             }
 
-            NeighborList this_domain_neighbors = new NeighborList(1000);
+            NeighborList this_domain_neighbors =
+                    new NeighborList(Integer.MAX_VALUE);
             for (Map.Entry<Domain, Double> other_domain_entry
                     : other_domains_sim.entrySet()) {
                 this_domain_neighbors.add(new Neighbor(
