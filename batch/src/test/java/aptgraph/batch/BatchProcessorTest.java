@@ -102,6 +102,29 @@ public class BatchProcessorTest extends TestCase {
     }
 
     /**
+     * Test the computation of domains.
+     * @throws IOException 
+     */
+    public void testComputeDomain()
+            throws IOException {
+        System.out.println("Test of the computation of domains");
+        // Creation of the data
+        BatchProcessor processor = new BatchProcessor();
+        HashMap<String, LinkedList<Request>> user_requests =
+                processor.computeUserLog(processor.parseFile(getClass()
+                        .getResourceAsStream("/domain_test.txt")));
+        LinkedList<Request> requests = user_requests.get("127.0.0.1");
+        for (Request req : requests) {
+            System.out.println("url = " + req.getUrl());
+            String dom = req.getDomain();
+            System.out.println("domain = " + dom);
+            String[] dom_split = dom.split("[.]");
+            System.out.println("domain (first) = " + dom_split[0]);
+            assertTrue(dom_split[0].equals("domain"));
+        }
+    }
+
+    /**
      * Test of the integrity of domains during computation of domains
      * @throws IOException
      * @throws ClassNotFoundException
