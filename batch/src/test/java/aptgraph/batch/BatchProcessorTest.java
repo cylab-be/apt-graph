@@ -1,6 +1,7 @@
 package aptgraph.batch;
 
 import aptgraph.core.Domain;
+import aptgraph.core.DomainSimilarity;
 import aptgraph.core.Request;
 import aptgraph.core.TimeSimilarity;
 import info.debatty.java.graphs.Graph;
@@ -200,6 +201,60 @@ public class BatchProcessorTest extends TestCase {
                             time_domains.get(nb.node.getDomain())));
                 }
             } 
+        }
+
+        // Test the similarities
+        for (Domain dom_1 : time_domain_graph.getNodes()) {
+            NeighborList nl_dom_1 = time_domain_graph.getNeighbors(dom_1);
+            for (Neighbor<Domain> dom_2 : nl_dom_1) {
+                double similarity_temp = 0.0;
+                for (Request req_1 : time_graph.getNodes()) {
+                    if (req_1.getDomain().equals(dom_1.getName())) {
+                        NeighborList nl_req_1 = time_graph.getNeighbors(req_1);
+                        for (Neighbor<Request> req_2 : nl_req_1) {
+                            if (req_2.node.getDomain().equals(dom_2.node.getName())) {
+                                similarity_temp += req_2.similarity;
+                            }
+                        }   
+                    }
+                }
+                assertTrue(dom_2.similarity == similarity_temp);
+            }
+        }
+    }
+
+    /**
+     * Test selection of children.
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
+    public void testChildSelection()
+        throws IOException, ClassNotFoundException {
+        System.out.println("Test Follow Requests");
+
+        BatchProcessor processor = new BatchProcessor();
+
+        // Create Data
+        HashMap<String, LinkedList<Request>> user_requests =
+                processor.computeUserLog(processor.parseFile(getClass()
+                        .getResourceAsStream("/simple.txt")));
+        LinkedList<Request> requests_all = user_requests.get("127.0.0.1");
+        Graph<Request> time_graph =
+                processor.computeRequestGraph(requests_all, 20,
+                        new DomainSimilarity());
+        Graph<Request> time_graph_old = time_graph;
+        time_graph = processor.childrenSelection(time_graph);
+
+        // Test the children
+        for (Request req : time_graph_old.getNodes()) {
+            NeighborList nl = time_graph_old.getNeighbors(req);
+            for (Neighbor<Request> nb : nl) {
+                if (nb.node.getTime() >= req.getTime()) {
+                    assertTrue(time_graph.getNeighbors(req).contains(nb));
+                } else {
+                    assertFalse(time_graph.getNeighbors(req).contains(nb));
+                }
+            }
         }
     }
 }

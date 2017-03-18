@@ -499,7 +499,7 @@ public class RequestHandler {
      * @param domain_graph
      * @return similarities
      */
-    private ArrayList<Double> listSimilarities(
+    final ArrayList<Double> listSimilarities(
             final Graph<Domain> domain_graph) {
         ArrayList<Double> similarities = new ArrayList<Double>();
         for (Domain dom : domain_graph.getNodes()) {
@@ -574,7 +574,7 @@ public class RequestHandler {
      * @param z_prune_threshold
      * @return prune_threshold
      */
-    private double computePruneThreshold(final double mean,
+    final double computePruneThreshold(final double mean,
             final double variance,
             final Double z_prune_threshold) {
         double prune_threshold = fromZ(mean, variance, z_prune_threshold);
@@ -598,7 +598,7 @@ public class RequestHandler {
      * @param filtered
      * @return HistData
      */
-    private HistData doFiltering(
+    final HistData doFiltering(
             final ArrayList<Graph<Domain>> clusters,
             final long start_time,
             final boolean cluster_z_bool,
@@ -641,7 +641,7 @@ public class RequestHandler {
      * @param clusters
      * @return cluster_sizes
      */
-    private ArrayList<Double> listClusterSizes(
+    final ArrayList<Double> listClusterSizes(
         final ArrayList<Graph<Domain>> clusters) {
         ArrayList<Double> cluster_sizes = new ArrayList<Double>();
         for (Graph<Domain> subgraph : clusters) {
@@ -900,7 +900,7 @@ public class RequestHandler {
      * @param list
      * @return ArrayList<Double> mean_variance
      */
-    private ArrayList<Double> getMeanVariance(final ArrayList<Double> list) {
+    final ArrayList<Double> getMeanVariance(final ArrayList<Double> list) {
         double mean = getMean(list);
         double sum = 0.0;
         for (double i :list) {

@@ -96,9 +96,10 @@ public class RequestHandlerTest extends TestCase {
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+        double[] weights = {0.7, 0.1, 0.2};
         Graph<Domain> merged_graph =
                 handler.computeFusionFeatures(20, graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
+                        new double[]{0.8, 0.2}, weights);
 
         // Test presence of all the domains
         for (Graph<Domain> graph_temp : graphs) {
@@ -121,6 +122,29 @@ public class RequestHandlerTest extends TestCase {
                 }
             }
         }
+
+        // Test the similarities
+        for (Domain dom_11 : merged_graph.getNodes()) {
+            NeighborList nl_dom_11 = merged_graph.getNeighbors(dom_11);
+            for (Neighbor<Domain> dom_12 : nl_dom_11) {
+                double similarity_temp = 0.0;
+                for (int i = 0; i < graphs.size(); i++) {
+                    Graph<Domain> feature_graph = graphs.get(i);
+                    double feature_weight = weights[i];
+                    for (Domain dom_21 : feature_graph.getNodes()) {
+                        if (dom_21 == dom_11) {
+                            NeighborList nl_dom_21 = feature_graph.getNeighbors(dom_21);
+                            for (Neighbor<Domain> dom_22 : nl_dom_21) {
+                                if (dom_22.node == dom_12.node) {
+                                    similarity_temp += feature_weight * dom_22.similarity;
+                                }
+                            }
+                        }
+                    }
+                }
+                assertTrue(dom_12.similarity == similarity_temp);
+            }
+        }
     }
 
     /**
@@ -140,21 +164,63 @@ public class RequestHandlerTest extends TestCase {
         Graph<Domain> merged_graph =
                 handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
-        Graph<Domain> merged_graph_old = merged_graph;
-        // Test both method to prune
-        handler.doPruning(merged_graph, (long) 0, true, 0.0);
-        handler.doPruning(merged_graph, (long) 0, false, 0.5);
+        Graph<Domain> merged_graph_1 =
+                handler.computeFusionFeatures(20, graphs,
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
+        Graph<Domain> merged_graph_2 =
+                handler.computeFusionFeatures(20, graphs,
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
 
-        // Test
-        System.out.println("Before pruning = " + merged_graph_old.getNodes());
-        System.out.println("After pruning = " + merged_graph.getNodes());
-        for (Domain dom : merged_graph_old.getNodes()) {
-            assertTrue(merged_graph.containsKey(dom));
+        // Test both method to prune
+        ArrayList<Double> similarities = handler.listSimilarities(merged_graph_2);
+        ArrayList<Double> mean_var_prune = handler.getMeanVariance(similarities);
+        double prune_threshold = mean_var_prune.get(0);
+        handler.doPruning(merged_graph_1, (long) 0, false, 0.4);
+        assertFalse(merged_graph_1.equals(merged_graph));
+        handler.doPruning(merged_graph_2, (long) 0, true, 0.0);
+        assertFalse(merged_graph_1.equals(merged_graph_2));
+
+        // Test presence of all domains
+        System.out.println("Before pruning = " + merged_graph.getNodes());
+        System.out.println("After pruning (1) = " + merged_graph_1.getNodes());
+        System.out.println("After pruning (2) = " + merged_graph_2.getNodes());
+        for (Domain dom : merged_graph.getNodes()) {
+            assertTrue(merged_graph_1.containsKey(dom));
+            assertTrue(merged_graph_2.containsKey(dom));
+        }
+
+        // Test similarities
+        for (Domain dom_11 : merged_graph.getNodes()) {
+            NeighborList nl_dom_11 = merged_graph.getNeighbors(dom_11);
+            for (Neighbor<Domain> dom_12 : nl_dom_11) {
+                // Pruning method 1
+                for (Domain dom_21 : merged_graph_1.getNodes()) {
+                    if (dom_21.getName().equals(dom_11.getName())) {
+                        NeighborList nl_dom_21 = merged_graph_1.getNeighbors(dom_21);
+                        if (dom_12.similarity > 0.4) {
+                            assertTrue(nl_dom_21.contains(dom_12));
+                        } else {
+                           assertFalse(nl_dom_21.contains(dom_12));
+                        }
+                    }
+                }
+                // Pruning method 2
+                for (Domain dom_21 : merged_graph_2.getNodes()) {
+                    if (dom_21.getName().equals(dom_11.getName())) {
+                        NeighborList nl_dom_21 = merged_graph_2.getNeighbors(dom_21);
+                        if (dom_12.similarity > prune_threshold) {
+                            assertTrue(nl_dom_21.contains(dom_12));
+                        } else {
+                           assertFalse(nl_dom_21.contains(dom_12));
+                        }
+                    }
+                }
+            }
         }
     }
 
     /**
-     * Test of the integrity of domains during clustering
+     * Test of the integrity of domains during clustering.
      * @throws IOException
      * @throws ClassNotFoundException
      */
@@ -187,6 +253,42 @@ public class RequestHandlerTest extends TestCase {
             }
 
             assertTrue(found_node);
+        }
+    }
+
+    /**
+     * Test effectiveness of filtering.
+     */
+    public void testFiltering() {
+        System.out.println("Test : filtering");
+        
+        // Creation of the data
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        String user = handler.getUsers().get(0);
+        LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+        Graph<Domain> merged_graph =
+                handler.computeFusionFeatures(20, graphs,
+                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
+        handler.doPruning(merged_graph, (long) 0, false, 0.5);
+        ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
+
+        // Method 1
+        LinkedList<Graph<Domain>> filtered_1 = new LinkedList<Graph<Domain>>();
+        handler.doFiltering(clusters, System.currentTimeMillis(), false,
+                10, filtered_1);
+        for (Graph<Domain> graph : filtered_1) {
+            assertTrue(graph.size() <= 10);
+        }
+        // Method 2
+        LinkedList<Graph<Domain>> filtered_2 = new LinkedList<Graph<Domain>>();
+        handler.doFiltering(clusters, System.currentTimeMillis(), true,
+                0, filtered_2);
+        ArrayList<Double> cluster_sizes = handler.listClusterSizes(clusters);
+        ArrayList<Double> mean_var_cluster = handler.getMeanVariance(cluster_sizes);
+        double mean_cluster = mean_var_cluster.get(0);
+        for (Graph<Domain> graph : filtered_2) {
+            assertTrue(graph.size() <= mean_cluster);
         }
     }
 

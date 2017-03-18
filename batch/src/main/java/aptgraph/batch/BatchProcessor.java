@@ -332,7 +332,7 @@ public class BatchProcessor {
      * @param graph
      * @return graph
      */
-    private Graph<Request> childrenSelection(
+    final Graph<Request> childrenSelection(
             final Graph<Request> graph) {
         Graph<Request> graph_new = new Graph<Request>(Integer.MAX_VALUE);
         for (Request req : graph.getNodes()) {
