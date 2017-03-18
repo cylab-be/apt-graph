@@ -164,12 +164,8 @@ public class RequestHandlerTest extends TestCase {
         Graph<Domain> merged_graph =
                 handler.computeFusionFeatures(20, graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
-        Graph<Domain> merged_graph_1 =
-                handler.computeFusionFeatures(20, graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
-        Graph<Domain> merged_graph_2 =
-                handler.computeFusionFeatures(20, graphs,
-                        new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
+        Graph<Domain> merged_graph_1 = new Graph(merged_graph);
+        Graph<Domain> merged_graph_2 = new Graph(merged_graph);
 
         // Test both method to prune
         ArrayList<Double> similarities = handler.listSimilarities(merged_graph_2);
@@ -178,6 +174,7 @@ public class RequestHandlerTest extends TestCase {
         handler.doPruning(merged_graph_1, (long) 0, false, 0.4);
         assertFalse(merged_graph_1.equals(merged_graph));
         handler.doPruning(merged_graph_2, (long) 0, true, 0.0);
+        assertFalse(merged_graph.equals(merged_graph_2));
         assertFalse(merged_graph_1.equals(merged_graph_2));
 
         // Test presence of all domains
