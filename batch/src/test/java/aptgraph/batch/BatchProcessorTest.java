@@ -71,7 +71,7 @@ public class BatchProcessorTest extends TestCase {
     }
 
     /**
-     * Test graph building.
+     * Test graph building (verify k and duplicated neighbors).
      * @throws IOException
      */
     public final void testGraph() throws IOException {
@@ -94,9 +94,18 @@ public class BatchProcessorTest extends TestCase {
                                 k, new TimeSimilarity());
                     
                 for (Request req : user_graph.getNodes()) {
+                    // Check k
                     NeighborList neighbors = user_graph.getNeighbors(req);
                     System.out.println(neighbors);
                     assertEquals(k, neighbors.size());
+
+                    // Check duplicated neighbors
+                    LinkedList<Neighbor<Request>> nb_list
+                            = new LinkedList<Neighbor<Request>>();
+                    for (Neighbor<Request> nb : neighbors) {
+                        assertFalse(nb_list.contains(nb));
+                        nb_list.add(nb);
+                    }
                 }
             }
         }
