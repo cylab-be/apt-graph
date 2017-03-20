@@ -207,7 +207,7 @@ public class RequestHandler {
         }
 
         // Fusion of the features (Graph of Requests)
-        Graph<Domain> merged_graph = computeFusionFeatures(k_store, graphs,
+        Graph<Domain> merged_graph = computeFusionFeatures(graphs,
                         feature_ordered_weights, feature_weights);
 
         long estimated_time_3 = System.currentTimeMillis() - start_time;
@@ -395,14 +395,12 @@ public class RequestHandler {
 
     /**
      * Compute the fusion of the feature graphs.
-     * @param k
      * @param graphs
      * @param feature_ordered_weights
      * @param feature_weights
      * @return merged_graph
      */
     final Graph<Domain> computeFusionFeatures(
-            final int k,
             final LinkedList<Graph<Domain>> graphs,
             final double[] feature_ordered_weights,
             final double[] feature_weights) {
