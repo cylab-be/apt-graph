@@ -311,7 +311,7 @@ public class BatchProcessor {
             final int k,
             final SimilarityInterface<Request> similarity) {
         Graph<Request> graph;
-        if (requests.size() < 50) {
+        if (requests.size() < 2 * k) {
             Brute<Request> nndes = new Brute<Request>();
             nndes.setSimilarity(similarity);
             nndes.setK(k);
