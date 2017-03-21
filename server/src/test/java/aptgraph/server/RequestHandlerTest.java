@@ -84,68 +84,125 @@ public class RequestHandlerTest extends TestCase {
     }
 
     /**
-     * Test of the integrity of domains during fusion of features
+     * Test of the integrity of domains during fusion of graphs
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public void testIntegrityFusionFeatures()
+    public void testIntegrityFusionGraphs()
             throws IOException, ClassNotFoundException {
-        System.out.println("Integrity : fusion of features");
+        System.out.println("Integrity : fusion of graphs");
 
         // Creation of the data
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        String user = handler.getUsers().get(0);
-        LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
-        double[] weights = {0.7, 0.1, 0.2};
-        Graph<Domain> merged_graph =
-                handler.computeFusionGraphs(graphs,
-                        new double[]{0.8, 0.2}, weights);
+        ArrayList<String> users = handler.getUsers();
+        LinkedList<Graph<Domain>> merged_graph_users
+                = new LinkedList<Graph<Domain>>();
+        for (String user : users) {
+            LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+            double[] weights = {0.7, 0.1, 0.2};
+            Graph<Domain> merged_graph =
+                    handler.computeFusionGraphs(graphs,
+                            new double[]{0.8, 0.2}, weights);
+            merged_graph_users.add(merged_graph);
 
-        // Test presence of all the domains
-        for (Graph<Domain> graph_temp : graphs) {
-            // System.out.println("Before fusion = " + graph_temp.getNodes());
-            // System.out.println("After fusion = " + merged_graph.getNodes());
-            for (Domain dom : graph_temp.getNodes()) {
-                assertTrue(merged_graph.containsKey(dom));
+            // Test presence of all the domains after feature fusion
+            for (Graph<Domain> graph_temp : graphs) {
+                // System.out.println("Before fusion = " + graph_temp.getNodes());
+                // System.out.println("After fusion = " + merged_graph.getNodes());
+                for (Domain dom : graph_temp.getNodes()) {
+                    assertTrue(merged_graph.containsKey(dom));
+                }
             }
-        }
 
-        // Test the lost of neighbors
-        for (Graph<Domain> graph_temp : graphs) {
-            for (Domain dom : graph_temp.getNodes()) {
-                NeighborList nl_temp = graph_temp.getNeighbors(dom);
-                NeighborList nl_merged = merged_graph.getNeighbors(dom);
-                for (Neighbor<Domain> nb : nl_temp) {
-                    if (nb.similarity != 0) {
-                        assertTrue(nl_merged.containsNode(nb.node));
+            // Test the lost of neighbors
+            for (Graph<Domain> graph_temp : graphs) {
+                for (Domain dom : graph_temp.getNodes()) {
+                    NeighborList nl_temp = graph_temp.getNeighbors(dom);
+                    NeighborList nl_merged = merged_graph.getNeighbors(dom);
+                    for (Neighbor<Domain> nb : nl_temp) {
+                        if (nb.similarity != 0) {
+                            assertTrue(nl_merged.containsNode(nb.node));
+                        }
                     }
                 }
             }
-        }
 
-        // Test the similarities
-        for (Domain dom_11 : merged_graph.getNodes()) {
-            NeighborList nl_dom_11 = merged_graph.getNeighbors(dom_11);
-            for (Neighbor<Domain> dom_12 : nl_dom_11) {
-                double similarity_temp = 0.0;
-                for (int i = 0; i < graphs.size(); i++) {
-                    Graph<Domain> feature_graph = graphs.get(i);
-                    double feature_weight = weights[i];
-                    for (Domain dom_21 : feature_graph.getNodes()) {
-                        if (dom_21 == dom_11) {
-                            NeighborList nl_dom_21 = feature_graph.getNeighbors(dom_21);
-                            for (Neighbor<Domain> dom_22 : nl_dom_21) {
-                                if (dom_22.node == dom_12.node) {
-                                    similarity_temp += feature_weight * dom_22.similarity;
+            // Test the similarities
+            for (Domain dom_11 : merged_graph.getNodes()) {
+                NeighborList nl_dom_11 = merged_graph.getNeighbors(dom_11);
+                for (Neighbor<Domain> dom_12 : nl_dom_11) {
+                    double similarity_temp = 0.0;
+                    for (int i = 0; i < graphs.size(); i++) {
+                        Graph<Domain> feature_graph = graphs.get(i);
+                        double feature_weight = weights[i];
+                        for (Domain dom_21 : feature_graph.getNodes()) {
+                            if (dom_21 == dom_11) {
+                                NeighborList nl_dom_21 = feature_graph.getNeighbors(dom_21);
+                                for (Neighbor<Domain> dom_22 : nl_dom_21) {
+                                    if (dom_22.node == dom_12.node) {
+                                        similarity_temp += feature_weight * dom_22.similarity;
+                                    }
                                 }
                             }
                         }
                     }
+                    assertTrue(dom_12.similarity == similarity_temp);
                 }
-                assertTrue(dom_12.similarity == similarity_temp);
             }
         }
+        double[] users_weights = new double[merged_graph_users.size()];
+        for (int i = 0; i < merged_graph_users.size(); i++) {
+            users_weights[i] = 1.0 / merged_graph_users.size();
+        }
+        Graph<Domain> merged_graph
+                = handler.computeFusionGraphs(merged_graph_users,
+                        new double[] {0.0}, users_weights);
+
+        // Test presence of all the domains after feature fusion
+            for (Graph<Domain> graph_temp : merged_graph_users) {
+                // System.out.println("Before fusion = " + graph_temp.getNodes());
+                // System.out.println("After fusion = " + merged_graph.getNodes());
+                for (Domain dom : graph_temp.getNodes()) {
+                    assertTrue(merged_graph.containsKey(dom));
+                }
+            }
+
+            // Test the lost of neighbors
+            for (Graph<Domain> graph_temp : merged_graph_users) {
+                for (Domain dom : graph_temp.getNodes()) {
+                    NeighborList nl_temp = graph_temp.getNeighbors(dom);
+                    NeighborList nl_merged = merged_graph.getNeighbors(dom);
+                    for (Neighbor<Domain> nb : nl_temp) {
+                        if (nb.similarity != 0) {
+                            assertTrue(nl_merged.containsNode(nb.node));
+                        }
+                    }
+                }
+            }
+
+            // Test the similarities
+            for (Domain dom_11 : merged_graph.getNodes()) {
+                NeighborList nl_dom_11 = merged_graph.getNeighbors(dom_11);
+                for (Neighbor<Domain> dom_12 : nl_dom_11) {
+                    double similarity_temp = 0.0;
+                    for (int i = 0; i < merged_graph_users.size(); i++) {
+                        Graph<Domain> feature_graph = merged_graph_users.get(i);
+                        double feature_weight = users_weights[i];
+                        for (Domain dom_21 : feature_graph.getNodes()) {
+                            if (dom_21 == dom_11) {
+                                NeighborList nl_dom_21 = feature_graph.getNeighbors(dom_21);
+                                for (Neighbor<Domain> dom_22 : nl_dom_21) {
+                                    if (dom_22.node == dom_12.node) {
+                                        similarity_temp += feature_weight * dom_22.similarity;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    assertTrue(dom_12.similarity == similarity_temp);
+                }
+            }
     }
 
     /**

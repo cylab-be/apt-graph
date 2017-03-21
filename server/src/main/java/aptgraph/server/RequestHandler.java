@@ -344,7 +344,7 @@ public class RequestHandler {
             final double[] ranking_weights) {
         // Check if user exists
         if (!all_users_list_store.contains(user)
-                || !all_subnets_list_store.contains(user)) {
+                && !all_subnets_list_store.contains(user)) {
             return false;
         }
 
