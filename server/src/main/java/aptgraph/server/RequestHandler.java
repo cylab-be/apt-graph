@@ -78,6 +78,14 @@ public class RequestHandler {
     private int k_store = 0;
 
     /**
+     * Return list of all users.
+     * @return ArrayList<String>
+     */
+    public final ArrayList<String> getAllUsersListStore() {
+        return all_users_list_store;
+    }
+
+    /**
      * Return list of selected users.
      * @return ArrayList<String>
      */
@@ -242,15 +250,16 @@ public class RequestHandler {
         // Compute each user graph
         LinkedList<Graph<Domain>> merged_graph_users
                 = new LinkedList<Graph<Domain>>();
-        int domains_total
+        HashMap<String, Domain> all_domains
                 = computeUsersGraphs(merged_graph_users, feature_weights,
                         feature_ordered_weights, start_time);
-        if (domains_total == -1) {
-                return null;
-        }
 
         stdout = stdout.concat("<br>Total number of domains: "
-                    + domains_total);
+                    + all_domains.values().size());
+
+        long estimated_time_4 = System.currentTimeMillis() - start_time;
+        System.out.println("4: " + estimated_time_4
+                + " (All users done)");
 
         // Fusion of the users (Graph of Domains)
         double[] users_weights = new double[merged_graph_users.size()];
@@ -258,16 +267,20 @@ public class RequestHandler {
             users_weights[i] = 1.0 / merged_graph_users.size();
         }
         Graph<Domain> merged_graph
-                = computeFusionGraphs(merged_graph_users,
+                = computeFusionGraphs(merged_graph_users, all_domains,
                         new double[] {0.0}, users_weights);
         graph_store = merged_graph;
+
+        long estimated_time_5 = System.currentTimeMillis() - start_time;
+        System.out.println("5: " + estimated_time_5
+                + " (Fusion of users done)");
 
         // Prune
         HistData hist_pruning = doPruning(merged_graph,
                 start_time, prune_z_bool, prune_threshold_temp);
 
-        long estimated_time_8 = System.currentTimeMillis() - start_time;
-        System.out.println("8: " + estimated_time_8 + " (Pruning done)");
+        long estimated_time_7 = System.currentTimeMillis() - start_time;
+        System.out.println("7: " + estimated_time_7 + " (Pruning done)");
 
         // The json-rpc request was probably canceled by the user
         if (Thread.currentThread().isInterrupted()) {
@@ -282,24 +295,24 @@ public class RequestHandler {
             return null;
         }
 
-        long estimated_time_9 = System.currentTimeMillis() - start_time;
-        System.out.println("9: " + estimated_time_9 + " (Clustering done)");
+        long estimated_time_8 = System.currentTimeMillis() - start_time;
+        System.out.println("8: " + estimated_time_8 + " (Clustering done)");
 
         // Filtering
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
         HistData hist_cluster = doFiltering(clusters, start_time,
                 cluster_z_bool, max_cluster_size_temp, filtered);
 
-        long estimated_time_11 = System.currentTimeMillis() - start_time;
-        System.out.println("11: " + estimated_time_11 + " (Filtering done)");
+        long estimated_time_9 = System.currentTimeMillis() - start_time;
+        System.out.println("9: " + estimated_time_9 + " (Filtering done)");
 
         // White listing
         if (whitelist_bool) {
             filtered = whiteListing(filtered, white_ongo);
         }
 
-        long estimated_time_12 = System.currentTimeMillis() - start_time;
-        System.out.println("12: " + estimated_time_12
+        long estimated_time_10 = System.currentTimeMillis() - start_time;
+        System.out.println("10: " + estimated_time_10
                 + " (White listing done)");
 
         // The json-rpc request was probably canceled by the user
@@ -309,11 +322,11 @@ public class RequestHandler {
 
         // Ranking
         if (filtered.size() > 1) {
-            showRanking(filtered, domains_total, ranking_weights);
+            showRanking(filtered, all_domains.values().size(), ranking_weights);
         }
 
-        long estimated_time_13 = System.currentTimeMillis() - start_time;
-        System.out.println("13: " + estimated_time_13 + " (Ranking printed)");
+        long estimated_time_11 = System.currentTimeMillis() - start_time;
+        System.out.println("11: " + estimated_time_11 + " (Ranking printed)");
 
         // Output
         stdout = stdout.concat("<br>Found " + filtered.size()
@@ -448,20 +461,25 @@ public class RequestHandler {
      * @param feature_weights
      * @param feature_ordered_weights
      * @param start_time
-     * @return domains_total
+     * @return all_domains
      */
-    final int computeUsersGraphs(
+    final HashMap<String, Domain> computeUsersGraphs(
             final LinkedList<Graph<Domain>> merged_graph_users,
             final double[] feature_weights,
             final double[] feature_ordered_weights,
             final long start_time) {
-        int domains_total = 0;
+        HashMap<String, Domain> all_domains = new HashMap<String, Domain>();
         for (String user_temp : users_list_store) {
             LinkedList<Graph<Domain>> graphs_temp = getUserGraphs(user_temp);
 
-            // Count number of domains
+            // List all domains
             for (Domain dom : graphs_temp.getFirst().getNodes()) {
-                domains_total += 1;
+                if (!all_domains.containsKey(dom.getName())) {
+                    all_domains.put(dom.getName(), dom);
+                } else if (!all_domains.get(dom.getName()).equals(dom)) {
+                    all_domains.put(dom.getName(),
+                            all_domains.get(dom.getName()).merge(dom));
+                }
             }
 
             long estimated_time_2 = System.currentTimeMillis() - start_time;
@@ -469,12 +487,12 @@ public class RequestHandler {
 
             // The json-rpc request was probably canceled by the user
             if (Thread.currentThread().isInterrupted()) {
-                return -1;
+                return null;
             }
 
             // Fusion of the features (Graph of Domains)
             Graph<Domain> merged_graph_temp = computeFusionGraphs(graphs_temp,
-                            feature_ordered_weights, feature_weights);
+                    all_domains, feature_ordered_weights, feature_weights);
 
             merged_graph_users.add(merged_graph_temp);
 
@@ -482,24 +500,26 @@ public class RequestHandler {
             System.out.println("3: " + estimated_time_3
                     + " (Fusion of features done)");
         }
-        return domains_total;
+        return all_domains;
     }
 
     /**
      * Compute the fusion of graphs.
      * @param graphs
+     * @param all_domains
      * @param feature_ordered_weights
      * @param feature_weights
      * @return merged_graph
      */
     final Graph<Domain> computeFusionGraphs(
             final LinkedList<Graph<Domain>> graphs,
+            final HashMap<String, Domain> all_domains,
             final double[] ordered_weights,
             final double[] weights) {
 
         // Weighted average using parameter weights
         Graph<Domain> merged_graph = new Graph<Domain>(Integer.MAX_VALUE);
-        for (Domain node : graphs.getFirst().getNodes()) {
+        for (Domain node : all_domains.values()) {
 
             // The json-rpc request was probably canceled by the user
             if (Thread.currentThread().isInterrupted()) {
@@ -511,22 +531,27 @@ public class RequestHandler {
 
             for (int i = 0; i < graphs.size(); i++) {
                 Graph<Domain> graph_temp = graphs.get(i);
-                NeighborList neighbors_temp =
-                        graph_temp.getNeighbors(node);
+                if (graph_temp.containsKey(node)) {
+                    System.out.println("IN : " + node.getName());
+                    NeighborList neighbors_temp =
+                            graph_temp.getNeighbors(node);
 
-                for (Neighbor<Domain> neighbor_temp : neighbors_temp) {
-                    double new_similarity =
-                            weights[i] * neighbor_temp.similarity;
+                    for (Neighbor<Domain> neighbor_temp : neighbors_temp) {
+                        double new_similarity =
+                                weights[i] * neighbor_temp.similarity;
 
-                    if (all_neighbors.containsKey(neighbor_temp.node)) {
-                        new_similarity +=
-                                all_neighbors.get(neighbor_temp.node);
+                        if (all_neighbors.containsKey(neighbor_temp.node)) {
+                            new_similarity +=
+                                    all_neighbors.get(neighbor_temp.node);
+                        }
+
+                        if (new_similarity != 0) {
+                          all_neighbors.put(
+                                  all_domains.get(neighbor_temp.node.getName()),
+                                  new_similarity);
+                        }
+
                     }
-
-                    if (new_similarity != 0) {
-                       all_neighbors.put(neighbor_temp.node, new_similarity);
-                    }
-
                 }
             }
 
@@ -562,8 +587,8 @@ public class RequestHandler {
         HistData hist_pruning = computeHistData(similarities, mean_prune,
                 variance_prune, prune_z_bool, false);
 
-        long estimated_time_7 = System.currentTimeMillis() - start_time;
-        System.out.println("7: " + estimated_time_7
+        long estimated_time_6 = System.currentTimeMillis() - start_time;
+        System.out.println("6: " + estimated_time_6
                 + " (Similarities hist. created)");
 
         // The json-rpc request was probably canceled by the user
@@ -701,8 +726,8 @@ public class RequestHandler {
         HistData hist_cluster = computeHistData(cluster_sizes, mean_cluster,
                 variance_cluster, cluster_z_bool, true);
 
-        long estimated_time_10 = System.currentTimeMillis() - start_time;
-        System.out.println("10: " + estimated_time_10
+        long estimated_time_7 = System.currentTimeMillis() - start_time;
+        System.out.println("7: " + estimated_time_7
                 + " (Clusters hist. created)");
 
         // The json-rpc request was probably canceled by the user
@@ -772,7 +797,8 @@ public class RequestHandler {
     final LinkedList<Graph<Domain>>
          whiteListing(final LinkedList<Graph<Domain>> filtered,
                  final String white_ongo) {
-        LinkedList<Graph<Domain>> filtered_new = filtered;
+        LinkedList<Graph<Domain>> filtered_new
+                = new LinkedList<Graph<Domain>>(filtered);
 
         List<String> whitelist = new ArrayList<String>();
         List<String> whitelist_ongo = new ArrayList<String>();
@@ -792,8 +818,8 @@ public class RequestHandler {
             Iterator<Domain> iterator_2 = domain_graph.getNodes().iterator();
             while (iterator_2.hasNext()) {
                 Domain dom = iterator_2.next();
-                if ((whitelist.contains(dom.toString())
-                        || whitelist_ongo.contains(dom.toString()))
+                if ((whitelist.contains(dom.getName())
+                        || whitelist_ongo.contains(dom.getName()))
                         && !whitelisted.contains(dom)) {
                     whitelisted.add(dom);
                 }
@@ -848,10 +874,16 @@ public class RequestHandler {
     private void showRanking(final LinkedList<Graph<Domain>> filtered,
             final int domains_total, final double[] ranking_weights) {
         // Creation of a big graph with the result
-        Graph<Domain> graph_all = new Graph<Domain>(1000);
+        Graph<Domain> graph_all = new Graph<Domain>(Integer.MAX_VALUE);
         for (Graph<Domain> graph : filtered) {
             for (Domain dom : graph.getNodes()) {
-                graph_all.put(dom, graph.getNeighbors(dom));
+                if (!graph_all.containsKey(dom)) {
+                    graph_all.put(dom, graph.getNeighbors(dom));
+                } else {
+                    NeighborList neighbors = graph_all.getNeighbors(dom);
+                    neighbors.addAll(graph.getNeighbors(dom));
+                    graph_all.put(dom, neighbors);
+                }
             }
         }
 
@@ -921,7 +953,6 @@ public class RequestHandler {
             stdout = stdout.concat("<br>TOP for APT.FINDME.be: NOT FOUND");
         }
         stdout = stdout.concat("<br>Ranking:");
-        stdout = stdout.concat("<br>(#Children + #Parents / #Resquests)");
         for (Domain dom : sorted) {
             stdout = stdout.concat("<br>    ("
                     + Math.round(index.get(dom) * 100) / 100.0 + ") " + dom);

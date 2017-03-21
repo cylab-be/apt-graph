@@ -49,6 +49,23 @@ public class Domain extends LinkedList<Request> {
     }
 
     /**
+     * Merge domains with the same name but different requests.
+     * @param dom
+     * @return dom_out
+     */
+    public final Domain merge(final Domain dom) {
+        Domain dom_out = (Domain) this.clone();
+        if (this.name.equals(dom.name)) {
+            for (Request req : dom) {
+                if (!this.contains(req)) {
+                    dom_out.add(req);
+                }
+            }
+        }
+        return dom_out;
+    }
+
+    /**
      * Return domain name.
      * @return
      */
