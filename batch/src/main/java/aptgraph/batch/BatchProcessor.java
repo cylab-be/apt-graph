@@ -2,6 +2,7 @@ package aptgraph.batch;
 
 import aptgraph.core.Request;
 import aptgraph.core.Domain;
+import aptgraph.core.Subnet;
 import aptgraph.core.TimeSimilarity;
 //import aptgraph.core.URLSimilarity;
 import aptgraph.core.DomainSimilarity;
@@ -29,7 +30,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,11 +64,13 @@ public class BatchProcessor {
      * @param input_file
      * @param output_dir
      * @param children_bool
+     * @param overwrite_bool
      * @throws IOException if we cannot read the input file
      */
     public final void analyze(final int k,
             final InputStream input_file, final Path output_dir,
-            final boolean children_bool)
+            final boolean children_bool,
+            final boolean overwrite_bool)
             throws IOException {
 
         // Parsing of the log file and Split of the log file by users
@@ -81,16 +83,23 @@ public class BatchProcessor {
         for (Map.Entry<String, LinkedList<Request>> entry
                 : user_requests.entrySet()) {
             String user = entry.getKey();
-            LinkedList<Request> requests = entry.getValue();
+            File file = new File(output_dir.toString(), user + ".ser");
+            if (overwrite_bool || !file.exists()) {
+                LinkedList<Request> requests = entry.getValue();
 
-            LinkedList<Graph<Domain>> graphs =
-                    computeUserGraphs(k, user, requests, children_bool);
+                LinkedList<Graph<Domain>> graphs =
+                        computeUserGraphs(k, user, requests, children_bool);
 
-            // Store of the list of graphs for one user on disk
-            saveGraphs(output_dir, user, graphs);
+                // Store of the list of graphs for one user on disk
+                saveGraphs(output_dir, user, graphs);
+            } else {
+                LOGGER.log(Level.INFO,
+                "User {0} has been skipped...", user);
+            }
             user_list.add(user);
         }
         saveUsers(output_dir, user_list);
+        saveSubnet(output_dir, user_list);
         saveK(output_dir, k);
     }
 
@@ -483,7 +492,7 @@ public class BatchProcessor {
      * @param output_dir
      * @param user_list
      */
-    final void saveUsers(
+    private void saveUsers(
             final Path output_dir,
             final ArrayList<String>  user_list) {
         try {
@@ -494,8 +503,33 @@ public class BatchProcessor {
                 new FileOutputStream(file.toString());
             ObjectOutputStream output = new ObjectOutputStream(
                     new BufferedOutputStream(output_stream));
-            Collections.sort(user_list);
-            output.writeObject(user_list);
+            Subnet sn = new Subnet();
+            output.writeObject(sn.sortIPs(user_list));
+            output.close();
+        } catch (IOException ex) {
+                System.err.println(ex);
+        }
+    }
+
+    /**
+     * Save the list of subnets.
+     * @param output_dir
+     * @param user_list
+     */
+    private void saveSubnet(
+            final Path output_dir,
+            final ArrayList<String> user_list) {
+        try {
+            LOGGER.log(Level.INFO,
+                    "Save list of subnets to disk...");
+            File file = new File(output_dir.toString(), "subnets.ser");
+            FileOutputStream output_stream =
+                new FileOutputStream(file.toString());
+            ObjectOutputStream output = new ObjectOutputStream(
+                    new BufferedOutputStream(output_stream));
+            Subnet sn = new Subnet();
+            ArrayList<String> subnet_list = sn.getAllSubnets(user_list);
+            output.writeObject(subnet_list);
             output.close();
         } catch (IOException ex) {
                 System.err.println(ex);
@@ -507,7 +541,7 @@ public class BatchProcessor {
      * @param output_dir
      * @param k
      */
-    final void saveK(
+    private void saveK(
             final Path output_dir,
             final int k) {
         try {

@@ -33,8 +33,9 @@ public final class Main {
             IllegalArgumentException {
         // Default value of k (if no user input)
         int k = DEFAULT_K;
-        // Default value of children_bool
+        // Default value of arguments
         boolean children_bool = true;
+        boolean overwrite_bool = false;
 
         // Parse command line arguments
         Options options = new Options();
@@ -54,6 +55,13 @@ public final class Main {
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_child);
+        Option arg_overwrite = Option.builder("x")
+                .optionalArg(true)
+                .desc("Overwrite existing graphs (default : false)")
+                .hasArg(true)
+                .numberOfArgs(1)
+                .build();
+        options.addOption(arg_overwrite);
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
@@ -85,10 +93,19 @@ public final class Main {
         }
 
         try {
+            if (cmd.hasOption("x")) {
+                overwrite_bool = Boolean.parseBoolean(cmd.getOptionValue("x"));
+            }
+        } catch (IllegalArgumentException ex) {
+                System.err.println(ex);
+        }
+
+        try {
             BatchProcessor processor = new BatchProcessor();
             processor.analyze(k,
                     new FileInputStream(cmd.getOptionValue("i")),
-                    Paths.get(cmd.getOptionValue("o")), children_bool);
+                    Paths.get(cmd.getOptionValue("o")),
+                    children_bool, overwrite_bool);
         } catch (IllegalArgumentException ex) {
                 System.err.println(ex);
         }

@@ -25,6 +25,7 @@
 package aptgraph.server;
 
 import aptgraph.core.Domain;
+import aptgraph.core.Subnet;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
@@ -70,9 +71,27 @@ public class RequestHandler {
 
     // Data (Storage variable)
     private String user_store = "";
-    private ArrayList<String> user_list_store = new ArrayList<String>();
-    private LinkedList<Graph<Domain>> graphs = new LinkedList<Graph<Domain>>();
+    private ArrayList<String> users_list_store = new ArrayList<String>();
+    private ArrayList<String> all_users_list_store = new ArrayList<String>();
+    private ArrayList<String> all_subnets_list_store = new ArrayList<String>();
+    private Graph<Domain> graph_store = new Graph<Domain>();
     private int k_store = 0;
+
+    /**
+     * Return list of selected users.
+     * @return ArrayList<String>
+     */
+    public final ArrayList<String> getUsersListStore() {
+        return users_list_store;
+    }
+
+    /**
+     * Set list of selected users.
+     * @param list
+     */
+    public final void setUsersListStore(final ArrayList<String> list) {
+        users_list_store = list;
+    }
 
     /**
      * A test json-rpc call, with no argument, that should return "hello".
@@ -113,6 +132,23 @@ public class RequestHandler {
      * @return List of users
      */
     public final ArrayList<String> getUsers() {
+        ArrayList<String> subnet_list = new ArrayList<String>();
+        LOGGER.info("Reading list of subnets from disk...");
+        try {
+            File file = new File(input_dir.toString(), "subnets.ser");
+            FileInputStream input_stream =
+                    new FileInputStream(file.toString());
+            ObjectInputStream input = new ObjectInputStream(
+                    new BufferedInputStream(input_stream));
+            subnet_list = (ArrayList<String>) input.readObject();
+            input.close();
+            all_subnets_list_store = subnet_list;
+        } catch (IOException ex) {
+                System.err.println(ex);
+        } catch (ClassNotFoundException ex) {
+                System.err.println(ex);
+        }
+
         ArrayList<String> user_list = new ArrayList<String>();
         LOGGER.info("Reading list of users from disk...");
         try {
@@ -123,14 +159,17 @@ public class RequestHandler {
                     new BufferedInputStream(input_stream));
             user_list = (ArrayList<String>) input.readObject();
             input.close();
-            user_list_store = user_list;
+            all_users_list_store = user_list;
         } catch (IOException ex) {
                 System.err.println(ex);
         } catch (ClassNotFoundException ex) {
                 System.err.println(ex);
         }
 
-        return user_list;
+        ArrayList<String> output = new ArrayList<String>();
+        output.addAll(subnet_list);
+        output.addAll(user_list);
+        return output;
     }
 
     /**
@@ -163,9 +202,10 @@ public class RequestHandler {
 
         long start_time = System.currentTimeMillis();
 
-        // Update user list if needed
-        if (user_list_store.isEmpty()) {
-            user_list_store = getUsers();
+        // Update users list and subnets list if needed
+        if (all_users_list_store.isEmpty()
+                || all_subnets_list_store.isEmpty()) {
+            getUsers();
         }
 
         // Check input of the user
@@ -178,41 +218,49 @@ public class RequestHandler {
         long estimated_time_1 = System.currentTimeMillis() - start_time;
         System.out.println("1: " + estimated_time_1 + " (User input checked)");
 
-        // Choice of the graphs of the user
-        if (user_store.isEmpty() || graphs.isEmpty()
+        // Create the list of users used to produce final graph
+        if (users_list_store.isEmpty() || graph_store == null
                 || k_store == 0 || !user_store.equals(user)) {
-            graphs = getUserGraphs(user);
             user_store = user;
             k_store = getK();
 
+            Subnet sn = new Subnet();
+            if (user.equals("0.0.0.0")) {
+                users_list_store = all_users_list_store;
+            } else if (sn.isSubnet(user)) {
+               users_list_store =
+                       sn.getUsersInSubnet(user, all_users_list_store);
+            } else {
+                users_list_store.clear();
+                users_list_store.add(user);
+            }
         }
 
-        stdout = ("<pre>k-NN Graph: k = " + k_store);
+        stdout = "<pre>Number of users selected: " + users_list_store.size();
+        stdout = stdout.concat("<br>k-NN Graph: k: " + k_store);
 
-        // Count number of domains
-        int domains_total = 0;
-        for (Domain dom : graphs.getFirst().getNodes()) {
-            domains_total += 1;
+        // Compute each user graph
+        LinkedList<Graph<Domain>> merged_graph_users
+                = new LinkedList<Graph<Domain>>();
+        int domains_total
+                = computeUsersGraphs(merged_graph_users, feature_weights,
+                        feature_ordered_weights, start_time);
+        if (domains_total == -1) {
+                return null;
         }
 
         stdout = stdout.concat("<br>Total number of domains: "
-                + domains_total);
+                    + domains_total);
 
-        long estimated_time_2 = System.currentTimeMillis() - start_time;
-        System.out.println("2: " + estimated_time_2 + " (Data loaded)");
-
-        // The json-rpc request was probably canceled by the user
-        if (Thread.currentThread().isInterrupted()) {
-            return null;
+        // Fusion of the users (Graph of Domains)
+        double[] users_weights = new double[merged_graph_users.size()];
+        for (int i = 0; i < merged_graph_users.size(); i++) {
+            users_weights[i] = 1.0 / merged_graph_users.size();
         }
-
-        // Fusion of the features (Graph of Requests)
-        Graph<Domain> merged_graph = computeFusionFeatures(graphs,
-                        feature_ordered_weights, feature_weights);
-
-        long estimated_time_3 = System.currentTimeMillis() - start_time;
-        System.out.println("3: " + estimated_time_3
-                + " (Fusion of features done)");
+        Graph<Domain> merged_graph
+                = computeFusionGraphs(merged_graph_users,
+                        new double[] {0.0}, users_weights);
+        graph_store = merged_graph;
 
         // Prune
         HistData hist_pruning = doPruning(merged_graph,
@@ -295,7 +343,8 @@ public class RequestHandler {
             final boolean cluster_z_bool,
             final double[] ranking_weights) {
         // Check if user exists
-        if (!user_list_store.contains(user)) {
+        if (!all_users_list_store.contains(user)
+                || !all_subnets_list_store.contains(user)) {
             return false;
         }
 
@@ -394,19 +443,61 @@ public class RequestHandler {
     }
 
     /**
-     * Compute the fusion of the feature graphs.
+     * Fusion features of each user.
+     * @param merged_graph_users
+     * @param feature_weights
+     * @param feature_ordered_weights
+     * @param start_time
+     * @return domains_total
+     */
+    final int computeUsersGraphs(
+            final LinkedList<Graph<Domain>> merged_graph_users,
+            final double[] feature_weights,
+            final double[] feature_ordered_weights,
+            final long start_time) {
+        int domains_total = 0;
+        for (String user_temp : users_list_store) {
+            LinkedList<Graph<Domain>> graphs_temp = getUserGraphs(user_temp);
+
+            // Count number of domains
+            for (Domain dom : graphs_temp.getFirst().getNodes()) {
+                domains_total += 1;
+            }
+
+            long estimated_time_2 = System.currentTimeMillis() - start_time;
+            System.out.println("2: " + estimated_time_2 + " (Data loaded)");
+
+            // The json-rpc request was probably canceled by the user
+            if (Thread.currentThread().isInterrupted()) {
+                return -1;
+            }
+
+            // Fusion of the features (Graph of Domains)
+            Graph<Domain> merged_graph_temp = computeFusionGraphs(graphs_temp,
+                            feature_ordered_weights, feature_weights);
+
+            merged_graph_users.add(merged_graph_temp);
+
+            long estimated_time_3 = System.currentTimeMillis() - start_time;
+            System.out.println("3: " + estimated_time_3
+                    + " (Fusion of features done)");
+        }
+        return domains_total;
+    }
+
+    /**
+     * Compute the fusion of graphs.
      * @param graphs
      * @param feature_ordered_weights
      * @param feature_weights
      * @return merged_graph
      */
-    final Graph<Domain> computeFusionFeatures(
+    final Graph<Domain> computeFusionGraphs(
             final LinkedList<Graph<Domain>> graphs,
-            final double[] feature_ordered_weights,
-            final double[] feature_weights) {
+            final double[] ordered_weights,
+            final double[] weights) {
 
-        // Feature Fusion
-        // Weighted average using parameter feature_weights
+        // Weighted average using parameter weights
         Graph<Domain> merged_graph = new Graph<Domain>(Integer.MAX_VALUE);
         for (Domain node : graphs.getFirst().getNodes()) {
 
@@ -419,21 +510,21 @@ public class RequestHandler {
                     new HashMap<Domain, Double>();
 
             for (int i = 0; i < graphs.size(); i++) {
-                Graph<Domain> feature_graph = graphs.get(i);
-                NeighborList feature_neighbors =
-                        feature_graph.getNeighbors(node);
+                Graph<Domain> graph_temp = graphs.get(i);
+                NeighborList neighbors_temp =
+                        graph_temp.getNeighbors(node);
 
-                for (Neighbor<Domain> feature_neighbor : feature_neighbors) {
+                for (Neighbor<Domain> neighbor_temp : neighbors_temp) {
                     double new_similarity =
-                            feature_weights[i] * feature_neighbor.similarity;
+                            weights[i] * neighbor_temp.similarity;
 
-                    if (all_neighbors.containsKey(feature_neighbor.node)) {
+                    if (all_neighbors.containsKey(neighbor_temp.node)) {
                         new_similarity +=
-                                all_neighbors.get(feature_neighbor.node);
+                                all_neighbors.get(neighbor_temp.node);
                     }
 
                     if (new_similarity != 0) {
-                       all_neighbors.put(feature_neighbor.node, new_similarity);
+                       all_neighbors.put(neighbor_temp.node, new_similarity);
                     }
 
                 }

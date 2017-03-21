@@ -36,7 +36,7 @@ public class BatchProcessorTest extends TestCase {
         BatchProcessor processor = new BatchProcessor();
         processor.analyze(20,
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
-                temp_dir, true);
+                temp_dir, true, true);
 
     }
 
@@ -96,7 +96,7 @@ public class BatchProcessorTest extends TestCase {
                 for (Request req : user_graph.getNodes()) {
                     // Check k
                     NeighborList neighbors = user_graph.getNeighbors(req);
-                    System.out.println(neighbors);
+                    // System.out.println(neighbors);
                     assertEquals(k, neighbors.size());
 
                     // Check duplicated neighbors
@@ -125,11 +125,11 @@ public class BatchProcessorTest extends TestCase {
                         .getResourceAsStream("/domain_test.txt")));
         LinkedList<Request> requests = user_requests.get("127.0.0.1");
         for (Request req : requests) {
-            System.out.println("url = " + req.getUrl());
+            // System.out.println("url = " + req.getUrl());
             String dom = req.getDomain();
-            System.out.println("domain = " + dom);
+            // System.out.println("domain = " + dom);
             String[] dom_split = dom.split("[.]");
-            System.out.println("domain (first) = " + dom_split[0]);
+            // System.out.println("domain (first) = " + dom_split[0]);
             assertTrue(dom_split[0].equals("domain"));
         }
     }
@@ -157,8 +157,8 @@ public class BatchProcessorTest extends TestCase {
                 processor.computeDomainNodes(time_graph);
 
         // Test
-        System.out.println("Before computation = " + time_graph.getNodes());
-        System.out.println("After computation = " + time_domains.keySet());
+        // System.out.println("Before computation = " + time_graph.getNodes());
+        // System.out.println("After computation = " + time_domains.keySet());
         for (Request req : time_graph.getNodes()) {
             assertTrue(time_domains.get(req.getDomain()).contains(req));
         }
@@ -191,8 +191,8 @@ public class BatchProcessorTest extends TestCase {
 
 
         // Test presence of all domains
-        System.out.println("Before computation = " + time_domains.keySet());
-        System.out.println("After computation = " + time_domain_graph.getNodes());
+        // System.out.println("Before computation = " + time_domains.keySet());
+        // System.out.println("After computation = " + time_domain_graph.getNodes());
         for (Domain dom : time_domains.values()) {
             assertTrue(time_domain_graph.containsKey(dom));
         }

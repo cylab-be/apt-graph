@@ -24,6 +24,7 @@
 package aptgraph.server;
 
 import aptgraph.core.Domain;
+import aptgraph.core.Subnet;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
@@ -98,13 +99,13 @@ public class RequestHandlerTest extends TestCase {
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         double[] weights = {0.7, 0.1, 0.2};
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionGraphs(graphs,
                         new double[]{0.8, 0.2}, weights);
 
         // Test presence of all the domains
         for (Graph<Domain> graph_temp : graphs) {
-            System.out.println("Before fusion = " + graph_temp.getNodes());
-            System.out.println("After fusion = " + merged_graph.getNodes());
+            // System.out.println("Before fusion = " + graph_temp.getNodes());
+            // System.out.println("After fusion = " + merged_graph.getNodes());
             for (Domain dom : graph_temp.getNodes()) {
                 assertTrue(merged_graph.containsKey(dom));
             }
@@ -148,6 +149,28 @@ public class RequestHandlerTest extends TestCase {
     }
 
     /**
+     * Test of the integrity of the computation of individual graphs.
+     */
+    public void testIntegrityUsersGraphs() {
+        System.out.println("Integrity : users graphs");
+
+        // Creation of the data
+        RequestHandler handler =
+                new RequestHandler(Paths.get("src/test/resources/dummyDir_users"));
+        Subnet sn = new Subnet();
+        ArrayList<String> users = handler.getUsers();
+        handler.setUsersListStore(sn.getUsersInSubnet("0.0.0.0", users));
+        LinkedList<Graph<Domain>> merged_graph_users
+                = new LinkedList<Graph<Domain>>();
+        handler.computeUsersGraphs(merged_graph_users,
+                new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2},
+                System.currentTimeMillis());
+
+        // Test
+        assertTrue(handler.getUsersListStore().size() == merged_graph_users.size());
+    }
+
+    /**
      * Test of the integrity of domains during pruning
      * @throws IOException
      * @throws ClassNotFoundException
@@ -162,7 +185,7 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionGraphs(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         Graph<Domain> merged_graph_1 = new Graph(merged_graph);
         Graph<Domain> merged_graph_2 = new Graph(merged_graph);
@@ -178,9 +201,9 @@ public class RequestHandlerTest extends TestCase {
         assertFalse(merged_graph_1.equals(merged_graph_2));
 
         // Test presence of all domains
-        System.out.println("Before pruning = " + merged_graph.getNodes());
-        System.out.println("After pruning (1) = " + merged_graph_1.getNodes());
-        System.out.println("After pruning (2) = " + merged_graph_2.getNodes());
+        // System.out.println("Before pruning = " + merged_graph.getNodes());
+        // System.out.println("After pruning (1) = " + merged_graph_1.getNodes());
+        // System.out.println("After pruning (2) = " + merged_graph_2.getNodes());
         for (Domain dom : merged_graph.getNodes()) {
             assertTrue(merged_graph_1.containsKey(dom));
             assertTrue(merged_graph_2.containsKey(dom));
@@ -231,14 +254,14 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionGraphs(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         handler.doPruning(merged_graph, (long) 0, false, 0.5);
         ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
 
         // Test
-        System.out.println("After prune = " + merged_graph.getNodes());
-        System.out.println("Clusters = " + clusters);
+        // System.out.println("After prune = " + merged_graph.getNodes());
+        // System.out.println("Clusters = " + clusters);
         boolean found_node;
         for (Domain dom : merged_graph.getNodes()) {
             found_node = false;
@@ -265,7 +288,7 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionGraphs(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2});
         handler.doPruning(merged_graph, (long) 0, false, 0.5);
         ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
@@ -304,7 +327,7 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionGraphs(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
         
         // Test 
@@ -331,7 +354,7 @@ public class RequestHandlerTest extends TestCase {
         String user = handler.getUsers().get(0);
         LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
         Graph<Domain> merged_graph =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionGraphs(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.7, 0.3});
         ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
@@ -358,9 +381,9 @@ public class RequestHandlerTest extends TestCase {
             }
         }
 
-        System.out.println("Before whitelisting = " + filtered);
+        // System.out.println("Before whitelisting = " + filtered);
         filtered = handler.whiteListing(filtered, "ss.symcd.com");
-        System.out.println("After whitelisting = " + filtered);
+        // System.out.println("After whitelisting = " + filtered);
         Graph<Domain> domain_graph_new = filtered.getFirst();
 
         assertFalse(domain_graph_new.containsKey(domain_node_1));
@@ -383,7 +406,7 @@ public class RequestHandlerTest extends TestCase {
         // Test time weight
         Graph<Domain> time_graph = graphs.get(0);
         Graph<Domain> merged_graph_time =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionGraphs(graphs,
                         new double[]{0.8, 0.2}, new double[]{1.0, 0.0, 0.0});
         for (Domain dom : merged_graph_time.getNodes()) {
             assertTrue(time_graph.containsKey(dom));
@@ -396,7 +419,7 @@ public class RequestHandlerTest extends TestCase {
         // Test domain weight
         Graph<Domain> domain_graph = graphs.get(1);
         Graph<Domain> merged_graph_domain =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionGraphs(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.0, 1.0, 0.0});
         for (Domain dom : merged_graph_domain.getNodes()) {
             assertTrue(domain_graph.containsKey(dom));
@@ -410,7 +433,7 @@ public class RequestHandlerTest extends TestCase {
         if (graphs.size() == 3) {
             Graph<Domain> url_graph = graphs.get(2);
             Graph<Domain> merged_graph_url =
-                handler.computeFusionFeatures(graphs,
+                handler.computeFusionGraphs(graphs,
                         new double[]{0.8, 0.2}, new double[]{0.0, 0.0, 1.0});
             for (Domain dom : merged_graph_url.getNodes()) {
                 assertTrue(url_graph.containsKey(dom));
