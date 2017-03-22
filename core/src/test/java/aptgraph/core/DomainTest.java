@@ -23,7 +23,6 @@
  */
 package aptgraph.core;
 
-import java.util.Arrays;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
@@ -33,8 +32,13 @@ import static junit.framework.Assert.assertTrue;
  */
 public class DomainTest {
 
+    /**
+     * Test the merge of two domains.
+     */
     public void testMerge() {
         System.out.println("Test Merge");
+
+        //Create data
         Request req_1 = new Request(
                 (long) 1486934544,
                 (int) 51, (String) "127.0.0.1", (String) "TCP_MISS",
@@ -83,6 +87,7 @@ public class DomainTest {
         // System.out.println("merge_2 = " + Arrays.toString(merge_2.toArray()));
         // System.out.println("merge_3 = " + Arrays.toString(merge_3.toArray()));
 
+        // Test
         assertTrue(merge_1.contains(req_1));
         assertTrue(merge_1.contains(req_2));
         assertTrue(merge_1.contains(req_3));
@@ -93,6 +98,74 @@ public class DomainTest {
 
         assertTrue(merge_3.contains(req_3));
         assertFalse(merge_3.contains(req_4));
+        assertTrue(merge_3.size() == 1);
+    }
+
+    public void testCompareTo() {
+        System.out.println("Test CompareTo");
+
+        //Create data
+        Request req_1 = new Request(
+                (long) 1486934544,
+                (int) 51, (String) "127.0.0.1", (String) "TCP_MISS",
+                (int) 200, (int) 4575, (String) "GET",
+                (String) "http://j.be/", (String) "j.be",
+                (String) "HIER_DIRECT", (String) "95.101.90.153", (String) "-");
+        Request req_2 = new Request(
+                (long) 1486934545,
+                (int) 51, (String) "127.0.0.1", (String) "TCP_MISS",
+                (int) 200, (int) 4575, (String) "GET",
+                (String) "http://j.be/", (String) "j.be",
+                (String) "HIER_DIRECT", (String) "95.101.90.153", (String) "-");
+        Request req_3 = new Request(
+                (long) 1486934544,
+                (int) 51, (String) "127.0.0.2", (String) "TCP_MISS",
+                (int) 200, (int) 4575, (String) "GET",
+                (String) "http://j.be/", (String) "j.be",
+                (String) "HIER_DIRECT", (String) "95.101.90.153", (String) "-");
+        Request req_4 = new Request(
+                (long) 1486934544,
+                (int) 51, (String) "127.0.0.2", (String) "TCP_MISS",
+                (int) 200, (int) 4575, (String) "GET",
+                (String) "http://i.be/", (String) "i.be",
+                (String) "HIER_DIRECT", (String) "95.101.90.153", (String) "-");
+
+        Domain dom_1 = new Domain();
+        dom_1.setName("j.be");
+        dom_1.add(req_1);
+        dom_1.add(req_2);
+
+        Domain dom_2 = new Domain();
+        dom_2.setName("j.be");
+        dom_2.add(req_1);
+        dom_2.add(req_2);
+
+        Domain dom_3 = new Domain();
+        dom_3.setName("j.be");
+        dom_3.add(req_1);
+
+        Domain dom_4 = new Domain();
+        dom_4.setName("j.be");
+        dom_4.add(req_1);
+        dom_4.add(req_2);
+        dom_4.add(req_3);
+
+        Domain dom_5 = new Domain();
+        dom_5.setName("j.be");
+        dom_5.add(req_1);
+        dom_5.add(req_3);
+
+        Domain dom_6 = new Domain();
+        dom_6.setName("i.be");
+        dom_6.add(req_1);
+        dom_6.add(req_2);
+
+        // Test
+        assertTrue(dom_1.compareTo(dom_2));
+        assertFalse(dom_1.compareTo(dom_3));
+        assertFalse(dom_1.compareTo(dom_4));
+        assertFalse(dom_1.compareTo(dom_5));
+        assertFalse(dom_1.compareTo(dom_6));
     }
     
 }

@@ -66,6 +66,26 @@ public class Domain extends LinkedList<Request> {
     }
 
     /**
+     * Compare two domains (size, name and requests).
+     * @param dom
+     * @return boolean
+     */
+    public final boolean compareTo(final Domain dom) {
+        boolean output = false;
+        if (this.getName().equals(dom.getName())
+            && this.size() == dom.size()) {
+                for (Request req : this) {
+                    if (dom.contains(req)) {
+                        output = true;
+                    } else {
+                        return false;
+                    }
+                }
+        }
+        return output;
+    }
+
+    /**
      * Return domain name.
      * @return
      */

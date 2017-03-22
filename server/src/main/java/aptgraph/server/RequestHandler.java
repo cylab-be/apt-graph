@@ -250,12 +250,12 @@ public class RequestHandler {
         // Compute each user graph
         LinkedList<Graph<Domain>> merged_graph_users
                 = new LinkedList<Graph<Domain>>();
-        HashMap<String, Domain> all_domains
+        HashMap<String, HashMap<String, Domain>> all_domains
                 = computeUsersGraphs(merged_graph_users, feature_weights,
                         feature_ordered_weights, start_time);
 
         stdout = stdout.concat("<br>Total number of domains: "
-                    + all_domains.values().size());
+                    + all_domains.get("all").values().size());
 
         long estimated_time_4 = System.currentTimeMillis() - start_time;
         System.out.println("4: " + estimated_time_4
@@ -268,7 +268,7 @@ public class RequestHandler {
         }
         Graph<Domain> merged_graph
                 = computeFusionGraphs(merged_graph_users, all_domains,
-                        new double[] {0.0}, users_weights);
+                        new double[] {0.0}, users_weights, "", "all");
         graph_store = merged_graph;
 
         long estimated_time_5 = System.currentTimeMillis() - start_time;
@@ -321,9 +321,8 @@ public class RequestHandler {
         }
 
         // Ranking
-        if (filtered.size() > 1) {
-            showRanking(filtered, all_domains.values().size(), ranking_weights);
-        }
+        showRanking(filtered,
+                all_domains.get("all").values().size(), ranking_weights);
 
         long estimated_time_11 = System.currentTimeMillis() - start_time;
         System.out.println("11: " + estimated_time_11 + " (Ranking printed)");
@@ -463,22 +462,36 @@ public class RequestHandler {
      * @param start_time
      * @return all_domains
      */
-    final HashMap<String, Domain> computeUsersGraphs(
+    final HashMap<String, HashMap<String, Domain>> computeUsersGraphs(
             final LinkedList<Graph<Domain>> merged_graph_users,
             final double[] feature_weights,
             final double[] feature_ordered_weights,
             final long start_time) {
-        HashMap<String, Domain> all_domains = new HashMap<String, Domain>();
+
+        // Definition of all_domains
+        HashMap<String, HashMap<String, Domain>> all_domains
+                = new HashMap<String, HashMap<String, Domain>>();
+        all_domains.put("byUsers", new HashMap<String, Domain>());
+        all_domains.put("all", new HashMap<String, Domain>());
+        // term 'byUsers' will contain all domains without merge
+        // (key = user:domain)
+        // term 'all' will contain all merged domains
+        // (key = domain)
+
         for (String user_temp : users_list_store) {
             LinkedList<Graph<Domain>> graphs_temp = getUserGraphs(user_temp);
 
             // List all domains
             for (Domain dom : graphs_temp.getFirst().getNodes()) {
-                if (!all_domains.containsKey(dom.getName())) {
-                    all_domains.put(dom.getName(), dom);
-                } else if (!all_domains.get(dom.getName()).equals(dom)) {
-                    all_domains.put(dom.getName(),
-                            all_domains.get(dom.getName()).merge(dom));
+                all_domains.get("byUsers")
+                        .put(user_temp + ":" + dom.getName(), dom);
+                if (!all_domains.get("all").containsKey(dom.getName())) {
+                    all_domains.get("all").put(dom.getName(), dom);
+                } else if (!all_domains.get("all")
+                        .get(dom.getName()).compareTo(dom)) {
+                    all_domains.get("all").put(dom.getName(),
+                            all_domains.get("all")
+                                    .get(dom.getName()).merge(dom));
                 }
             }
 
@@ -492,7 +505,8 @@ public class RequestHandler {
 
             // Fusion of the features (Graph of Domains)
             Graph<Domain> merged_graph_temp = computeFusionGraphs(graphs_temp,
-                    all_domains, feature_ordered_weights, feature_weights);
+                    all_domains, feature_ordered_weights,
+                    feature_weights, user_temp, "byUsers");
 
             merged_graph_users.add(merged_graph_temp);
 
@@ -509,60 +523,93 @@ public class RequestHandler {
      * @param all_domains
      * @param feature_ordered_weights
      * @param feature_weights
+     * @param user
+     * @param mode
      * @return merged_graph
      */
     final Graph<Domain> computeFusionGraphs(
             final LinkedList<Graph<Domain>> graphs,
-            final HashMap<String, Domain> all_domains,
+            final HashMap<String, HashMap<String, Domain>> all_domains,
             final double[] ordered_weights,
-            final double[] weights) {
-
+            final double[] weights,
+            final String user,
+            final String mode) {
         // Weighted average using parameter weights
         Graph<Domain> merged_graph = new Graph<Domain>(Integer.MAX_VALUE);
-        for (Domain node : all_domains.values()) {
+        for (Entry<String, Domain> entry_1 : all_domains.get(mode).entrySet()) {
+            String key = entry_1.getKey();
+            Domain node = entry_1.getValue();
+            if ((mode.equals("byUsers") && key.startsWith(user))
+                    || mode.equals("all")) {
+                // The json-rpc request was probably canceled by the user
+                if (Thread.currentThread().isInterrupted()) {
+                    return null;
+                }
 
-            // The json-rpc request was probably canceled by the user
-            if (Thread.currentThread().isInterrupted()) {
-                return null;
-            }
+                HashMap<Domain, Double> all_neighbors =
+                        new HashMap<Domain, Double>();
 
-            HashMap<Domain, Double> all_neighbors =
-                    new HashMap<Domain, Double>();
+                for (int i = 0; i < graphs.size(); i++) {
+                    Graph<Domain> graph_temp = graphs.get(i);
+                    String user_temp = "";
+                    if (mode.equals("all")) {
+                        user_temp = graph_temp.getNodes().iterator()
+                                .next().element().getClient();
+                    }
+                    String key_user = key;
+                    if (mode.equals("all") && !key_user.startsWith(user_temp)) {
+                        key_user = user_temp + ":" + key;
+                    }
+                    if (graph_temp.containsKey(all_domains
+                            .get("byUsers").get(key_user))) {
+                        NeighborList neighbors_temp = graph_temp
+                             .getNeighbors(all_domains.get("byUsers")
+                                     .get(key_user));
 
-            for (int i = 0; i < graphs.size(); i++) {
-                Graph<Domain> graph_temp = graphs.get(i);
-                if (graph_temp.containsKey(node)) {
-                    System.out.println("IN : " + node.getName());
-                    NeighborList neighbors_temp =
-                            graph_temp.getNeighbors(node);
+                        for (Neighbor<Domain> neighbor_temp : neighbors_temp) {
+                            double new_similarity =
+                                    weights[i] * neighbor_temp.similarity;
 
-                    for (Neighbor<Domain> neighbor_temp : neighbors_temp) {
-                        double new_similarity =
-                                weights[i] * neighbor_temp.similarity;
+                            if (mode.equals("byUsers") && all_neighbors
+                                    .containsKey(neighbor_temp.node)) {
+                                new_similarity +=
+                                        all_neighbors.get(neighbor_temp.node);
+                            } else if (mode.equals("all")
+                                    && all_neighbors.containsKey(all_domains
+                                            .get("all").get(neighbor_temp.node
+                                                    .getName()))) {
+                                new_similarity +=
+                                        all_neighbors.get(all_domains
+                                            .get("all").get(neighbor_temp.node
+                                                    .getName()));
+                            }
 
-                        if (all_neighbors.containsKey(neighbor_temp.node)) {
-                            new_similarity +=
-                                    all_neighbors.get(neighbor_temp.node);
+                            if (new_similarity != 0) {
+                                if (mode.equals("all")) {
+                                    all_neighbors.put(
+                                      all_domains.get(mode)
+                                      .get(neighbor_temp.node.getName()),
+                                      new_similarity);
+                                } else if (mode.equals("byUsers")) {
+                                    all_neighbors.put(
+                                      all_domains.get(mode)
+                                      .get(user + ":"
+                                              + neighbor_temp.node.getName()),
+                                      new_similarity);
+                                }
+                            }
+
                         }
-
-                        if (new_similarity != 0) {
-                          all_neighbors.put(
-                                  all_domains.get(neighbor_temp.node.getName()),
-                                  new_similarity);
-                        }
-
                     }
                 }
-            }
 
-            NeighborList nl = new NeighborList(Integer.MAX_VALUE);
-            for (Entry<Domain, Double> entry : all_neighbors.entrySet()) {
-                nl.add(new Neighbor(entry.getKey(), entry.getValue()));
+                NeighborList nl = new NeighborList(Integer.MAX_VALUE);
+                for (Entry<Domain, Double> entry_2 : all_neighbors.entrySet()) {
+                    nl.add(new Neighbor(entry_2.getKey(), entry_2.getValue()));
+                }
+                merged_graph.put(node, nl);
             }
-
-            merged_graph.put(node, nl);
         }
-
         return merged_graph;
     }
 

@@ -189,14 +189,21 @@ public class BatchProcessorTest extends TestCase {
         Graph<Domain> time_domain_graph =
                 processor.computeSimilarityDomain(time_graph, time_domains);
 
-
-        // Test presence of all domains
-        // System.out.println("Before computation = " + time_domains.keySet());
-        // System.out.println("After computation = " + time_domain_graph.getNodes());
-        for (Domain dom : time_domains.values()) {
-            assertTrue(time_domain_graph.containsKey(dom));
+        HashMap<String, Domain> all_domains_merged
+                = new HashMap<String, Domain>();
+        for (Domain dom : time_domain_graph.getNodes()) {
+            all_domains_merged.put(dom.getName(), dom);
         }
-        
+
+        // Test presence of all the domains and requests after feature fusion
+        for (Domain dom_1 : time_domains.values()) {
+            for (Domain dom_2 : all_domains_merged.values()) {
+                if (dom_1.getName().equals(dom_2.getName())) {
+                    assertTrue(dom_1.compareTo(dom_2));
+                }
+            }
+        }
+
         // Test the lost of neighbors
         for (Request req : time_graph.getNodes()) {
             NeighborList nl_req = time_graph.getNeighbors(req);
