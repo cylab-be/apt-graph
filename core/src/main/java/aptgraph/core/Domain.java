@@ -23,6 +23,7 @@
  */
 package aptgraph.core;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -46,6 +47,59 @@ public class Domain extends LinkedList<Request> {
      */
     public final void setName(final String name) {
         this.name = name;
+    }
+
+    /**
+     * Merge domains with the same name but different requests.
+     * @param dom
+     * @return dom_out
+     */
+    public final Domain merge(final Domain dom) {
+        Domain dom_out = (Domain) this.clone();
+        if (this.name.equals(dom.name)) {
+            for (Request req : dom) {
+                if (!this.contains(req)) {
+                    dom_out.add(req);
+                }
+            }
+        }
+        return dom_out;
+    }
+
+    /**
+     * Compare two domains (size, name and requests).
+     * @param obj
+     * @return boolean
+     */
+    @Override
+    public final boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Domain dom = (Domain) obj;
+        boolean output = false;
+        if (this.getName().equals(dom.getName())
+            && this.size() == dom.size()) {
+                for (Request req : this) {
+                    if (dom.contains(req)) {
+                        output = true;
+                    } else {
+                        return false;
+                    }
+                }
+        }
+        return output;
+    }
+
+    @Override
+    public final int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + this.name.hashCode()
+                + Arrays.hashCode(this.toArray());
+        return hash;
     }
 
     /**

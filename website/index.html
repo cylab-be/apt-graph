@@ -662,6 +662,20 @@ function printRequests(d) {
     var domains_printed = [];
   });
 
+ // Function to check if selected user is a subnet
+ function isSubnet(user) {
+ 	var bool = false;
+ 	var all_split = user.split(".");
+ 	for (i = 0; i < all_split.length; i++) {
+ 		if (all_split[i] == "0") {
+ 			bool = true;
+ 		} else {
+ 			bool = false;
+ 		}
+ 	}
+ 	return bool;
+ }
+
  // Functions to do with taking the variables filled in the fields
  // and creating a request to the server for method analyze()   
     $("#apply_button").click(function(){
@@ -689,53 +703,59 @@ function printRequests(d) {
       $("#chart_pruning").html("");
       $("#chart_cluster").html("");
       var selecteduser = $("#selected-user").text();
-      var white_ongo_text = document.getElementById("white_ongo").value;
-      var jsonbody = {"jsonrpc": "2.0",
-                        "method": "analyze",
-                        "params": [
-                        selecteduser,
-                        [$("#time").val(), $("#domain").val(), $("#url").val()],
-                        [$("#ord_weights_high").val(), $("#ord_weights_low").val()],
-                        $("#prune_threshold").val(),
-                        $("#max_cluster_size").val(),
-                        children.checked,
-                        prune_z.checked,
-                        cluster_z.checked,
-                        whitelist.checked,
-                        white_ongo_text,
-                        [$("#rank_parent").val(), $("#rank_child").val(), $("#rank_req").val()]],
-                        "id": 167
-                      };
-      var request = json_post("http://127.0.0.1:8080" , jsonbody); 
-      request.addEventListener('load', function(){
-        if (request.readyState == 4 && request.status == 200){
-          json = JSON.parse(request.responseText);
-          if (json.result != null) {
-            //console.log("Server Response: " + json.result);
-            $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
-            $("#panel_head").css('color', 'green');
-            $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
-            draw_graph(json.result.filtered, printRequests); 
-            $("#request_text").html("");
-            var domains_printed = [];
-            $("#stdout_body").prepend(json.result.stdout);
-            document.getElementById("show_all_domains_button").style.display = 'inline';
-            document.getElementById("clear_domains_button").style.display = 'inline';
-          } else {
-            $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
-            $("#panel_head").css('color', 'red');
-            $("#panel_body").text("Server Response is empty ! (Input values are probably wrong)");
-          }
-        } else {
-          $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
-          $("#panel_head").css('color', 'red');
-          $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
+      if (!isSubnet(selecteduser) || confirm("This computation could take a while...")) {
+	      var white_ongo_text = document.getElementById("white_ongo").value;
+	      var jsonbody = {"jsonrpc": "2.0",
+	                        "method": "analyze",
+	                        "params": [
+	                        selecteduser,
+	                        [$("#time").val(), $("#domain").val(), $("#url").val()],
+	                        [$("#ord_weights_high").val(), $("#ord_weights_low").val()],
+	                        $("#prune_threshold").val(),
+	                        $("#max_cluster_size").val(),
+	                        children.checked,
+	                        prune_z.checked,
+	                        cluster_z.checked,
+	                        whitelist.checked,
+	                        white_ongo_text,
+	                        [$("#rank_parent").val(), $("#rank_child").val(), $("#rank_req").val()]],
+	                        "id": 167
+	                      };
+	      var request = json_post("http://127.0.0.1:8080" , jsonbody); 
+	      request.addEventListener('load', function(){
+	        if (request.readyState == 4 && request.status == 200){
+	          json = JSON.parse(request.responseText);
+	          if (json.result != null) {
+	            //console.log("Server Response: " + json.result);
+	            $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
+	            $("#panel_head").css('color', 'green');
+	            $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
+	            draw_graph(json.result.filtered, printRequests); 
+	            $("#request_text").html("");
+	            var domains_printed = [];
+	            $("#stdout_body").prepend(json.result.stdout);
+	            document.getElementById("show_all_domains_button").style.display = 'inline';
+	            document.getElementById("clear_domains_button").style.display = 'inline';
+	          } else {
+	            $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
+	            $("#panel_head").css('color', 'red');
+	            $("#panel_body").text("Server Response is empty ! (Input values are probably wrong)");
+	          }
+	        } else {
+	          $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
+	          $("#panel_head").css('color', 'red');
+	          $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
 
-        } 
-      });
-      request.addEventListener('error', function(){
-          alert('Server is NOT available !');
-        });
+	        } 
+	      });
+	      request.addEventListener('error', function(){
+	          alert('Server is NOT available !');
+        	});
+      } else {
+      	$("#panel_head").text('Request Status');
+      	$("#panel_head").css('color', 'green');
+      	$("#panel_body").text("Ready");
+      }
     });
     $("#cancel_button").click(function(){
       location.reload();

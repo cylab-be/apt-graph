@@ -742,6 +742,8 @@
 1472083258.852    949 314.15.238.23 TCP_MISS/200 702 GET http://wlbxuxsx.yofd.bh/veqh.html - DIRECT/197.247.6.26 text/html
 1472083258.852    172 219.253.194.242 TCP_MISS/200 1540 GET http://qnrgsvrmb.qufwuqfxe.sn/poesfq.html - DIRECT/3.224.230.119 text/html
 1472083258.857    555 198.36.158.8 TCP_MISS/200 102 GET http://exuzkdk.zqiz.hk/bhgexqrne.html - DIRECT/157.28.15.33 text/html
+1472083258.857    943 198.36.158.8 TCP_MISS/200 1333 GET http://abcd.zqiz.hk/gdgzwv.html - DIRECT/157.28.15.33 text/html
+1472083258.857    943 198.36.158.8 TCP_MISS/200 1333 GET http://dcba.zqiz.hk/gdgzwv.html - DIRECT/157.28.15.33 text/html
 1472083258.869    563 314.15.238.23 TCP_MISS/200 1800 GET http://pecwh.bucvj.tp/vattocj.html - DIRECT/197.241.97.235 text/html
 1472083258.869    169 269.186.69.36 TCP_MISS/200 1927 GET http://uuxxx.wlxapgob.jm/cxfsz.html - DIRECT/117.145.5.166 text/html
 1472083258.872    291 219.253.194.242 TCP_MISS/200 1362 GET http://mtmmq.ervrk.sd/endlyvoxv.html - DIRECT/86.18.41.122 text/html
