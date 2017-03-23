@@ -587,7 +587,8 @@ public class RequestHandlerTest extends TestCase {
         
         // Creation of the data
         RequestHandler handler =
-                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+                new RequestHandler(Paths
+                        .get("src/test/resources/dummyDir_whitelist"));
         handler.getUsers();
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
@@ -633,10 +634,14 @@ public class RequestHandlerTest extends TestCase {
         }
 
         // System.out.println("Before whitelisting = " + filtered);
+        Graph<Domain> domain_graph_new_1 = filtered.getFirst();
+        assertTrue(domain_graph_new_1.containsKey(domain_node_1));
+        assertTrue(domain_graph_new_1.containsKey(domain_node_2));
+        assertTrue(domain_graph_new_1.containsKey(domain_node_3));
         filtered = handler.whiteListing(filtered, "ss.symcd.com");
+
         // System.out.println("After whitelisting = " + filtered);
         Graph<Domain> domain_graph_new = filtered.getFirst();
-
         assertFalse(domain_graph_new.containsKey(domain_node_1));
         assertFalse(domain_graph_new.containsKey(domain_node_2));
         assertFalse(domain_graph_new.containsKey(domain_node_3));
