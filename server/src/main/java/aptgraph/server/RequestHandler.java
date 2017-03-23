@@ -488,7 +488,7 @@ public class RequestHandler {
                 if (!all_domains.get("all").containsKey(dom.getName())) {
                     all_domains.get("all").put(dom.getName(), dom);
                 } else if (!all_domains.get("all")
-                        .get(dom.getName()).compareTo(dom)) {
+                        .get(dom.getName()).equals(dom)) {
                     all_domains.get("all").put(dom.getName(),
                             all_domains.get("all")
                                     .get(dom.getName()).merge(dom));

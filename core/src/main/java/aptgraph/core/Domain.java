@@ -23,6 +23,7 @@
  */
 package aptgraph.core;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -67,10 +68,18 @@ public class Domain extends LinkedList<Request> {
 
     /**
      * Compare two domains (size, name and requests).
-     * @param dom
+     * @param obj
      * @return boolean
      */
-    public final boolean compareTo(final Domain dom) {
+    @Override
+    public final boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Domain dom = (Domain) obj;
         boolean output = false;
         if (this.getName().equals(dom.getName())
             && this.size() == dom.size()) {
@@ -83,6 +92,14 @@ public class Domain extends LinkedList<Request> {
                 }
         }
         return output;
+    }
+
+    @Override
+    public final int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + this.name.hashCode()
+                + Arrays.hashCode(this.toArray());
+        return hash;
     }
 
     /**

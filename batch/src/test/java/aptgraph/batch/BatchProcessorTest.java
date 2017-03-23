@@ -199,7 +199,7 @@ public class BatchProcessorTest extends TestCase {
         for (Domain dom_1 : time_domains.values()) {
             for (Domain dom_2 : all_domains_merged.values()) {
                 if (dom_1.getName().equals(dom_2.getName())) {
-                    assertTrue(dom_1.compareTo(dom_2));
+                    assertTrue(dom_1.equals(dom_2));
                 }
             }
         }

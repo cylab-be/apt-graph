@@ -113,7 +113,7 @@ public class RequestHandlerTest extends TestCase {
             for (Graph<Domain> graph : graphs) {
                 for (Domain dom : graph.getNodes()) {
                     assertTrue(all_domains.get("byUsers")
-                            .get(user + ":" + dom).compareTo(dom));
+                            .get(user + ":" + dom).equals(dom));
                     for (Request req : dom) {
                         assertTrue(all_domains.get("all")
                                 .get(dom.getName()).contains(req));
@@ -137,91 +137,93 @@ public class RequestHandlerTest extends TestCase {
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         handler.getUsers();
-        String user = handler.getAllUsersListStore().get(0);
-        HashMap<String, HashMap<String, Domain>> all_domains
-                = new HashMap<String, HashMap<String, Domain>>();
-        all_domains.put("byUsers", new HashMap<String, Domain>());
-        all_domains.put("all", new HashMap<String, Domain>());
+        ArrayList<String> users = handler.getAllUsersListStore();
+        for (String user : users) {
+            HashMap<String, HashMap<String, Domain>> all_domains
+                    = new HashMap<String, HashMap<String, Domain>>();
+            all_domains.put("byUsers", new HashMap<String, Domain>());
+            all_domains.put("all", new HashMap<String, Domain>());
 
-        LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
-        for (Domain dom : graphs.getFirst().getNodes()) {
-            all_domains.get("byUsers")
-                    .put(user + ":" + dom.getName(), dom);
-            if (!all_domains.get("all").containsKey(dom.getName())) {
-                all_domains.get("all").put(dom.getName(), dom);
-            } else if (!all_domains.get("all")
-                    .get(dom.getName()).equals(dom)) {
-                all_domains.get("all").put(dom.getName(),
-                        all_domains.get("all")
-                                .get(dom.getName()).merge(dom));
-            }
-        }
-        double[] weights = {0.7, 0.1, 0.2};
-        Graph<Domain> merged_graph =
-                handler.computeFusionGraphs(graphs, all_domains,
-                        new double[]{0.8, 0.2}, weights, user, "byUsers");
-
-        HashMap<String, Domain> all_domains_merged
-                = new HashMap<String, Domain>();
-        for (Domain dom : merged_graph.getNodes()) {
-            all_domains_merged.put(dom.getName(), dom);
-        }
-
-        // Test presence of all the domains and requests after feature fusion
-        for (Map.Entry<String, Domain> entry : all_domains
-                .get("byUsers").entrySet()) {
-            String key = entry.getKey();
-            Domain dom_1 = entry.getValue();
-            if (key.startsWith(user)) {
-                for (Domain dom_2 : all_domains_merged.values()) {
-                    if (dom_1.getName().equals(dom_2.getName())) {
-                        assertTrue(dom_1.compareTo(dom_2));
-                    }
+            LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+            for (Domain dom : graphs.getFirst().getNodes()) {
+                all_domains.get("byUsers")
+                        .put(user + ":" + dom.getName(), dom);
+                if (!all_domains.get("all").containsKey(dom.getName())) {
+                    all_domains.get("all").put(dom.getName(), dom);
+                } else if (!all_domains.get("all")
+                        .get(dom.getName()).equals(dom)) {
+                    all_domains.get("all").put(dom.getName(),
+                            all_domains.get("all")
+                                    .get(dom.getName()).merge(dom));
                 }
             }
-        }
+            double[] weights = {0.7, 0.1, 0.2};
+            Graph<Domain> merged_graph =
+                    handler.computeFusionGraphs(graphs, all_domains,
+                            new double[]{0.8, 0.2}, weights, user, "byUsers");
 
-        // Test the lost of neighbors (domains and requests)
-        for (Graph<Domain> graph_temp : graphs) {
-            for (Domain dom : graph_temp.getNodes()) {
-                NeighborList nl_temp = graph_temp.getNeighbors(dom);
-                NeighborList nl_merged = merged_graph.getNeighbors(dom);
-                for (Neighbor<Domain> nb : nl_temp) {
-                    if (nb.similarity != 0) {
-                        assertTrue(nl_merged.containsNode(nb.node));
-                        for (Neighbor<Domain> nb_merged : nl_merged) {
-                            if (nb_merged.node.getName()
-                                    .equals(nb.node.getName())) {
-                                assertTrue(nb.node.compareTo(nb_merged.node));
-                            }
+            HashMap<String, Domain> all_domains_merged
+                    = new HashMap<String, Domain>();
+            for (Domain dom : merged_graph.getNodes()) {
+                all_domains_merged.put(dom.getName(), dom);
+            }
+
+            // Test presence of all the domains and requests after feature fusion
+            for (Map.Entry<String, Domain> entry : all_domains
+                    .get("byUsers").entrySet()) {
+                String key = entry.getKey();
+                Domain dom_1 = entry.getValue();
+                if (key.startsWith(user)) {
+                    for (Domain dom_2 : all_domains_merged.values()) {
+                        if (dom_1.getName().equals(dom_2.getName())) {
+                            assertTrue(dom_1.equals(dom_2));
                         }
                     }
                 }
             }
-        }
 
-        // Test the similarities
-        for (Domain dom_11 : merged_graph.getNodes()) {
-            NeighborList nl_dom_11 = merged_graph.getNeighbors(dom_11);
-            for (Neighbor<Domain> dom_12 : nl_dom_11) {
-                double similarity_temp = 0.0;
-                for (int i = 0; i < graphs.size(); i++) {
-                    Graph<Domain> feature_graph = graphs.get(i);
-                    double feature_weight = weights[i];
-                    for (Domain dom_21 : feature_graph.getNodes()) {
-                        if (dom_21 == dom_11) {
-                            NeighborList nl_dom_21 = feature_graph
-                                    .getNeighbors(dom_21);
-                            for (Neighbor<Domain> dom_22 : nl_dom_21) {
-                                if (dom_22.node == dom_12.node) {
-                                    similarity_temp += feature_weight
-                                            * dom_22.similarity;
+            // Test the lost of neighbors (domains and requests)
+            for (Graph<Domain> graph_temp : graphs) {
+                for (Domain dom : graph_temp.getNodes()) {
+                    NeighborList nl_temp = graph_temp.getNeighbors(dom);
+                    NeighborList nl_merged = merged_graph.getNeighbors(dom);
+                    for (Neighbor<Domain> nb : nl_temp) {
+                        if (nb.similarity != 0) {
+                            assertTrue(nl_merged.containsNode(nb.node));
+                            for (Neighbor<Domain> nb_merged : nl_merged) {
+                                if (nb_merged.node.getName()
+                                        .equals(nb.node.getName())) {
+                                    assertTrue(nb.node.equals(nb_merged.node));
                                 }
                             }
                         }
                     }
                 }
-                assertTrue(dom_12.similarity == similarity_temp);
+            }
+
+            // Test the similarities
+            for (Domain dom_11 : merged_graph.getNodes()) {
+                NeighborList nl_dom_11 = merged_graph.getNeighbors(dom_11);
+                for (Neighbor<Domain> dom_12 : nl_dom_11) {
+                    double similarity_temp = 0.0;
+                    for (int i = 0; i < graphs.size(); i++) {
+                        Graph<Domain> feature_graph = graphs.get(i);
+                        double feature_weight = weights[i];
+                        for (Domain dom_21 : feature_graph.getNodes()) {
+                            if (dom_21.equals(dom_11)) {
+                                NeighborList nl_dom_21 = feature_graph
+                                        .getNeighbors(dom_21);
+                                for (Neighbor<Domain> dom_22 : nl_dom_21) {
+                                    if (dom_22.node.equals(dom_12.node)) {
+                                        similarity_temp += feature_weight
+                                                * dom_22.similarity;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    assertTrue(dom_12.similarity == similarity_temp);
+                }
             }
         }
     }
@@ -261,7 +263,7 @@ public class RequestHandlerTest extends TestCase {
         for (Domain dom_1 : all_domains.get("all").values()) {
             for (Domain dom_2 : merged_graph.getNodes()) {
                 if (dom_1.getName().equals(dom_2.getName())) {
-                    assertTrue(dom_1.compareTo(dom_2));
+                    assertTrue(dom_1.equals(dom_2));
                 }
             }
         }
@@ -281,7 +283,7 @@ public class RequestHandlerTest extends TestCase {
                         for (Neighbor<Domain> nb_merged : nl_merged) {
                             if (nb_merged.node.getName()
                                     .equals(nb.node.getName())) {
-                                assertTrue(nb.node.compareTo(all_domains
+                                assertTrue(nb.node.equals(all_domains
                                         .get("byUsers")
                                         .get(user_temp + ":"
                                                 + nb_merged.node.getName())));
@@ -303,14 +305,14 @@ public class RequestHandlerTest extends TestCase {
                                 .next().element().getClient();
                     double feature_weight = users_weights[i];
                     for (Domain dom_21 : user_graph.getNodes()) {
-                        if (dom_21 == all_domains.get("byUsers")
-                                .get(user_temp + ":" + dom_11.getName())) {
+                        if (dom_21.equals(all_domains.get("byUsers")
+                                .get(user_temp + ":" + dom_11.getName()))) {
                             NeighborList nl_dom_21 = user_graph
                                     .getNeighbors(dom_21);
                             for (Neighbor<Domain> dom_22 : nl_dom_21) {
-                                if (dom_22.node == all_domains.get("byUsers")
+                                if (dom_22.node.equals(all_domains.get("byUsers")
                                         .get(user_temp + ":"
-                                                + dom_12.node.getName())) {
+                                                + dom_12.node.getName()))) {
                                     similarity_temp += feature_weight
                                             * dom_22.similarity;
                                 }
