@@ -19,6 +19,9 @@ import org.apache.commons.cli.ParseException;
 public final class Main {
 
     private static final int DEFAULT_K = 20;
+    private static final boolean DEFAULT_CHILDREN_BOOL = true;
+    private static final boolean DEFAULT_OVERWRITE_BOOL = false;
+    private static final String DEFAULT_FORMAT = "squid";
 
     /**
      *
@@ -31,11 +34,11 @@ public final class Main {
     public static void main(final String[] args)
             throws ParseException, FileNotFoundException, IOException,
             IllegalArgumentException {
-        // Default value of k (if no user input)
-        int k = DEFAULT_K;
         // Default value of arguments
-        boolean children_bool = true;
-        boolean overwrite_bool = false;
+        int k = DEFAULT_K;
+        boolean children_bool = DEFAULT_CHILDREN_BOOL;
+        boolean overwrite_bool = DEFAULT_OVERWRITE_BOOL;
+        String format = DEFAULT_FORMAT;
 
         // Parse command line arguments
         Options options = new Options();
@@ -62,6 +65,13 @@ public final class Main {
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_overwrite);
+        Option arg_format = Option.builder("f")
+                .optionalArg(true)
+                .desc("Specify format of input file (default : squid)")
+                .hasArg(true)
+                .numberOfArgs(1)
+                .build();
+        options.addOption(arg_format);
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
@@ -101,11 +111,22 @@ public final class Main {
         }
 
         try {
+            if (cmd.hasOption("f")) {
+                format = cmd.getOptionValue("f");
+                if (!format.equals("squid") && !format.equals("json")) {
+                    throw new IllegalArgumentException("Wrong format option");
+                }
+            }
+        } catch (IllegalArgumentException ex) {
+                System.err.println(ex);
+        }
+
+        try {
             BatchProcessor processor = new BatchProcessor();
             processor.analyze(k,
                     new FileInputStream(cmd.getOptionValue("i")),
                     Paths.get(cmd.getOptionValue("o")),
-                    children_bool, overwrite_bool);
+                    format, children_bool, overwrite_bool);
         } catch (IllegalArgumentException ex) {
                 System.err.println(ex);
         }

@@ -36,7 +36,7 @@ public class BatchProcessorTest extends TestCase {
         BatchProcessor processor = new BatchProcessor();
         processor.analyze(20,
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
-                temp_dir, true, true);
+                temp_dir, "squid", true, true);
 
     }
 
@@ -54,7 +54,8 @@ public class BatchProcessorTest extends TestCase {
         BatchProcessor processor = new BatchProcessor();
         HashMap<String, LinkedList<Request>> user_requests =
                 processor.computeUserLog(processor.parseFile(getClass()
-                        .getResourceAsStream("/1000_http_requests.txt")));
+                        .getResourceAsStream("/1000_http_requests.txt"), 
+                        "squid"));
         LinkedList<Graph<Domain>> original_user_graphs =
                     processor.computeUserGraphs(20, "test_user",
                            user_requests.values().iterator().next(), true);
@@ -84,7 +85,7 @@ public class BatchProcessorTest extends TestCase {
             BatchProcessor processor = new BatchProcessor();
             HashMap<String, LinkedList<Request>> user_requests =
                 processor.computeUserLog(processor.parseFile(getClass()
-                        .getResourceAsStream("/simple.txt")));
+                        .getResourceAsStream("/simple.txt"), "squid"));
 
             for (Map.Entry<String, LinkedList<Request>> entry :
                     user_requests.entrySet()) {
@@ -122,7 +123,7 @@ public class BatchProcessorTest extends TestCase {
         BatchProcessor processor = new BatchProcessor();
         HashMap<String, LinkedList<Request>> user_requests =
                 processor.computeUserLog(processor.parseFile(getClass()
-                        .getResourceAsStream("/domain_test.txt")));
+                        .getResourceAsStream("/domain_test.txt"), "squid"));
         LinkedList<Request> requests = user_requests.get("127.0.0.1");
         for (Request req : requests) {
             // System.out.println("url = " + req.getUrl());
@@ -147,7 +148,8 @@ public class BatchProcessorTest extends TestCase {
         BatchProcessor processor = new BatchProcessor();
         HashMap<String, LinkedList<Request>> user_requests =
                 processor.computeUserLog(processor.parseFile(getClass()
-                        .getResourceAsStream("/1000_http_requests.txt")));
+                        .getResourceAsStream("/1000_http_requests.txt"),
+                        "squid"));
         LinkedList<Request> requests = user_requests.get("198.36.158.8");
         Graph<Request> time_graph = processor.computeRequestGraph(
                 requests, 20, new TimeSimilarity());
@@ -177,7 +179,8 @@ public class BatchProcessorTest extends TestCase {
         BatchProcessor processor = new BatchProcessor();
         HashMap<String, LinkedList<Request>> user_requests =
                 processor.computeUserLog(processor.parseFile(getClass()
-                        .getResourceAsStream("/1000_http_requests.txt")));
+                        .getResourceAsStream("/1000_http_requests.txt"),
+                        "squid"));
         LinkedList<Request> requests = user_requests.get("198.36.158.8");
         Graph<Request> time_graph = processor.computeRequestGraph(
                 requests, 20, new TimeSimilarity());
@@ -253,7 +256,7 @@ public class BatchProcessorTest extends TestCase {
         // Create Data
         HashMap<String, LinkedList<Request>> user_requests =
                 processor.computeUserLog(processor.parseFile(getClass()
-                        .getResourceAsStream("/simple.txt")));
+                        .getResourceAsStream("/simple.txt"), "squid"));
         LinkedList<Request> requests_all = user_requests.get("127.0.0.1");
         Graph<Request> time_graph =
                 processor.computeRequestGraph(requests_all, 20,

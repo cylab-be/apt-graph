@@ -29,9 +29,13 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONObject;
 
 /**
  *
@@ -63,12 +67,14 @@ public class BatchProcessor {
      * @param k
      * @param input_file
      * @param output_dir
+     * @param format
      * @param children_bool
      * @param overwrite_bool
      * @throws IOException if we cannot read the input file
      */
     public final void analyze(final int k,
             final InputStream input_file, final Path output_dir,
+            final String format,
             final boolean children_bool,
             final boolean overwrite_bool)
             throws IOException {
@@ -76,7 +82,7 @@ public class BatchProcessor {
         // Parsing of the log file and Split of the log file by users
         LOGGER.info("Read and parse input file...");
         HashMap<String, LinkedList<Request>> user_requests =
-                computeUserLog(parseFile(input_file));
+                computeUserLog(parseFile(input_file, format));
 
         // Build graphs for each user
         ArrayList<String> user_list = new ArrayList<String>();
@@ -106,9 +112,11 @@ public class BatchProcessor {
     /**
      * Read and parse the input file line by line.
      * @param file
+     * @param format
      * @return LinkedList<Request>
      */
-    final LinkedList<Request> parseFile(final InputStream file)
+    final LinkedList<Request> parseFile(final InputStream file,
+            final String format)
             throws IOException {
 
         LinkedList<Request> requests = new LinkedList<Request>();
@@ -118,7 +126,13 @@ public class BatchProcessor {
 
         while ((line = in.readLine()) != null) {
             try {
-                requests.add(parseLine(line));
+                if (format.equals("squid")) {
+                    requests.add(parseLineSquid(line));
+                } else if (format.equals("json")) {
+                    requests.add(parseLineJson(line));
+                } else {
+                    throw new IllegalArgumentException();
+                }
 
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
@@ -129,11 +143,11 @@ public class BatchProcessor {
     }
 
     /**
-     * Parse a give line.
+     * Parse a give line encoded in squid format.
      * @param line
      * @return  Request
      */
-    private Request parseLine(final String line) {
+    private Request parseLineSquid(final String line) {
 
         Matcher match = pattern.matcher(line);
 
@@ -163,6 +177,79 @@ public class BatchProcessor {
                 match.group(9),
                 match.group(10),
                 match.group(11));
+
+        return request;
+    }
+
+    /**
+     * Parse a given line encoded with JSON.
+     * @param line
+     * @return Request
+     */
+    private Request parseLineJson(final String line) {
+        JSONObject obj = new JSONObject(line);
+
+        String thisdomain = null;
+
+        try {
+            thisdomain = computeDomain(obj.getString("tk_url"));
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(BatchProcessor.class.getName())
+                    .log(Level.SEVERE, null, ex);
+        }
+
+        Request request = null;
+        try {
+        SimpleDateFormat sdf =
+                new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS");
+        Date date = sdf.parse(obj.getString("@timestamp"));
+        Long timestamp = date.getTime();
+
+        String client = "unkown";
+        if (obj.has("tk_client_ip")) {
+            client = obj.getString("tk_client_ip");
+        }
+        String method = "unkown";
+        if (obj.has("tk_operation")) {
+            method = obj.getString("tk_operation");
+        }
+        int bytes = 0;
+        if (obj.has("tk_size")) {
+            bytes = obj.getInt("tk_size");
+        }
+        String url = "unkown";
+        if (obj.has("tk_url")) {
+            url = obj.getString("tk_url");
+        }
+        String peerhost = "unkown";
+        if (obj.has("tk_server_ip")) {
+            peerhost = obj.getString("tk_server_ip");
+        }
+        String type = "unkown";
+        if (obj.has("tk_mime_content")) {
+            type = obj.getString("tk_mime_content");
+        }
+
+        request = new Request(
+                timestamp,
+                0, // info not available
+                client,
+                "unknown", // info not available
+                0, // info not available
+                bytes,
+                method,
+                url,
+                thisdomain,
+                "unknown", // info not available
+                peerhost,
+                type);
+
+        System.out.println("req = " + request);
+
+        } catch (ParseException ex) {
+            Logger.getLogger(BatchProcessor.class.getName())
+                    .log(Level.SEVERE, null, ex);
+        }
 
         return request;
     }
