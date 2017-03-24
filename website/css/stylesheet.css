@@ -111,7 +111,7 @@ textarea {
 }
 
 #request_text {
-  max-height: 800px;
+  max-height: 750px;
   overflow-y: scroll;
 }
 
