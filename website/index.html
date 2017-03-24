@@ -207,6 +207,12 @@
                   <input type="number" step="0.1" class="form-control" id="rank_req" value="0.1" style="width: 80px;">
                 </div>
               </div>
+              <div class="form-group">
+               <label for="apt_search" class="col-md-4 control-label" style="text-align: left; width: 200px;">Search APT.FINDME.be</label>
+               <div class="col-md-2">
+                 <input type="checkbox" id="apt_search" value="" checked>
+               </div>
+              </div>
             </div>
           </div>
           <div class="container-fluid" id="log_details">
@@ -502,9 +508,15 @@ function printRequests(d) {
               json = JSON.parse(request.responseText);
               users = json.result;
               //console.log("Server Response: " + json.result);
+              var counter = 0;
+              for (var i = 0; i < json.result.length; i++) {
+                if (!isSubnet(json.result[i])) {
+                  counter += 1;
+                }
+              }
               $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
               $("#panel_head").css('color', 'green');
-              $("#panel_body").text("Server Response: " + json.result.length + " Users loaded");
+              $("#panel_body").text("Server Response: " + counter + " Users loaded");
             }
             else if (request.status != 400) {
               $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
@@ -718,7 +730,8 @@ function printRequests(d) {
 	                        cluster_z.checked,
 	                        whitelist.checked,
 	                        white_ongo_text,
-	                        [$("#rank_parent").val(), $("#rank_child").val(), $("#rank_req").val()]],
+	                        [$("#rank_parent").val(), $("#rank_child").val(), $("#rank_req").val()],
+                          apt_search.checked],
 	                        "id": 167
 	                      };
 	      var request = json_post("http://127.0.0.1:8080" , jsonbody); 

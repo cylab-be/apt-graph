@@ -244,8 +244,6 @@ public class BatchProcessor {
                 peerhost,
                 type);
 
-        System.out.println("req = " + request);
-
         } catch (ParseException ex) {
             Logger.getLogger(BatchProcessor.class.getName())
                     .log(Level.SEVERE, null, ex);

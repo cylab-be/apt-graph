@@ -193,6 +193,7 @@ public class RequestHandler {
      * @param whitelist_bool
      * @param white_ongo
      * @param ranking_weights
+     * @param apt_search
      * @return Output
      */
     public final Output analyze(
@@ -206,7 +207,8 @@ public class RequestHandler {
             final boolean cluster_z_bool,
             final boolean whitelist_bool,
             final String white_ongo,
-            final double[] ranking_weights) {
+            final double[] ranking_weights,
+            final boolean apt_search) {
 
         long start_time = System.currentTimeMillis();
 
@@ -322,7 +324,8 @@ public class RequestHandler {
 
         // Ranking
         showRanking(filtered,
-                all_domains.get("all").values().size(), ranking_weights);
+                all_domains.get("all").values().size(),
+                ranking_weights, apt_search);
 
         long estimated_time_11 = System.currentTimeMillis() - start_time;
         System.out.println("11: " + estimated_time_11 + " (Ranking printed)");
@@ -917,9 +920,11 @@ public class RequestHandler {
      * @param filtered
      * @param domains_total
      * @param ranking_weights
+     * @param apt_search
      */
     private void showRanking(final LinkedList<Graph<Domain>> filtered,
-            final int domains_total, final double[] ranking_weights) {
+            final int domains_total, final double[] ranking_weights,
+            final boolean apt_search) {
         // Creation of a big graph with the result
         Graph<Domain> graph_all = new Graph<Domain>(Integer.MAX_VALUE);
         for (Graph<Domain> graph : filtered) {
@@ -979,25 +984,28 @@ public class RequestHandler {
         ArrayList<Domain> sorted = sortByIndex(list_domain, index);
 
         // Print out
-        double top = 0.0;
-        double rank = Double.MAX_VALUE;
-        boolean founded = false;
-        for (Domain dom : sorted) {
-            if (dom.toString().equals("APT.FINDME.be")) {
-                rank = index.get(dom);
-                top++;
-                founded = true;
+        if (apt_search) {
+            double top = 0.0;
+            double rank = Double.MAX_VALUE;
+            boolean founded = false;
+            for (Domain dom : sorted) {
+                if (dom.toString().equals("APT.FINDME.be")) {
+                    rank = index.get(dom);
+                    top++;
+                    founded = true;
+                }
+                if (!dom.toString().equals("APT.FINDME.be")
+                        && index.get(dom) <= rank) {
+                    top++;
+                }
             }
-            if (!dom.toString().equals("APT.FINDME.be")
-                    && index.get(dom) <= rank) {
-                top++;
+            if (founded) {
+                stdout = stdout.concat("<br>TOP for APT.FINDME.be: "
+                       + Math.round(top / domains_total * 100 * 100)
+                               / 100.0 + "%");
+            } else {
+                stdout = stdout.concat("<br>TOP for APT.FINDME.be: NOT FOUND");
             }
-        }
-        if (founded) {
-            stdout = stdout.concat("<br>TOP for APT.FINDME.be: "
-                   + Math.round(top / domains_total * 100 * 100) / 100.0 + "%");
-        } else {
-            stdout = stdout.concat("<br>TOP for APT.FINDME.be: NOT FOUND");
         }
         stdout = stdout.concat("<br>Ranking:");
         for (Domain dom : sorted) {
