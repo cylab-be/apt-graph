@@ -51,7 +51,7 @@ public class BatchServerIT extends TestCase {
         BatchProcessor processor = new BatchProcessor();
         processor.analyze(20,
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
-                temp_dir, true, true);
+                temp_dir, "squid", true, true);
 
         final JsonRpcServer server = new JsonRpcServer(temp_dir);
 
