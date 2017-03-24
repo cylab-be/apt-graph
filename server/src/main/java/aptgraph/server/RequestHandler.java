@@ -1015,7 +1015,7 @@ public class RequestHandler {
     }
 
     /**
-     * Sorting function, based on the given indexes.
+     * Sorting function, based on the given index.
      * @param list_domain
      * @param index
      * @return ArrayList<Domain> sorted list

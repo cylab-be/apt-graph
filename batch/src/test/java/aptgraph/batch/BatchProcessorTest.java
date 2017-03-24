@@ -3,6 +3,7 @@ package aptgraph.batch;
 import aptgraph.core.Domain;
 import aptgraph.core.DomainSimilarity;
 import aptgraph.core.Request;
+import aptgraph.core.Subnet;
 import aptgraph.core.TimeSimilarity;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -51,24 +53,56 @@ public class BatchProcessorTest extends TestCase {
         System.out.println("Test serialization with 1000 reqs");
         Path temp_dir = Files.createTempDirectory("tempdir");
 
+        int k = 20;
         BatchProcessor processor = new BatchProcessor();
         HashMap<String, LinkedList<Request>> user_requests =
                 processor.computeUserLog(processor.parseFile(getClass()
                         .getResourceAsStream("/1000_http_requests.txt"), 
                         "squid"));
+        ArrayList<String> user_list = new ArrayList<String>();
+        for (String user : user_requests.keySet()) {
+            user_list.add(user);
+        }
         LinkedList<Graph<Domain>> original_user_graphs =
-                    processor.computeUserGraphs(20, "test_user",
+                    processor.computeUserGraphs(k, "test_user",
                            user_requests.values().iterator().next(), true);
         processor.saveGraphs(temp_dir, "test_user", original_user_graphs);
+        processor.saveK(temp_dir, k);
+        processor.saveSubnet(temp_dir, user_list);
+        processor.saveUsers(temp_dir, user_list);
 
-        File temp_file =
+        File temp_file_1 =
                 new File(temp_dir.toString(), "test_user" + ".ser");
-        ObjectInputStream ois = new ObjectInputStream(
-                new FileInputStream(temp_file));
+        ObjectInputStream ois_1 = new ObjectInputStream(
+                new FileInputStream(temp_file_1));
         LinkedList<Graph<Request>> deserialized_user_graphs
-                = (LinkedList<Graph<Request>>) ois.readObject();
-
+                = (LinkedList<Graph<Request>>) ois_1.readObject();
         assertEquals(original_user_graphs, deserialized_user_graphs);
+
+        File temp_file_2 =
+                new File(temp_dir.toString(), "users.ser");
+        ObjectInputStream ois_2 = new ObjectInputStream(
+                new FileInputStream(temp_file_2));
+        ArrayList<String> deserialized_user_list
+                = (ArrayList<String>) ois_2.readObject();
+        Subnet sn_1 = new Subnet();
+        assertEquals(sn_1.sortIPs(user_list), deserialized_user_list);
+
+        File temp_file_3 =
+                new File(temp_dir.toString(), "subnets.ser");
+        ObjectInputStream ois_3 = new ObjectInputStream(
+                new FileInputStream(temp_file_3));
+        ArrayList<String> deserialized_subnet_list
+                = (ArrayList<String>) ois_3.readObject();
+        Subnet sn_2 = new Subnet();
+        assertEquals(sn_2.getAllSubnets(user_list), deserialized_subnet_list);
+
+        File temp_file_4 =
+                new File(temp_dir.toString(), "k.ser");
+        ObjectInputStream ois_4 = new ObjectInputStream(
+                new FileInputStream(temp_file_4));
+        int deserialized_k = ois_4.readInt();
+        assertEquals(k, deserialized_k);
     }
 
     /**
@@ -112,6 +146,27 @@ public class BatchProcessorTest extends TestCase {
         }
     }
 
+    public void testComputeUserLog () 
+        throws IOException {
+        System.out.println("Test of the computation of users log.");
+        // Creation of the data
+        BatchProcessor processor = new BatchProcessor();
+        LinkedList<Request> requests = processor.parseFile(getClass()
+                        .getResourceAsStream("/1000_http_requests.txt"),
+                        "squid");
+        HashMap<String, LinkedList<Request>> user_requests =
+                processor.computeUserLog(requests);
+        // Test
+        int total_requests = 0;
+        for (LinkedList list : user_requests.values()) {
+            total_requests += list.size();
+        }
+        assertTrue(total_requests == requests.size());
+        for (Request req : requests) {
+            assertTrue(user_requests.get(req.getClient()).contains(req));
+        }
+    }
+
     /**
      * Test the computation of domains.
      * @throws IOException 
@@ -151,18 +206,77 @@ public class BatchProcessorTest extends TestCase {
                         .getResourceAsStream("/1000_http_requests.txt"),
                         "squid"));
         LinkedList<Request> requests = user_requests.get("198.36.158.8");
-        Graph<Request> time_graph = processor.computeRequestGraph(
-                requests, 20, new TimeSimilarity());
-        // Create the domain nodes
-        // (it contains every requests of a specific domain, for each domain)
-        HashMap<String, Domain> time_domains =
-                processor.computeDomainNodes(time_graph);
+        HashMap<String, Domain> domains =
+                processor.computeDomainNodes(requests);
 
         // Test
         // System.out.println("Before computation = " + time_graph.getNodes());
         // System.out.println("After computation = " + time_domains.keySet());
+        int total_requests = 0;
+        for (Domain dom : domains.values()) {
+            total_requests += dom.size();
+        }
+        assertTrue(total_requests == requests.size());
+        for (Request req : requests) {
+            assertTrue(domains.get(req.getDomain()).contains(req));
+        }
+    }
+
+    public void testComputeRequestGraph() 
+        throws IOException {
+        System.out.println("Integrity : computation of graph of requests");
+        
+        // Creation of the data
+        BatchProcessor processor = new BatchProcessor();
+        HashMap<String, LinkedList<Request>> user_requests =
+                processor.computeUserLog(processor.parseFile(getClass()
+                        .getResourceAsStream("/1000_http_requests.txt"),
+                        "squid"));
+        LinkedList<Request> requests = user_requests.get("198.36.158.8");
+        Graph<Request> time_graph = processor.computeRequestGraph(
+                requests, 20, new TimeSimilarity());
+
+        // Test presence of all requests
+        int total_requests = 0;
         for (Request req : time_graph.getNodes()) {
-            assertTrue(time_domains.get(req.getDomain()).contains(req));
+            total_requests += 1;
+            assertTrue(requests.contains(req));
+        }
+        assertTrue(total_requests == requests.size());
+    }
+
+    /**
+     * Test selection of children.
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
+    public void testChildrenSelection()
+        throws IOException, ClassNotFoundException {
+        System.out.println("Test Follow Requests");
+
+        BatchProcessor processor = new BatchProcessor();
+
+        // Create Data
+        HashMap<String, LinkedList<Request>> user_requests =
+                processor.computeUserLog(processor.parseFile(getClass()
+                        .getResourceAsStream("/simple.txt"), "squid"));
+        LinkedList<Request> requests_all = user_requests.get("127.0.0.1");
+        Graph<Request> time_graph =
+                processor.computeRequestGraph(requests_all, 20,
+                        new DomainSimilarity());
+        Graph<Request> time_graph_old = new Graph<Request>(time_graph);
+        time_graph = processor.childrenSelection(time_graph);
+
+        // Test the children
+        for (Request req : time_graph_old.getNodes()) {
+            NeighborList nl = time_graph_old.getNeighbors(req);
+            for (Neighbor<Request> nb : nl) {
+                if (nb.node.getTime() >= req.getTime()) {
+                    assertTrue(time_graph.getNeighbors(req).contains(nb));
+                } else {
+                    assertFalse(time_graph.getNeighbors(req).contains(nb));
+                }
+            }
         }
     }
 
@@ -181,97 +295,65 @@ public class BatchProcessorTest extends TestCase {
                 processor.computeUserLog(processor.parseFile(getClass()
                         .getResourceAsStream("/1000_http_requests.txt"),
                         "squid"));
-        LinkedList<Request> requests = user_requests.get("198.36.158.8");
-        Graph<Request> time_graph = processor.computeRequestGraph(
-                requests, 20, new TimeSimilarity());
-        // Create the domain nodes
-        // (it contains every requests of a specific domain, for each domain)
-        HashMap<String, Domain> time_domains =
-                processor.computeDomainNodes(time_graph);
-        // Compute similarity between domains and build domain graph
-        Graph<Domain> time_domain_graph =
-                processor.computeSimilarityDomain(time_graph, time_domains);
+        for (String user : user_requests.keySet()) {
+            LinkedList<Request> requests = user_requests.get(user);
+            Graph<Request> time_graph = processor.computeRequestGraph(
+                    requests, 20, new TimeSimilarity());
+            // Create the domain nodes
+            // (it contains every requests of a specific domain, for each domain)
+            HashMap<String, Domain> domains =
+                    processor.computeDomainNodes(requests);
+            // Compute similarity between domains and build domain graph
+            Graph<Domain> time_domain_graph =
+                    processor.computeSimilarityDomain(time_graph, domains);
 
-        HashMap<String, Domain> all_domains_merged
-                = new HashMap<String, Domain>();
-        for (Domain dom : time_domain_graph.getNodes()) {
-            all_domains_merged.put(dom.getName(), dom);
-        }
-
-        // Test presence of all the domains and requests after feature fusion
-        for (Domain dom_1 : time_domains.values()) {
-            for (Domain dom_2 : all_domains_merged.values()) {
-                if (dom_1.getName().equals(dom_2.getName())) {
-                    assertTrue(dom_1.equals(dom_2));
-                }
+            HashMap<String, Domain> all_domains_merged
+                    = new HashMap<String, Domain>();
+            for (Domain dom : time_domain_graph.getNodes()) {
+                all_domains_merged.put(dom.getName(), dom);
             }
-        }
 
-        // Test the lost of neighbors
-        for (Request req : time_graph.getNodes()) {
-            NeighborList nl_req = time_graph.getNeighbors(req);
-            NeighborList nl_dom =
-                    time_domain_graph.getNeighbors(
-                            time_domains.get(req.getDomain()));
-            for (Neighbor<Request> nb : nl_req) {
-                if(nb.similarity != 0
-                        && !nb.node.getDomain().equals(req.getDomain())) {
-                    assertTrue(nl_dom.containsNode(
-                            time_domains.get(nb.node.getDomain())));
-                }
-            } 
-        }
-
-        // Test the similarities
-        for (Domain dom_1 : time_domain_graph.getNodes()) {
-            NeighborList nl_dom_1 = time_domain_graph.getNeighbors(dom_1);
-            for (Neighbor<Domain> dom_2 : nl_dom_1) {
-                double similarity_temp = 0.0;
-                for (Request req_1 : time_graph.getNodes()) {
-                    if (req_1.getDomain().equals(dom_1.getName())) {
-                        NeighborList nl_req_1 = time_graph.getNeighbors(req_1);
-                        for (Neighbor<Request> req_2 : nl_req_1) {
-                            if (req_2.node.getDomain().equals(dom_2.node.getName())) {
-                                similarity_temp += req_2.similarity;
-                            }
-                        }   
+            // Test presence of all the domains and requests after feature fusion
+            for (Domain dom_1 : domains.values()) {
+                for (Domain dom_2 : all_domains_merged.values()) {
+                    if (dom_1.getName().equals(dom_2.getName())) {
+                        assertTrue(dom_1.equals(dom_2));
                     }
                 }
-                assertTrue(dom_2.similarity == similarity_temp);
             }
-        }
-    }
 
-    /**
-     * Test selection of children.
-     * @throws IOException
-     * @throws ClassNotFoundException 
-     */
-    public void testChildSelection()
-        throws IOException, ClassNotFoundException {
-        System.out.println("Test Follow Requests");
+            // Test the lost of neighbors
+            for (Request req : time_graph.getNodes()) {
+                NeighborList nl_req = time_graph.getNeighbors(req);
+                NeighborList nl_dom =
+                        time_domain_graph.getNeighbors(
+                                domains.get(req.getDomain()));
+                for (Neighbor<Request> nb : nl_req) {
+                    if(nb.similarity != 0
+                            && !nb.node.getDomain().equals(req.getDomain())) {
+                        assertTrue(nl_dom.containsNode(
+                                domains.get(nb.node.getDomain())));
+                    }
+                } 
+            }
 
-        BatchProcessor processor = new BatchProcessor();
-
-        // Create Data
-        HashMap<String, LinkedList<Request>> user_requests =
-                processor.computeUserLog(processor.parseFile(getClass()
-                        .getResourceAsStream("/simple.txt"), "squid"));
-        LinkedList<Request> requests_all = user_requests.get("127.0.0.1");
-        Graph<Request> time_graph =
-                processor.computeRequestGraph(requests_all, 20,
-                        new DomainSimilarity());
-        Graph<Request> time_graph_old = time_graph;
-        time_graph = processor.childrenSelection(time_graph);
-
-        // Test the children
-        for (Request req : time_graph_old.getNodes()) {
-            NeighborList nl = time_graph_old.getNeighbors(req);
-            for (Neighbor<Request> nb : nl) {
-                if (nb.node.getTime() >= req.getTime()) {
-                    assertTrue(time_graph.getNeighbors(req).contains(nb));
-                } else {
-                    assertFalse(time_graph.getNeighbors(req).contains(nb));
+            // Test the similarities
+            for (Domain dom_1 : time_domain_graph.getNodes()) {
+                NeighborList nl_dom_1 = time_domain_graph.getNeighbors(dom_1);
+                for (Neighbor<Domain> dom_2 : nl_dom_1) {
+                    double similarity_temp = 0.0;
+                    for (Request req_1 : time_graph.getNodes()) {
+                        if (req_1.getDomain().equals(dom_1.getName())) {
+                            NeighborList nl_req_1 = time_graph.getNeighbors(req_1);
+                            for (Neighbor<Request> req_2 : nl_req_1) {
+                                if (req_2.node.getDomain().equals(dom_2.node.getName())) {
+                                    similarity_temp += req_2.similarity;
+                                }
+                            }   
+                        }
+                    }
+                    assertTrue(Math.abs(dom_2.similarity - similarity_temp)
+                            <= 1E-15);
                 }
             }
         }

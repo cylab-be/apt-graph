@@ -333,55 +333,47 @@ public class BatchProcessor {
             final String user,
             final LinkedList<Request> requests,
             final boolean children_bool) {
+        LOGGER.log(Level.INFO,
+                "Build the domains for user {0} ...", user);
+        // Create the domain nodes
+        // (it contains every requests of a specific domain, for each domain)
+        HashMap<String, Domain> domains = computeDomainNodes(requests);
 
         LOGGER.log(Level.INFO,
                 "Build the time based graph for user {0} ...", user);
         Graph<Request> time_graph =
                 computeRequestGraph(requests, k, new TimeSimilarity());
         // Selection of the temporal children only
-        // (could be optional with command line)
         if (children_bool) {
             time_graph = childrenSelection(time_graph);
         }
-        // Create the domain nodes
-        // (it contains every requests of a specific domain, for each domain)
-        HashMap<String, Domain> time_domains = computeDomainNodes(time_graph);
         // Compute similarity between domains and build domain graph
         Graph<Domain> time_domain_graph =
-                computeSimilarityDomain(time_graph, time_domains);
+                computeSimilarityDomain(time_graph, domains);
 
         LOGGER.log(Level.INFO,
                 "Build the Domain based graph for user {0} ...", user);
         Graph<Request> domain_graph =
                 computeRequestGraph(requests, k, new DomainSimilarity());
         // Selection of the temporal children only
-        // (could be optional with command line)
         if (children_bool) {
             domain_graph = childrenSelection(domain_graph);
         }
-        // Create the domain nodes
-        // (it contains every requests of a specific domain, for each domain)
-        HashMap<String, Domain> domain_domains =
-                computeDomainNodes(domain_graph);
         // Compute similarity between domains and build domain graph
         Graph<Domain> domain_domain_graph =
-                computeSimilarityDomain(domain_graph, domain_domains);
+                computeSimilarityDomain(domain_graph, domains);
 
         /*LOGGER.log(Level.INFO,
                 "Build the URL based graph for user {0} ...", user);
         Graph<Request> url_graph =
                 computeRequestGraph(requests, k, new URLSimilarity());
         // Selection of the temporal children only
-        // (could be optional with command line)
         if (children_bool) {
             url_graph = childrenSelection(url_graph);
         }
-        // Create the domain nodes
-        // (it contains every requests of a specific domain, for each domain)
-        HashMap<String, Domain> url_domains = computeDomainNodes(url_graph);
         // Compute similarity between domains and build domain graph
         Graph<Domain> url_domain_graph =
-                computeSimilarityDomain(url_graph, url_domains);*/
+                computeSimilarityDomain(url_graph, domains);*/
 
         // List of graphs
         LinkedList<Graph<Domain>> graphs =
@@ -444,17 +436,16 @@ public class BatchProcessor {
 
     /**
      * Group the requests by domain to create domain nodes.
-     * @param merged_graph
+     * @param requests
      * @return domains
      */
     final HashMap<String, Domain> computeDomainNodes(
-            final Graph<Request> merged_graph) {
-        // URL/Domain clustering
-        // Associate each domain_name (String) to a Node<Domain>
+            final LinkedList<Request> requests) {
+        // Associate each domain_name (String) to a Domain
         HashMap<String, Domain> domains =
                 new HashMap<String, Domain>();
-        for (Request node : merged_graph.getNodes()) {
-            String domain_name = node.getDomain();
+        for (Request request : requests) {
+            String domain_name = request.getDomain();
 
             Domain domain_node;
             if (domains.containsKey(domain_name)) {
@@ -466,7 +457,7 @@ public class BatchProcessor {
                 domains.put(domain_name, domain_node);
             }
 
-            domain_node.add(node);
+            domain_node.add(request);
 
         }
 
@@ -506,10 +497,8 @@ public class BatchProcessor {
                 NeighborList neighbors =
                         graph.getNeighbors(request_node);
                 for (Neighbor<Request> neighbor : neighbors) {
-                    Request target_request = neighbor.node;
-
                     // Find the corresponding domain name
-                    String other_domain_name = target_request.getDomain();
+                    String other_domain_name = neighbor.node.getDomain();
                     if (other_domain_name.equals(domain_name)) {
                         continue;
                     }
@@ -577,7 +566,7 @@ public class BatchProcessor {
      * @param output_dir
      * @param user_list
      */
-    private void saveUsers(
+    final void saveUsers(
             final Path output_dir,
             final ArrayList<String>  user_list) {
         try {
@@ -601,7 +590,7 @@ public class BatchProcessor {
      * @param output_dir
      * @param user_list
      */
-    private void saveSubnet(
+    final void saveSubnet(
             final Path output_dir,
             final ArrayList<String> user_list) {
         try {
@@ -626,7 +615,7 @@ public class BatchProcessor {
      * @param output_dir
      * @param k
      */
-    private void saveK(
+    final void saveK(
             final Path output_dir,
             final int k) {
         try {
