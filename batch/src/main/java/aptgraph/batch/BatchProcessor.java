@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -186,8 +187,13 @@ public class BatchProcessor {
      * @param line
      * @return Request
      */
-    private Request parseLineJson(final String line) {
-        JSONObject obj = new JSONObject(line);
+    private Request parseLineJson(final String line)  {
+        JSONObject obj;
+        try {
+            obj = new JSONObject(line);
+        } catch (JSONException ex) {
+            throw new JSONException(ex + "\nJSON did not match " + line);
+        }
 
         String thisdomain = null;
 
