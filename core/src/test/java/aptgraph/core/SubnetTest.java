@@ -73,15 +73,18 @@ public class SubnetTest extends TestCase {
         assertFalse(subnet.isSubnet("192.168.1.1"));
         assertFalse(subnet.isSubnet("192.0.1.1"));
         assertFalse(subnet.isSubnet("192.0.0.1"));
+        assertFalse(subnet.isSubnet("0.0.0.1"));
 
         // Test getSubnet
         assertEquals(subnet.getSubnet("192.168.1.0"), "192.168.1.");
         assertEquals(subnet.getSubnet("192.0.1.0"), "192.0.1.");
+        assertEquals(subnet.getSubnet("0.0.1.0"), "0.0.1.");
         assertEquals(subnet.getSubnet("192.168.0.0"), "192.168.");
+        assertEquals(subnet.getSubnet("0.168.0.0"), "0.168.");
         assertEquals(subnet.getSubnet("192.0.0.0"), "192.");
 
         // Test getUsersSubnet
-        String input_1 = "108.142.0.0";
+        String input_1 = "198.0.0.0";
         String sn = subnet.getSubnet(input_1);
         ArrayList<String> users_subnet = subnet.getUsersInSubnet(input_1, users);
         for (String user : users) {
