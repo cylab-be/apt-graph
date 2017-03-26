@@ -81,9 +81,11 @@ public class RequestHandlerTest extends TestCase {
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         handler.getUsers();
-        handler.analyze("253.115.106.54", new double[]{0.7, 0.1, 0.2},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, true, "",
-                new double[]{0.45, 0.45, 0.1}, true);
+        for (int i = 0; i < 1E10; i++) {
+            handler.analyze("253.115.106.54", new double[]{0.7, 0.1, 0.2},
+                    new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, true, "",
+                    new double[]{0.45, 0.45, 0.1}, true);
+        }
     }
 
     /**
@@ -98,13 +100,11 @@ public class RequestHandlerTest extends TestCase {
         handler.getUsers();
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
-        LinkedList<Graph<Domain>> merged_graph_users
-                = new LinkedList<Graph<Domain>>();
-        double[] weights = {0.7, 0.1, 0.2};
+        HashMap<String, LinkedList<Graph<Domain>>> users_graphs
+                = new HashMap<String, LinkedList<Graph<Domain>>>();
         HashMap<String, HashMap<String, Domain>> all_domains
-                = handler.computeUsersGraphs(merged_graph_users,
-                        weights,
-                        new double[]{0.0}, System.currentTimeMillis());
+                    = handler.loadUsersGraphs(users_graphs,
+                            System.currentTimeMillis());
 
         // Test
         for (String user : users) {
@@ -241,13 +241,16 @@ public class RequestHandlerTest extends TestCase {
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         handler.getUsers();
         handler.setUsersListStore(handler.getAllUsersListStore());
-        LinkedList<Graph<Domain>> merged_graph_users
-                = new LinkedList<Graph<Domain>>();
-        double[] weights = {0.7, 0.1, 0.2};
+        HashMap<String, LinkedList<Graph<Domain>>> users_graphs
+                = new HashMap<String, LinkedList<Graph<Domain>>>();
         HashMap<String, HashMap<String, Domain>> all_domains
-                = handler.computeUsersGraphs(merged_graph_users,
-                        weights,
-                        new double[]{0.0}, System.currentTimeMillis());
+                    = handler.loadUsersGraphs(users_graphs,
+                            System.currentTimeMillis());
+        double[] weights = {0.7, 0.1, 0.2};
+        LinkedList<Graph<Domain>> merged_graph_users
+                    = handler.computeUsersGraph(users_graphs, all_domains,
+                            weights,
+                            new double[]{0.0, 0.0});
 
         double[] users_weights = new double[merged_graph_users.size()];
         for (int i = 0; i < merged_graph_users.size(); i++) {
@@ -337,11 +340,16 @@ public class RequestHandlerTest extends TestCase {
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
         handler.setUsersListStore(sn.getUsersInSubnet("0.0.0.0", users));
+        HashMap<String, LinkedList<Graph<Domain>>> users_graphs
+                = new HashMap<String, LinkedList<Graph<Domain>>>();
+        HashMap<String, HashMap<String, Domain>> all_domains
+                    = handler.loadUsersGraphs(users_graphs,
+                            System.currentTimeMillis());
+        double[] weights = {0.7, 0.1, 0.2};
         LinkedList<Graph<Domain>> merged_graph_users
-                = new LinkedList<Graph<Domain>>();
-        handler.computeUsersGraphs(merged_graph_users,
-                new double[]{0.8, 0.2}, new double[]{0.7, 0.1, 0.2},
-                System.currentTimeMillis());
+                    = handler.computeUsersGraph(users_graphs, all_domains,
+                            weights,
+                            new double[]{0.0, 0.0});
 
         // Test
         assertTrue(handler.getUsersListStore().size() ==
@@ -363,13 +371,16 @@ public class RequestHandlerTest extends TestCase {
         handler.getUsers();
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
-        LinkedList<Graph<Domain>> merged_graph_users
-                = new LinkedList<Graph<Domain>>();
-        double[] weights = {0.7, 0.1, 0.2};
+        HashMap<String, LinkedList<Graph<Domain>>> users_graphs
+                = new HashMap<String, LinkedList<Graph<Domain>>>();
         HashMap<String, HashMap<String, Domain>> all_domains
-                = handler.computeUsersGraphs(merged_graph_users,
-                        weights,
-                        new double[]{0.0}, System.currentTimeMillis());
+                    = handler.loadUsersGraphs(users_graphs,
+                            System.currentTimeMillis());
+        double[] weights = {0.7, 0.1, 0.2};
+        LinkedList<Graph<Domain>> merged_graph_users
+                    = handler.computeUsersGraph(users_graphs, all_domains,
+                            weights,
+                            new double[]{0.0, 0.0});
 
         double[] users_weights = new double[merged_graph_users.size()];
         for (int i = 0; i < merged_graph_users.size(); i++) {
@@ -385,6 +396,7 @@ public class RequestHandlerTest extends TestCase {
         // Test both method to prune
         ArrayList<Double> similarities = handler.listSimilarities(merged_graph_2);
         ArrayList<Double> mean_var_prune = handler.getMeanVariance(similarities);
+        handler.setMeanVarPruneStore(mean_var_prune);
         double prune_threshold = mean_var_prune.get(0);
         handler.doPruning(merged_graph_1, (long) 0, false, 0.4);
         assertFalse(merged_graph_1.equals(merged_graph));
@@ -448,13 +460,16 @@ public class RequestHandlerTest extends TestCase {
         handler.getUsers();
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
-        LinkedList<Graph<Domain>> merged_graph_users
-                = new LinkedList<Graph<Domain>>();
-        double[] weights = {0.7, 0.1, 0.2};
+        HashMap<String, LinkedList<Graph<Domain>>> users_graphs
+                = new HashMap<String, LinkedList<Graph<Domain>>>();
         HashMap<String, HashMap<String, Domain>> all_domains
-                = handler.computeUsersGraphs(merged_graph_users,
-                        weights,
-                        new double[]{0.0}, System.currentTimeMillis());
+                    = handler.loadUsersGraphs(users_graphs,
+                            System.currentTimeMillis());
+        double[] weights = {0.7, 0.1, 0.2};
+        LinkedList<Graph<Domain>> merged_graph_users
+                    = handler.computeUsersGraph(users_graphs, all_domains,
+                            weights,
+                            new double[]{0.0, 0.0});
 
         double[] users_weights = new double[merged_graph_users.size()];
         for (int i = 0; i < merged_graph_users.size(); i++) {
@@ -496,13 +511,16 @@ public class RequestHandlerTest extends TestCase {
         handler.getUsers();
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
-        LinkedList<Graph<Domain>> merged_graph_users
-                = new LinkedList<Graph<Domain>>();
-        double[] weights = {0.7, 0.1, 0.2};
+        HashMap<String, LinkedList<Graph<Domain>>> users_graphs
+                = new HashMap<String, LinkedList<Graph<Domain>>>();
         HashMap<String, HashMap<String, Domain>> all_domains
-                = handler.computeUsersGraphs(merged_graph_users,
-                        weights,
-                        new double[]{0.0}, System.currentTimeMillis());
+                    = handler.loadUsersGraphs(users_graphs,
+                            System.currentTimeMillis());
+        double[] weights = {0.7, 0.1, 0.2};
+        LinkedList<Graph<Domain>> merged_graph_users
+                    = handler.computeUsersGraph(users_graphs, all_domains,
+                            weights,
+                            new double[]{0.0, 0.0});
 
         double[] users_weights = new double[merged_graph_users.size()];
         for (int i = 0; i < merged_graph_users.size(); i++) {
@@ -516,20 +534,21 @@ public class RequestHandlerTest extends TestCase {
         ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
 
         // Method 1
-        LinkedList<Graph<Domain>> filtered_1 = new LinkedList<Graph<Domain>>();
-        handler.doFiltering(clusters, System.currentTimeMillis(), false,
-                10, filtered_1);
+        LinkedList<Graph<Domain>> filtered_1
+                = handler.doFiltering(clusters, System.currentTimeMillis(),
+                        false, 10);
         for (Graph<Domain> graph : filtered_1) {
             assertTrue(graph.size() <= 10);
         }
         // Method 2
-        LinkedList<Graph<Domain>> filtered_2 = new LinkedList<Graph<Domain>>();
-        handler.doFiltering(clusters, System.currentTimeMillis(), true,
-                0, filtered_2);
         ArrayList<Double> cluster_sizes = handler.listClusterSizes(clusters);
         ArrayList<Double> mean_var_cluster = handler
                 .getMeanVariance(cluster_sizes);
+        handler.setMeanVarClusterStore(mean_var_cluster);
         double mean_cluster = mean_var_cluster.get(0);
+        LinkedList<Graph<Domain>> filtered_2
+                = handler.doFiltering(clusters, System.currentTimeMillis(),
+                        true, 0);
         for (Graph<Domain> graph : filtered_2) {
             assertTrue(graph.size() <= mean_cluster);
         }
@@ -550,13 +569,16 @@ public class RequestHandlerTest extends TestCase {
         handler.getUsers();
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
-        LinkedList<Graph<Domain>> merged_graph_users
-                = new LinkedList<Graph<Domain>>();
-        double[] weights = {0.7, 0.1, 0.2};
+        HashMap<String, LinkedList<Graph<Domain>>> users_graphs
+                = new HashMap<String, LinkedList<Graph<Domain>>>();
         HashMap<String, HashMap<String, Domain>> all_domains
-                = handler.computeUsersGraphs(merged_graph_users,
-                        weights,
-                        new double[]{0.0}, System.currentTimeMillis());
+                    = handler.loadUsersGraphs(users_graphs,
+                            System.currentTimeMillis());
+        double[] weights = {0.7, 0.1, 0.2};
+        LinkedList<Graph<Domain>> merged_graph_users
+                    = handler.computeUsersGraph(users_graphs, all_domains,
+                            weights,
+                            new double[]{0.0, 0.0});
 
         double[] users_weights = new double[merged_graph_users.size()];
         for (int i = 0; i < merged_graph_users.size(); i++) {
@@ -591,13 +613,16 @@ public class RequestHandlerTest extends TestCase {
         handler.getUsers();
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
-        LinkedList<Graph<Domain>> merged_graph_users
-                = new LinkedList<Graph<Domain>>();
-        double[] weights = {0.7, 0.1, 0.2};
+        HashMap<String, LinkedList<Graph<Domain>>> users_graphs
+                = new HashMap<String, LinkedList<Graph<Domain>>>();
         HashMap<String, HashMap<String, Domain>> all_domains
-                = handler.computeUsersGraphs(merged_graph_users,
-                        weights,
-                        new double[]{0.0}, System.currentTimeMillis());
+                    = handler.loadUsersGraphs(users_graphs,
+                            System.currentTimeMillis());
+        double[] weights = {0.7, 0.1, 0.2};
+        LinkedList<Graph<Domain>> merged_graph_users
+                    = handler.computeUsersGraph(users_graphs, all_domains,
+                            weights,
+                            new double[]{0.0, 0.0});
 
         double[] users_weights = new double[merged_graph_users.size()];
         for (int i = 0; i < merged_graph_users.size(); i++) {
