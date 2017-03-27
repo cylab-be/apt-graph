@@ -231,7 +231,9 @@ public class RequestHandler {
             System.out.println("2: " + estimated_time_2 + " (Data loaded)");
 
             // The json-rpc request was probably canceled by the user
-            if (Thread.currentThread().isInterrupted()) { return null; }
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
         }
         if (stages[1]) {
             // Compute each user graph
@@ -265,7 +267,9 @@ public class RequestHandler {
         }
 
         // The json-rpc request was probably canceled by the user
-        if (Thread.currentThread().isInterrupted()) { return null; }
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
 
         m.setStdout("<pre>Number of users selected: "
                 + m.getUsersList().size());
@@ -282,7 +286,10 @@ public class RequestHandler {
             System.out.println("6: " + estimated_time_6 + " (Pruning done)");
 
             // The json-rpc request was probably canceled by the user
-            if (Thread.currentThread().isInterrupted()) { return null; }
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
+
             // Clustering
             m.setClusters(pruned_graph.connectedComponents());
 
@@ -291,7 +298,9 @@ public class RequestHandler {
                     + " (Clustering done)");
 
             // The json-rpc request was probably canceled by the user
-            if (Thread.currentThread().isInterrupted()) { return null; }
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
 
             ArrayList<Double> cluster_sizes = listClusterSizes(m.getClusters());
             m.setMeanVarClusters(Utility.getMeanVariance(cluster_sizes));
@@ -304,7 +313,9 @@ public class RequestHandler {
         }
 
         // The json-rpc request was probably canceled by the user
-        if (Thread.currentThread().isInterrupted()) { return null; }
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
 
         if (stages[3]) {
             // Filtering
@@ -327,7 +338,9 @@ public class RequestHandler {
         }
 
         // The json-rpc request was probably canceled by the user
-        if (Thread.currentThread().isInterrupted()) { return null; }
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
 
         if (stages[5]) {
             // Ranking
@@ -558,7 +571,9 @@ public class RequestHandler {
             if ((mode.equals("byUsers") && key.startsWith(user))
                     || mode.equals("all")) {
                 // The json-rpc request was probably canceled by the user
-                if (Thread.currentThread().isInterrupted()) { return null; }
+                if (Thread.currentThread().isInterrupted()) {
+                    return null;
+                }
 
                 HashMap<Domain, Double> all_neighbors =
                         new HashMap<Domain, Double>();
