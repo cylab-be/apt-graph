@@ -39,13 +39,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -59,80 +57,18 @@ public class RequestHandler {
     private static final Logger LOGGER
             = Logger.getLogger(JsonRpcServer.class.getName());
 
+    private final Memory m = new Memory();
+
     RequestHandler(final Path input_dir) {
         this.input_dir = input_dir;
     }
 
-    // Path of the white list
-    private static final Path PATH = Paths.get("./src/main/resources/hosts");
-
-    // Define stdout on UI
-    private String stdout = "";
-
-    // Data (Storage variables)
-    private ArrayList<String> all_users_list_store = new ArrayList<String>();
-    private ArrayList<String> all_subnets_list_store = new ArrayList<String>();
-    private String user_store = "";
-    private ArrayList<String> users_list_store = new ArrayList<String>();
-    private int k_store;
-    private Graph<Domain> merged_graph_store;
-    private HashMap<String, HashMap<String, Domain>> all_domains_store;
-    private HashMap<String, LinkedList<Graph<Domain>>> users_graphs_store;
-    private double[] feature_weights_store;
-    private double[] feature_ordered_weights_store;
-    private ArrayList<Double> mean_var_prune_store;
-    private HistData hist_pruning_store;
-    private double prune_threshold_temp_store;
-    private boolean prune_z_bool_store;
-    private ArrayList<Double> mean_var_cluster_store;
-    private HistData hist_cluster_store;
-    private ArrayList<Graph<Domain>> clusters_store;
-    private double max_cluster_size_temp_store;
-    private boolean cluster_z_bool_store;
-    private LinkedList<Graph<Domain>> filtered_store;
-    private boolean whitelist_bool_store;
-    private String white_ongo_store;
-    private double[] ranking_weights_store;
-    private boolean apt_search_store;
-
     /**
-     * Return list of all users.
-     * @return ArrayList<String>
+     * Give access to the internal memory of server.
+     * @return m
      */
-    public final ArrayList<String> getAllUsersListStore() {
-        return all_users_list_store;
-    }
-
-    /**
-     * Return list of selected users.
-     * @return ArrayList<String>
-     */
-    public final ArrayList<String> getUsersListStore() {
-        return users_list_store;
-    }
-
-    /**
-     * Set list of selected users.
-     * @param list
-     */
-    public final void setUsersListStore(final ArrayList<String> list) {
-        users_list_store = list;
-    }
-
-    /**
-     * Set mean and variance of similarities for pruning.
-     * @param mean_var
-     */
-    public final void setMeanVarPruneStore(final ArrayList<Double> mean_var) {
-        mean_var_prune_store = mean_var;
-    }
-
-    /**
-     * Set mean and variance of similarities for clustering.
-     * @param mean_var
-     */
-    public final void setMeanVarClusterStore(final ArrayList<Double> mean_var) {
-        mean_var_cluster_store = mean_var;
+    final Memory getMemory() {
+        return this.m;
     }
 
     /**
@@ -176,7 +112,6 @@ public class RequestHandler {
      * @return List of users
      */
     public final ArrayList<String> getUsers() {
-        ArrayList<String> subnet_list = new ArrayList<String>();
         LOGGER.info("Reading list of subnets from disk...");
         try {
             File file = new File(input_dir.toString(), "subnets.ser");
@@ -184,16 +119,14 @@ public class RequestHandler {
                     new FileInputStream(file.toString());
             ObjectInputStream input = new ObjectInputStream(
                     new BufferedInputStream(input_stream));
-            subnet_list = (ArrayList<String>) input.readObject();
+            m.setAllSubnetsList((ArrayList<String>) input.readObject());
             input.close();
-            all_subnets_list_store = subnet_list;
         } catch (IOException ex) {
                 System.err.println(ex);
         } catch (ClassNotFoundException ex) {
                 System.err.println(ex);
         }
 
-        ArrayList<String> user_list = new ArrayList<String>();
         LOGGER.info("Reading list of users from disk...");
         try {
             File file = new File(input_dir.toString(), "users.ser");
@@ -201,9 +134,8 @@ public class RequestHandler {
                     new FileInputStream(file.toString());
             ObjectInputStream input = new ObjectInputStream(
                     new BufferedInputStream(input_stream));
-            user_list = (ArrayList<String>) input.readObject();
+            m.setAllUsersList((ArrayList<String>) input.readObject());
             input.close();
-            all_users_list_store = user_list;
         } catch (IOException ex) {
                 System.err.println(ex);
         } catch (ClassNotFoundException ex) {
@@ -211,8 +143,8 @@ public class RequestHandler {
         }
 
         ArrayList<String> output = new ArrayList<String>();
-        output.addAll(subnet_list);
-        output.addAll(user_list);
+        output.addAll(m.getAllSubnetsList());
+        output.addAll(m.getAllUsersList());
         return output;
     }
 
@@ -249,8 +181,7 @@ public class RequestHandler {
         long start_time = System.currentTimeMillis();
 
         // Update users list and subnets list if needed
-        if (all_users_list_store.isEmpty()
-                || all_subnets_list_store.isEmpty()) {
+        if (m.getAllUsersList().isEmpty() || m.getAllSubnetsList().isEmpty()) {
             getUsers();
         }
 
@@ -265,54 +196,47 @@ public class RequestHandler {
                 max_cluster_size_temp, prune_z_bool,
                 cluster_z_bool, whitelist_bool, white_ongo,
                 ranking_weights, apt_search);
+        m.setCurrentK(FileManager.getK(input_dir));
+        m.setUser(user);
+        m.setFeatureWeights(feature_weights);
+        m.setFeatureOrderedWeights(feature_ordered_weights);
+        m.setPruningThresholdTemp(prune_threshold_temp);
+        m.setMaxClusterSizeTemp(max_cluster_size_temp);
+        m.setPruneZBool(prune_z_bool);
+        m.setClusterZBool(cluster_z_bool);
+        m.setWhitelistBool(whitelist_bool);
+        m.setWhiteOngo(white_ongo);
+        m.setRankingWeights(ranking_weights);
+        m.setAptSearch(apt_search);
 
         long estimated_time_1 = System.currentTimeMillis() - start_time;
         System.out.println("1: " + estimated_time_1 + " (User input checked)");
 
         // Create the list of users used to produce final graph
         if (stages[0]) {
-            user_store = user;
-            k_store = FileManager.getK(input_dir);
-
-            if (user.equals("0.0.0.0")) {
-                users_list_store = all_users_list_store;
-            } else if (Subnet.isSubnet(user)) {
-               users_list_store =
-                       Subnet.getUsersInSubnet(user, all_users_list_store);
+            if (m.getUser().equals("0.0.0.0")) {
+                m.setUsersList(m.getAllUsersList());
+            } else if (Subnet.isSubnet(m.getUser())) {
+                m.setUsersList(Subnet.getUsersInSubnet(
+                       m.getUser(), m.getAllUsersList()));
             } else {
-                if (!users_list_store.isEmpty()) {
-                    users_list_store.clear();
-                }
-                users_list_store.add(user);
+                m.setUsersList(new ArrayList<String>()
+                { { add(m.getUser()); } });
             }
 
             // Load users graphs
-            HashMap<String, LinkedList<Graph<Domain>>> users_graphs
-                = new HashMap<String, LinkedList<Graph<Domain>>>();
-            HashMap<String, HashMap<String, Domain>> all_domains
-                    = loadUsersGraphs(users_graphs, start_time);
-            all_domains_store = all_domains;
-            users_graphs_store = users_graphs;
+            loadUsersGraphs(start_time);
 
             long estimated_time_2 = System.currentTimeMillis() - start_time;
             System.out.println("2: " + estimated_time_2 + " (Data loaded)");
 
             // The json-rpc request was probably canceled by the user
-            if (Thread.currentThread().isInterrupted()) {
-                return null;
-            }
+            if (Thread.currentThread().isInterrupted()) { return null; }
         }
         if (stages[1]) {
-            feature_weights_store = null;
-            feature_ordered_weights_store = null;
-            feature_weights_store = feature_weights.clone();
-            feature_ordered_weights_store = feature_ordered_weights.clone();
-
             // Compute each user graph
             LinkedList<Graph<Domain>> merged_graph_users
-                    = computeUsersGraph(users_graphs_store, all_domains_store,
-                            feature_weights_store,
-                            feature_ordered_weights_store);
+                    = computeUsersGraph();
 
             long estimated_time_3 = System.currentTimeMillis() - start_time;
             System.out.println("3: " + estimated_time_3
@@ -323,25 +247,17 @@ public class RequestHandler {
             for (int i = 0; i < merged_graph_users.size(); i++) {
                 users_weights[i] = 1.0 / merged_graph_users.size();
             }
-            Graph<Domain> merged_graph
-                    = computeFusionGraphs(merged_graph_users, all_domains_store,
-                            new double[] {0.0}, users_weights, "", "all");
-            merged_graph_store = merged_graph;
+            m.setMergedGraph(computeFusionGraphs(merged_graph_users, "",
+                            users_weights, new double[] {0.0}, "all"));
 
             long estimated_time_4 = System.currentTimeMillis() - start_time;
             System.out.println("4: " + estimated_time_4
                 + " (Fusion of users done)");
 
-            ArrayList<Double> similarities
-                    = listSimilarities(merged_graph_store);
-            ArrayList<Double> mean_var_prune
-                    = Utility.getMeanVariance(similarities);
-            mean_var_prune_store = mean_var_prune;
+            ArrayList<Double> similarities = listSimilarities();
+            m.setMeanVarSimilarities(Utility.getMeanVariance(similarities));
 
-            HistData hist_pruning = computeHistData(similarities,
-                    mean_var_prune_store.get(0), mean_var_prune_store.get(1),
-                    prune_z_bool, false);
-            hist_pruning_store = hist_pruning;
+            computeHistData(similarities, false, "prune");
 
             long estimated_time_5 = System.currentTimeMillis() - start_time;
             System.out.println("5: " + estimated_time_5
@@ -349,54 +265,38 @@ public class RequestHandler {
         }
 
         // The json-rpc request was probably canceled by the user
-        if (Thread.currentThread().isInterrupted()) {
-            return null;
-        }
+        if (Thread.currentThread().isInterrupted()) { return null; }
 
-        stdout = "<pre>Number of users selected: " + users_list_store.size();
-        stdout = stdout.concat("<br>k-NN Graph: k: " + k_store);
-        stdout = stdout.concat("<br>Total number of domains: "
-                        + all_domains_store.get("all").values().size());
+        m.setStdout("<pre>Number of users selected: "
+                + m.getUsersList().size());
+        m.concatStdout("<br>k-NN Graph: k: " + m.getCurrentK());
+        m.concatStdout("<br>Total number of domains: "
+                        + m.getAllDomains().get("all").values().size());
 
         if (stages[2]) {
-            Graph<Domain> merged_graph = new Graph(merged_graph_store);
-            prune_threshold_temp_store = prune_threshold_temp;
-            prune_z_bool_store = prune_z_bool;
-
+            Graph<Domain> pruned_graph = new Graph<Domain>(m.getMergedGraph());
             // Prune
-            doPruning(merged_graph,
-                    start_time, prune_z_bool_store, prune_threshold_temp_store);
+            pruned_graph = doPruning(pruned_graph, start_time);
 
             long estimated_time_6 = System.currentTimeMillis() - start_time;
             System.out.println("6: " + estimated_time_6 + " (Pruning done)");
 
             // The json-rpc request was probably canceled by the user
-            if (Thread.currentThread().isInterrupted()) {
-                return null;
-            }
+            if (Thread.currentThread().isInterrupted()) { return null; }
             // Clustering
-            ArrayList<Graph<Domain>> clusters
-                    = merged_graph.connectedComponents();
-            clusters_store = clusters;
+            m.setClusters(pruned_graph.connectedComponents());
 
             long estimated_time_7 = System.currentTimeMillis() - start_time;
             System.out.println("7: " + estimated_time_7
                     + " (Clustering done)");
 
             // The json-rpc request was probably canceled by the user
-            if (Thread.currentThread().isInterrupted()) {
-                return null;
-            }
+            if (Thread.currentThread().isInterrupted()) { return null; }
 
-            ArrayList<Double> cluster_sizes = listClusterSizes(clusters);
-            ArrayList<Double> mean_var_cluster
-                    = Utility.getMeanVariance(cluster_sizes);
-            mean_var_cluster_store = mean_var_cluster;
+            ArrayList<Double> cluster_sizes = listClusterSizes(m.getClusters());
+            m.setMeanVarClusters(Utility.getMeanVariance(cluster_sizes));
 
-            HistData hist_cluster = computeHistData(cluster_sizes,
-                    mean_var_cluster_store.get(0),
-                    mean_var_cluster_store.get(1), cluster_z_bool, true);
-            hist_cluster_store = hist_cluster;
+            computeHistData(cluster_sizes, true, "cluster");
 
             long estimated_time_8 = System.currentTimeMillis() - start_time;
             System.out.println("8: " + estimated_time_8
@@ -404,18 +304,11 @@ public class RequestHandler {
         }
 
         // The json-rpc request was probably canceled by the user
-        if (Thread.currentThread().isInterrupted()) {
-            return null;
-        }
+        if (Thread.currentThread().isInterrupted()) { return null; }
 
         if (stages[3]) {
-            max_cluster_size_temp_store = max_cluster_size_temp;
-            cluster_z_bool_store = cluster_z_bool;
             // Filtering
-            LinkedList<Graph<Domain>> filtered
-                    = doFiltering(clusters_store, start_time,
-                    cluster_z_bool_store, max_cluster_size_temp_store);
-            filtered_store = filtered;
+            doFiltering(start_time);
 
             long estimated_time_9 = System.currentTimeMillis() - start_time;
             System.out.println("9: " + estimated_time_9
@@ -423,12 +316,9 @@ public class RequestHandler {
         }
 
         if (stages[4]) {
-            whitelist_bool_store = whitelist_bool;
-            white_ongo_store = white_ongo;
-
             // White listing
-            if (whitelist_bool) {
-                filtered_store = whiteListing(filtered_store, white_ongo);
+            if (m.getWhitelistBool()) {
+                whiteListing();
             }
 
             long estimated_time_10 = System.currentTimeMillis() - start_time;
@@ -437,31 +327,22 @@ public class RequestHandler {
         }
 
         // The json-rpc request was probably canceled by the user
-        if (Thread.currentThread().isInterrupted()) {
-            return null;
-        }
+        if (Thread.currentThread().isInterrupted()) { return null; }
 
         if (stages[5]) {
-            ranking_weights_store = null;
-            ranking_weights_store = ranking_weights.clone();
-            apt_search_store = apt_search;
-
             // Ranking
-            showRanking(filtered_store,
-                    all_domains_store.get("all").values().size(),
-                    ranking_weights_store, apt_search_store);
+            showRanking();
 
             long estimated_time_11 = System.currentTimeMillis() - start_time;
             System.out.println("11: " + estimated_time_11
                     + " (Ranking printed)");
 
-            stdout = stdout.concat("<br>Found " + filtered_store.size()
+            m.concatStdout("<br>Found " + m.getFilteredWhiteListed().size()
                 + " clusters</pre>");
         }
 
         // Output
-        return createOutput(filtered_store, hist_pruning_store,
-                hist_cluster_store);
+        return createOutput();
     }
 
     /**
@@ -486,8 +367,8 @@ public class RequestHandler {
             final boolean cluster_z_bool,
             final double[] ranking_weights) {
         // Check if user exists
-        if (!all_users_list_store.contains(user)
-                && !all_subnets_list_store.contains(user)) {
+        if (!m.getAllUsersList().contains(user)
+                && !m.getAllSubnetsList().contains(user)) {
             return false;
         }
 
@@ -569,30 +450,30 @@ public class RequestHandler {
         // By default all stages have changed
         boolean[] stages = {true, true, true, true, true, true};
 
-        if (user_store.equals(user)) {
+        if (m.getUser().equals(user)) {
             stages[0] = false;
 
-            if (Arrays.equals(feature_weights_store, feature_weights)
-                    && Arrays.equals(feature_ordered_weights_store,
+            if (Arrays.equals(m.getFeatureWeights(), feature_weights)
+                    && Arrays.equals(m.getFeatureOrderedWeights(),
                             feature_ordered_weights)) {
                 stages[1] = false;
 
-                if (prune_threshold_temp_store == prune_threshold_temp
-                        && prune_z_bool_store == prune_z_bool) {
+                if (m.getPruningThresholdTemp() == prune_threshold_temp
+                        && m.getPruneZBool() == prune_z_bool) {
                     stages[2] = false;
 
-                    if (max_cluster_size_temp_store == max_cluster_size_temp
-                            && cluster_z_bool_store == cluster_z_bool) {
+                    if (m.getMaxClusterSizeTemp() == max_cluster_size_temp
+                            && m.getClusterZBool() == cluster_z_bool) {
                         stages[3] = false;
 
-                        if (whitelist_bool_store == whitelist_bool
-                                && white_ongo_store != null
-                                && white_ongo_store.equals(white_ongo)) {
+                        if (m.getWhitelistBool() == whitelist_bool
+                                && m.getWhiteOngo() != null
+                                && m.getWhiteOngo().equals(white_ongo)) {
                             stages[4] = false;
 
-                            if (Arrays.equals(ranking_weights_store,
+                            if (Arrays.equals(m.getRankingWeights(),
                                     ranking_weights)
-                                    && apt_search_store == apt_search) {
+                                    && m.getAptSearch() == apt_search) {
                                 stages[5] = false;
                             }
                         }
@@ -605,74 +486,49 @@ public class RequestHandler {
 
     /**
      * Load the graphs needed.
-     * @param users_graphs
      * @param start_time
-     * @return all_domains
+     * @return
      */
-    final HashMap<String, HashMap<String, Domain>> loadUsersGraphs(
-            final HashMap<String, LinkedList<Graph<Domain>>> users_graphs,
-            final long start_time) {
-        // Definition of all_domains
-        HashMap<String, HashMap<String, Domain>> all_domains
-                = new HashMap<String, HashMap<String, Domain>>();
-        all_domains.put("byUsers", new HashMap<String, Domain>());
-        all_domains.put("all", new HashMap<String, Domain>());
-        // term 'byUsers' will contain all domains without merge
-        // (key = user:domain)
-        // term 'all' will contain all merged domains
-        // (key = domain)
-
-        for (String user_temp : users_list_store) {
+    final void loadUsersGraphs(final long start_time) {
+        for (String user_temp : m.getUsersList()) {
             LinkedList<Graph<Domain>> graphs_temp = FileManager.getUserGraphs(
                     input_dir, user_temp);
 
             // List all domains
             for (Domain dom : graphs_temp.getFirst().getNodes()) {
-                all_domains.get("byUsers")
+                m.getAllDomains().get("byUsers")
                         .put(user_temp + ":" + dom.getName(), dom);
-                if (!all_domains.get("all").containsKey(dom.getName())) {
-                    all_domains.get("all").put(dom.getName(), dom);
-                } else if (!all_domains.get("all")
+                if (!m.getAllDomains().get("all").containsKey(dom.getName())) {
+                    m.getAllDomains().get("all").put(dom.getName(), dom);
+                } else if (!m.getAllDomains().get("all")
                         .get(dom.getName()).equals(dom)) {
-                    all_domains.get("all").put(dom.getName(),
-                            all_domains.get("all")
+                    m.getAllDomains().get("all").put(dom.getName(),
+                            m.getAllDomains().get("all")
                                     .get(dom.getName()).merge(dom));
                 }
             }
 
             // Store user graph
-            users_graphs.put(user_temp, graphs_temp);
+            m.getUsersGraphs().put(user_temp, graphs_temp);
         }
-
-        return all_domains;
     }
 
     /**
      * Fusion features of each user.
-     * @param users_graphs
-     * @param all_domains
-     * @param feature_weights
-     * @param feature_ordered_weights
      * @return merged_graph_users
      */
-    final LinkedList<Graph<Domain>> computeUsersGraph(
-            final HashMap<String, LinkedList<Graph<Domain>>> users_graphs,
-            final HashMap<String, HashMap<String, Domain>> all_domains,
-            final double[] feature_weights,
-            final double[] feature_ordered_weights) {
+    final LinkedList<Graph<Domain>> computeUsersGraph() {
         LinkedList<Graph<Domain>> merged_graph_users
                     = new LinkedList<Graph<Domain>>();
-        for (String user_temp : users_list_store) {
+        for (String user_temp : m.getUsersList()) {
             // Load user graph
             LinkedList<Graph<Domain>> graphs_temp
-                    = users_graphs.get(user_temp);
+                    = m.getUsersGraphs().get(user_temp);
 
             // Fusion of the features (Graph of Domains)
-            Graph<Domain> merged_graph_temp = computeFusionGraphs(graphs_temp,
-                    all_domains, feature_ordered_weights,
-                    feature_weights, user_temp, "byUsers");
-
-            merged_graph_users.add(merged_graph_temp);
+            merged_graph_users.add(computeFusionGraphs(graphs_temp,
+                    user_temp, m.getFeatureWeights(),
+                    m.getFeatureOrderedWeights(), "byUsers"));
         }
 
         return merged_graph_users;
@@ -681,31 +537,28 @@ public class RequestHandler {
     /**
      * Compute the fusion of graphs.
      * @param graphs
-     * @param all_domains
-     * @param feature_ordered_weights
-     * @param feature_weights
      * @param user
+     * @param feature_weights
+     * @param feature_ordered_weights
      * @param mode
      * @return merged_graph
      */
     final Graph<Domain> computeFusionGraphs(
             final LinkedList<Graph<Domain>> graphs,
-            final HashMap<String, HashMap<String, Domain>> all_domains,
-            final double[] ordered_weights,
-            final double[] weights,
             final String user,
+            final double[] weights,
+            final double[] ordered_weights,
             final String mode) {
         // Weighted average using parameter weights
         Graph<Domain> merged_graph = new Graph<Domain>(Integer.MAX_VALUE);
-        for (Entry<String, Domain> entry_1 : all_domains.get(mode).entrySet()) {
+        for (Entry<String, Domain> entry_1 : m.getAllDomains()
+                .get(mode).entrySet()) {
             String key = entry_1.getKey();
             Domain node = entry_1.getValue();
             if ((mode.equals("byUsers") && key.startsWith(user))
                     || mode.equals("all")) {
                 // The json-rpc request was probably canceled by the user
-                if (Thread.currentThread().isInterrupted()) {
-                    return null;
-                }
+                if (Thread.currentThread().isInterrupted()) { return null; }
 
                 HashMap<Domain, Double> all_neighbors =
                         new HashMap<Domain, Double>();
@@ -721,10 +574,10 @@ public class RequestHandler {
                     if (mode.equals("all") && !key_user.startsWith(user_temp)) {
                         key_user = user_temp + ":" + key;
                     }
-                    if (graph_temp.containsKey(all_domains
+                    if (graph_temp.containsKey(m.getAllDomains()
                             .get("byUsers").get(key_user))) {
                         NeighborList neighbors_temp = graph_temp
-                             .getNeighbors(all_domains.get("byUsers")
+                             .getNeighbors(m.getAllDomains().get("byUsers")
                                      .get(key_user));
 
                         for (Neighbor<Domain> neighbor_temp : neighbors_temp) {
@@ -736,11 +589,12 @@ public class RequestHandler {
                                 new_similarity +=
                                         all_neighbors.get(neighbor_temp.node);
                             } else if (mode.equals("all")
-                                    && all_neighbors.containsKey(all_domains
-                                            .get("all").get(neighbor_temp.node
+                                    && all_neighbors.containsKey(
+                                            m.getAllDomains().get("all")
+                                            .get(neighbor_temp.node
                                                     .getName()))) {
                                 new_similarity +=
-                                        all_neighbors.get(all_domains
+                                        all_neighbors.get(m.getAllDomains()
                                             .get("all").get(neighbor_temp.node
                                                     .getName()));
                             }
@@ -748,12 +602,12 @@ public class RequestHandler {
                             if (new_similarity != 0) {
                                 if (mode.equals("all")) {
                                     all_neighbors.put(
-                                      all_domains.get(mode)
+                                      m.getAllDomains().get(mode)
                                       .get(neighbor_temp.node.getName()),
                                       new_similarity);
                                 } else if (mode.equals("byUsers")) {
                                     all_neighbors.put(
-                                      all_domains.get(mode)
+                                      m.getAllDomains().get(mode)
                                       .get(user + ":"
                                               + neighbor_temp.node.getName()),
                                       new_similarity);
@@ -775,40 +629,13 @@ public class RequestHandler {
     }
 
     /**
-     * Make the pruning on the graph and analyze the similarities.
-     * @param graph
-     * @param start_time
-     * @param prune_z_bool
-     * @param prune_threshold_temp
-     * @return HistData
-     */
-    final void doPruning(
-            final Graph<Domain> graph,
-            final long start_time,
-            final boolean prune_z_bool,
-            final double prune_threshold_temp) {
-        double prune_threshold;
-        if (prune_z_bool) {
-            prune_threshold
-                = computePruneThreshold(mean_var_prune_store.get(0),
-                        mean_var_prune_store.get(1),
-                        prune_threshold_temp);
-        } else {
-            prune_threshold = prune_threshold_temp;
-        }
-        graph.prune(prune_threshold);
-    }
-
-    /**
      * Compute the list of all the similarities of domain graph.
-     * @param domain_graph
      * @return similarities
      */
-    final ArrayList<Double> listSimilarities(
-            final Graph<Domain> domain_graph) {
+    final ArrayList<Double> listSimilarities() {
         ArrayList<Double> similarities = new ArrayList<Double>();
-        for (Domain dom : domain_graph.getNodes()) {
-            NeighborList neighbors = domain_graph.getNeighbors(dom);
+        for (Domain dom : m.getMergedGraph().getNodes()) {
+            NeighborList neighbors = m.getMergedGraph().getNeighbors(dom);
             for (Neighbor<Domain> neighbor : neighbors) {
                 similarities.add(neighbor.similarity);
             }
@@ -819,16 +646,27 @@ public class RequestHandler {
     /**
      * Compute distribution of a list.
      * @param list
-     * @param mean
-     * @param variance
-     * @param z_bool
      * @param int_bool
      * @return HashMap<Double, Integer>
      */
-    private HistData computeHistData(
+    private void computeHistData(
             final ArrayList<Double> list,
-            final double mean, final double variance, final boolean z_bool,
-            final boolean int_bool) {
+            final boolean int_bool,
+            final String mode) {
+        boolean z_bool;
+        double mean;
+        double variance;
+        if (mode.equals("prune")) {
+            z_bool = m.getPruneZBool();
+            mean = m.getMeanVarSimilarities()[0];
+            variance = m.getMeanVarSimilarities()[1];
+        } else if (mode.equals("cluster")) {
+            z_bool = m.getClusterZBool();
+            mean = m.getMeanVarClusters()[0];
+            variance = m.getMeanVarClusters()[1];
+        } else {
+            return;
+        }
         ArrayList<Double> list_func = new ArrayList<Double>(list.size());
         // Transform list in z score if needed
         if (z_bool) {
@@ -869,60 +707,37 @@ public class RequestHandler {
             hist_data.put(bin, hist_data.get(bin) + 1.0 / total_links * 100);
         }
         // there ara actually (bins + 2) bins (to include max in the histogram)
-        return hist_data;
-    }
-
-    /**
-     * Compute the absolute prune threshold based on z score.
-     * @param mean
-     * @param variance
-     * @param z_prune_threshold
-     * @return prune_threshold
-     */
-    final double computePruneThreshold(final double mean,
-            final double variance,
-            final Double z_prune_threshold) {
-        double prune_threshold
-                = Utility.fromZ(mean, variance, z_prune_threshold);
-        if (prune_threshold < 0) {
-            prune_threshold = 0;
+        if (mode.equals("prune")) {
+            m.setHistDataSimilarities(hist_data);
+        } else if (mode.equals("cluster")) {
+            m.setHistDataClusters(hist_data);
         }
-        stdout = stdout.concat("<br>Prune Threshold : ");
-        stdout = stdout.concat("<br>    Mean = " + mean);
-        stdout = stdout.concat("<br>    Variance = " + variance);
-        stdout = stdout.concat("<br>    Prune Threshold = " + prune_threshold);
-
-        return prune_threshold;
     }
 
     /**
-     * Make the filtering and analyze the cluster sizes.
-     * @param clusters
+     * Make the pruning on the graph and analyze the similarities.
+     * @param graph
      * @param start_time
-     * @param cluster_z_bool
-     * @param max_cluster_size_temp
-     * @param filtered
-     * @return HistData
+     * @return Graph<Domain>
      */
-    final LinkedList<Graph<Domain>> doFiltering(
-            final ArrayList<Graph<Domain>> clusters,
-            final long start_time,
-            final boolean cluster_z_bool,
-            final double max_cluster_size_temp) {
-        LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
-        double max_cluster_size;
-        if (cluster_z_bool) {
-            max_cluster_size = computeClusterSize(mean_var_cluster_store.get(0),
-                    mean_var_cluster_store.get(1), max_cluster_size_temp);
+    final Graph<Domain> doPruning(
+            final Graph<Domain> graph,
+            final long start_time) {
+        double prune_threshold;
+        if (m.getPruneZBool()) {
+            prune_threshold
+                = Utility.computePruneThreshold(m.getMeanVarSimilarities()[0],
+                        m.getMeanVarSimilarities()[1],
+                        m.getPruningThresholdTemp());
+        m.concatStdout("<br>Prune Threshold : ");
+        m.concatStdout("<br>    Mean = " + m.getMeanVarSimilarities()[0]);
+        m.concatStdout("<br>    Variance = " + m.getMeanVarSimilarities()[1]);
+        m.concatStdout("<br>    Prune Threshold = " + prune_threshold);
         } else {
-            max_cluster_size = max_cluster_size_temp;
+            prune_threshold = m.getPruningThresholdTemp();
         }
-        for (Graph<Domain> subgraph : clusters) {
-            if (subgraph.size() <= max_cluster_size) {
-                filtered.add(subgraph);
-            }
-        }
-        return filtered;
+        graph.prune(prune_threshold);
+        return graph;
     }
 
     /**
@@ -940,48 +755,47 @@ public class RequestHandler {
     }
 
     /**
-     * Compute the absolute maximum cluster size based on z score.
-     * @param mean
-     * @param variance
-     * @param z_max_cluster_size
-     * @return max_cluster_size
+     * Make the filtering and analyze the cluster sizes.
+     * @param start_time
+     * @return HistData
      */
-    private double computeClusterSize(final double mean, final double variance,
-            final Double z_max_cluster_size) {
-        double max_cluster_size_temp = Utility.fromZ(mean, variance,
-                z_max_cluster_size);
-        int max_cluster_size = (int) Math.round(max_cluster_size_temp);
-        if (max_cluster_size < 0) {
-            max_cluster_size = 0;
+    final void doFiltering(final long start_time) {
+        LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
+        double max_cluster_size;
+        if (m.getClusterZBool()) {
+            max_cluster_size = Utility.computeClusterSize(
+                    m.getMeanVarClusters()[0], m.getMeanVarClusters()[0],
+                    m.getMaxClusterSizeTemp());
+            m.concatStdout("<br>Cluster Size : ");
+            m.concatStdout("<br>    Mean = " + m.getMeanVarClusters()[0]);
+            m.concatStdout("<br>    Variance = " + m.getMeanVarClusters()[1]);
+            m.concatStdout("<br>    Max Cluster Size = " + max_cluster_size);
+        } else {
+            max_cluster_size = m.getMaxClusterSizeTemp();
         }
-        stdout = stdout.concat("<br>Cluster Size : ");
-        stdout = stdout.concat("<br>    Mean = " + mean);
-        stdout = stdout.concat("<br>    Variance = " + variance);
-        stdout =
-              stdout.concat("<br>    Max Cluster Size = " + max_cluster_size);
-
-        return max_cluster_size;
+        for (Graph<Domain> subgraph : m.getClusters()) {
+            if (subgraph.size() <= max_cluster_size) {
+                filtered.add(subgraph);
+            }
+        }
+        m.setFiltered(filtered);
     }
 
     /**
      * White List unwanted domains.
-     * @param domain_graph
-     * @param white_ongo
-     * @return domain_graph
+     * @return
      */
-    final LinkedList<Graph<Domain>>
-         whiteListing(final LinkedList<Graph<Domain>> filtered,
-                 final String white_ongo) {
+    final void whiteListing() {
         LinkedList<Graph<Domain>> filtered_new
-                = new LinkedList<Graph<Domain>>(filtered);
+                = new LinkedList<Graph<Domain>>(m.getFiltered());
 
         List<String> whitelist = new ArrayList<String>();
         List<String> whitelist_ongo = new ArrayList<String>();
         LinkedList<Domain> whitelisted = new LinkedList<Domain>();
         try {
-            whitelist =
-                    Files.readAllLines(PATH, StandardCharsets.UTF_8);
-            whitelist_ongo.addAll(Arrays.asList(white_ongo.split("\n")));
+            whitelist = Files.readAllLines(m.getWhiteListPath(),
+                            StandardCharsets.UTF_8);
+            whitelist_ongo.addAll(Arrays.asList(m.getWhiteOngo().split("\n")));
         } catch (IOException ex) {
             Logger.getLogger(RequestHandler.class.getName())
                     .log(Level.SEVERE, null, ex);
@@ -999,61 +813,22 @@ public class RequestHandler {
                     whitelisted.add(dom);
                 }
             }
-            remove(domain_graph, whitelisted);
+            Utility.remove(domain_graph, whitelisted);
         }
 
-        stdout = stdout.concat("<br>Number of white listed domains: "
+        m.concatStdout("<br>Number of white listed domains: "
                 + whitelisted.size());
-        return filtered_new;
-    }
-
-    /**
-     * Remove a list of nodes from a given graph (and update graph).
-     * @param <U>
-     * @param graph
-     * @param node
-     */
-    static <U> void remove(final Graph<U> graph, final LinkedList<U> nodes) {
-        HashMap<U, NeighborList> map = graph.getHashMap();
-
-        // Delete the node
-        for (U node : nodes) {
-            map.remove(node);
-        }
-        // Delete the invalid edges to avoid "NullPointerException"
-        Iterator<Map.Entry<U, NeighborList>> iterator_1 =
-                map.entrySet().iterator();
-        while (iterator_1.hasNext()) {
-            Map.Entry<U, NeighborList> entry = iterator_1.next();
-            NeighborList neighborlist = entry.getValue();
-
-            // Delete reference to deleted node
-            // => for() can't be used
-            // (see http://stackoverflow.com/questions/223918/)
-            Iterator<Neighbor> iterator_2 = neighborlist.iterator();
-            while (iterator_2.hasNext()) {
-                Neighbor<U> neighbor = iterator_2.next();
-                if (nodes.contains(neighbor.node)) {
-                    iterator_2.remove();
-                }
-            }
-        }
+        m.setFilteredWhiteListed(filtered_new);
     }
 
     /**
      * Print of the ranking list.
-     * @param filtered
-     * @param domains_total
-     * @param ranking_weights
-     * @param apt_search
      */
-    private void showRanking(final LinkedList<Graph<Domain>> filtered,
-            final int domains_total, final double[] ranking_weights,
-            final boolean apt_search) {
+    private void showRanking() {
         //System.out.println("Stage 1");
         // Creation of a big graph with the result
         Graph<Domain> graph_all = new Graph<Domain>(Integer.MAX_VALUE);
-        for (Graph<Domain> graph : filtered) {
+        for (Graph<Domain> graph : m.getFilteredWhiteListed()) {
             for (Domain dom : graph.getNodes()) {
                 if (!graph_all.containsKey(dom)) {
                     graph_all.put(dom, graph.getNeighbors(dom));
@@ -1070,8 +845,7 @@ public class RequestHandler {
         for (Domain dom : graph_all.getNodes()) {
             list_domain.add(dom);
         }
-        stdout = stdout.concat("<br>Number of domains shown: "
-                + list_domain.size());
+        m.concatStdout("<br>Number of domains shown: " + list_domain.size());
         //System.out.println("Stage 3");
         // Number of children
         HashMap<Domain, Integer> index_children =
@@ -1101,16 +875,16 @@ public class RequestHandler {
         HashMap<Domain, Double> index = new HashMap<Domain, Double>();
         for (Domain dom : graph_all.getNodes()) {
             index.put(dom,
-                    ranking_weights[0] * index_parents.get(dom)
-                    + ranking_weights[1] * index_children.get(dom)
-                    + ranking_weights[2] * index_requests.get(dom));
+                    m.getRankingWeights()[0] * index_parents.get(dom)
+                    + m.getRankingWeights()[1] * index_children.get(dom)
+                    + m.getRankingWeights()[2] * index_requests.get(dom));
         }
         //System.out.println("Stage 6");
         //Sort
-        ArrayList<Domain> sorted = sortByIndex(list_domain, index);
+        ArrayList<Domain> sorted = Utility.sortByIndex(list_domain, index);
         //System.out.println("Stage 7");
         // Print out
-        if (apt_search) {
+        if (m.getAptSearch()) {
             double top = 0.0;
             double rank = Double.MAX_VALUE;
             boolean founded = false;
@@ -1126,61 +900,31 @@ public class RequestHandler {
                 }
             }
             if (founded) {
-                stdout = stdout.concat("<br>TOP for APT.FINDME.be: "
-                       + Math.round(top / domains_total * 100 * 100)
-                               / 100.0 + "%");
+                m.concatStdout("<br>TOP for APT.FINDME.be: "
+                       + Math.round(top / m.getAllDomains()
+                       .get("all").values().size() * 100 * 100) / 100.0 + "%");
             } else {
-                stdout = stdout.concat("<br>TOP for APT.FINDME.be: NOT FOUND");
+                m.concatStdout("<br>TOP for APT.FINDME.be: NOT FOUND");
             }
         }
-        stdout = stdout.concat("<br>Ranking:");
+        m.concatStdout("<br>Ranking:");
         for (Domain dom : sorted) {
-            stdout = stdout.concat("<br>    ("
+            m.concatStdout("<br>    ("
                     + Math.round(index.get(dom) * 100) / 100.0 + ") " + dom);
         }
         //System.out.println("Stage 8");
     }
 
     /**
-     * Sorting function, based on the given index.
-     * @param list_domain
-     * @param index
-     * @return ArrayList<Domain> sorted list
-     */
-    private ArrayList<Domain> sortByIndex(final List<Domain> list_domain,
-            final HashMap<Domain, Double> index) {
-        Domain selected;
-        ArrayList<Domain> sorted = new ArrayList<Domain>();
-        while (!list_domain.isEmpty()) {
-            selected = list_domain.get(0);
-            for (Domain dom : list_domain) {
-                if (index.get(dom) < index.get(selected)) {
-                    selected = dom;
-                }
-            }
-            sorted.add(selected);
-            list_domain.remove(selected);
-        }
-
-        return sorted;
-    }
-
-    /**
      * Create the output variable.
-     * @param filtered
-     * @param hist_pruning
-     * @param hist_cluster
      * @return Output
      */
-    private Output createOutput(
-            final LinkedList<Graph<Domain>> filtered,
-            final HistData hist_pruning,
-            final HistData hist_cluster) {
+    private Output createOutput() {
         Output output = new Output();
-        output.setFiltered(filtered);
-        output.setStdout(stdout);
-        output.setHistPruning(hist_pruning);
-        output.setHistCluster(hist_cluster);
+        output.setFiltered(m.getFilteredWhiteListed());
+        output.setStdout(m.getStdout());
+        output.setHistPruning(m.getHistDataSimilarities());
+        output.setHistCluster(m.getHistDataClusters());
         return output;
     }
 }

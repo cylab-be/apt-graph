@@ -23,7 +23,16 @@
  */
 package aptgraph.server;
 
+import aptgraph.core.Domain;
+import info.debatty.java.graphs.Graph;
+import info.debatty.java.graphs.Neighbor;
+import info.debatty.java.graphs.NeighborList;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -49,19 +58,16 @@ public final class Utility {
     /**
      * Compute the mean and variance of an ArrayList<Double>.
      * @param list
-     * @return ArrayList<Double> mean_variance
+     * @return double[] mean_variance
      */
-    public static ArrayList<Double> getMeanVariance(
+    public static double[] getMeanVariance(
             final ArrayList<Double> list) {
         double mean = getMean(list);
         double sum = 0.0;
         for (double i :list) {
             sum += (i - mean) * (i - mean);
         }
-        ArrayList<Double> out = new ArrayList<Double>(2);
-        out.add(mean);
-        out.add(sum / list.size());
-        return out;
+        return new double[] {mean, sum / list.size()};
     }
 
     /**
@@ -104,5 +110,99 @@ public final class Utility {
         max_min.add(max);
         max_min.add(min);
         return max_min;
+    }
+
+    /**
+     * Compute the absolute prune threshold based on z score.
+     * @param mean
+     * @param variance
+     * @param z_prune_threshold
+     * @return prune_threshold
+     */
+    public static double computePruneThreshold(final double mean,
+            final double variance,
+            final Double z_prune_threshold) {
+        double prune_threshold
+                = Utility.fromZ(mean, variance, z_prune_threshold);
+        if (prune_threshold < 0) {
+            prune_threshold = 0;
+        }
+        return prune_threshold;
+    }
+
+    /**
+     * Compute the absolute maximum cluster size based on z score.
+     * @param mean
+     * @param variance
+     * @param z_max_cluster_size
+     * @return max_cluster_size
+     */
+    public static double computeClusterSize(final double mean,
+            final double variance,
+            final Double z_max_cluster_size) {
+        double max_cluster_size_temp = Utility.fromZ(mean, variance,
+                z_max_cluster_size);
+        int max_cluster_size = (int) Math.round(max_cluster_size_temp);
+        if (max_cluster_size < 0) {
+            max_cluster_size = 0;
+        }
+        return max_cluster_size;
+    }
+
+        /**
+     * Remove a list of nodes from a given graph (and update graph).
+     * @param <U>
+     * @param graph
+     * @param node
+     */
+    static <U> void remove(final Graph<U> graph, final LinkedList<U> nodes) {
+        HashMap<U, NeighborList> map = graph.getHashMap();
+
+        // Delete the node
+        for (U node : nodes) {
+            map.remove(node);
+        }
+        // Delete the invalid edges to avoid "NullPointerException"
+        Iterator<Map.Entry<U, NeighborList>> iterator_1 =
+                map.entrySet().iterator();
+        while (iterator_1.hasNext()) {
+            Map.Entry<U, NeighborList> entry = iterator_1.next();
+            NeighborList neighborlist = entry.getValue();
+
+            // Delete reference to deleted node
+            // => for() can't be used
+            // (see http://stackoverflow.com/questions/223918/)
+            Iterator<Neighbor> iterator_2 = neighborlist.iterator();
+            while (iterator_2.hasNext()) {
+                Neighbor<U> neighbor = iterator_2.next();
+                if (nodes.contains(neighbor.node)) {
+                    iterator_2.remove();
+                }
+            }
+        }
+    }
+
+        /**
+     * Sorting function, based on the given index.
+     * @param list_domain
+     * @param index
+     * @return ArrayList<Domain> sorted list
+     */
+    public static ArrayList<Domain> sortByIndex(final List<Domain> list_domain,
+            final HashMap<Domain, Double> index) {
+        Domain selected;
+        ArrayList<Domain> sorted = new ArrayList<Domain>();
+        while (!list_domain.isEmpty()) {
+            selected = list_domain.get(0);
+            for (Domain dom : list_domain) {
+                if (index.get(dom) < index.get(selected)) {
+                    selected = dom;
+                }
+            }
+            sorted.add(selected);
+            list_domain.remove(selected);
+        }
+
+        return sorted;
     }
 }
