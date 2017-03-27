@@ -30,6 +30,7 @@ import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,8 +96,9 @@ public class RequestHandlerTest extends TestCase {
         System.out.println("\nIntegrity : all_domains");
 
         // Creation of the data
+        Path input_dir = Paths.get("src/test/resources/dummyDir");
         RequestHandler handler =
-                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+                new RequestHandler(input_dir);
         handler.getUsers();
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
@@ -108,7 +110,8 @@ public class RequestHandlerTest extends TestCase {
 
         // Test
         for (String user : users) {
-            LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+            LinkedList<Graph<Domain>> graphs = FileManager.getUserGraphs(
+                    input_dir, user);
             for (Graph<Domain> graph : graphs) {
                 for (Domain dom : graph.getNodes()) {
                     assertTrue(all_domains.get("byUsers")
@@ -133,8 +136,9 @@ public class RequestHandlerTest extends TestCase {
         System.out.println("\nIntegrity : fusion of features");
 
         // Creation of the data
+        Path input_dir = Paths.get("src/test/resources/dummyDir");
         RequestHandler handler =
-                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+                new RequestHandler(input_dir);
         handler.getUsers();
         ArrayList<String> users = handler.getAllUsersListStore();
         for (String user : users) {
@@ -143,7 +147,8 @@ public class RequestHandlerTest extends TestCase {
             all_domains.put("byUsers", new HashMap<String, Domain>());
             all_domains.put("all", new HashMap<String, Domain>());
 
-            LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+            LinkedList<Graph<Domain>> graphs = FileManager.getUserGraphs(
+                    input_dir, user);
             for (Domain dom : graphs.getFirst().getNodes()) {
                 all_domains.get("byUsers")
                         .put(user + ":" + dom.getName(), dom);
@@ -394,7 +399,8 @@ public class RequestHandlerTest extends TestCase {
 
         // Test both method to prune
         ArrayList<Double> similarities = handler.listSimilarities(merged_graph_2);
-        ArrayList<Double> mean_var_prune = handler.getMeanVariance(similarities);
+        ArrayList<Double> mean_var_prune
+                = Utility.getMeanVariance(similarities);
         handler.setMeanVarPruneStore(mean_var_prune);
         double prune_threshold = mean_var_prune.get(0);
         handler.doPruning(merged_graph_1, (long) 0, false, 0.4);
@@ -541,7 +547,7 @@ public class RequestHandlerTest extends TestCase {
         }
         // Method 2
         ArrayList<Double> cluster_sizes = handler.listClusterSizes(clusters);
-        ArrayList<Double> mean_var_cluster = handler
+        ArrayList<Double> mean_var_cluster = Utility
                 .getMeanVariance(cluster_sizes);
         handler.setMeanVarClusterStore(mean_var_cluster);
         double mean_cluster = mean_var_cluster.get(0);
@@ -677,11 +683,13 @@ public class RequestHandlerTest extends TestCase {
         System.out.println("\nFusion : test weights");
 
         // Creation of the data
+        Path input_dir = Paths.get("src/test/resources/dummyDir");
         RequestHandler handler =
-                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+                new RequestHandler(input_dir);
         handler.getUsers();
         String user = handler.getAllUsersListStore().get(0);
-        LinkedList<Graph<Domain>> graphs = handler.getUserGraphs(user);
+        LinkedList<Graph<Domain>> graphs = FileManager.getUserGraphs(
+                input_dir, user);
         HashMap<String, HashMap<String, Domain>> all_domains
                 = new HashMap<String, HashMap<String, Domain>>();
         all_domains.put("byUsers", new HashMap<String, Domain>());

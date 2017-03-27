@@ -148,7 +148,9 @@ public class RequestHandler {
      * @return
      */
     public final List<Graph<Domain>> dummy() {
-        Graph<Domain> graph = getUserGraphs("219.253.194.242").getFirst();
+        String user = "219.253.194.242";
+        Graph<Domain> graph = FileManager.getUserGraphs(
+                input_dir, user).getFirst();
 
         // Feature Fusion
 
@@ -270,7 +272,7 @@ public class RequestHandler {
         // Create the list of users used to produce final graph
         if (stages[0]) {
             user_store = user;
-            k_store = getK();
+            k_store = FileManager.getK(input_dir);
 
             if (user.equals("0.0.0.0")) {
                 users_list_store = all_users_list_store;
@@ -332,7 +334,8 @@ public class RequestHandler {
 
             ArrayList<Double> similarities
                     = listSimilarities(merged_graph_store);
-            ArrayList<Double> mean_var_prune = getMeanVariance(similarities);
+            ArrayList<Double> mean_var_prune
+                    = Utility.getMeanVariance(similarities);
             mean_var_prune_store = mean_var_prune;
 
             HistData hist_pruning = computeHistData(similarities,
@@ -386,7 +389,8 @@ public class RequestHandler {
             }
 
             ArrayList<Double> cluster_sizes = listClusterSizes(clusters);
-            ArrayList<Double> mean_var_cluster = getMeanVariance(cluster_sizes);
+            ArrayList<Double> mean_var_cluster
+                    = Utility.getMeanVariance(cluster_sizes);
             mean_var_cluster_store = mean_var_cluster;
 
             HistData hist_cluster = computeHistData(cluster_sizes,
@@ -600,54 +604,6 @@ public class RequestHandler {
     }
 
     /**
-     * Load the list of graphs for a given user.
-     * @param user
-     * @return List of graphs
-     */
-    final LinkedList<Graph<Domain>> getUserGraphs(final String user) {
-        LinkedList<Graph<Domain>> user_graphs =
-                new LinkedList<Graph<Domain>>();
-        LOGGER.log(Level.INFO, "Reading graphs of user {0} from disk...", user);
-        try {
-            File file = new File(input_dir.toString(), user + ".ser");
-            FileInputStream input_stream =
-                    new FileInputStream(file.toString());
-            ObjectInputStream input = new ObjectInputStream(
-                    new BufferedInputStream(input_stream));
-            user_graphs = (LinkedList<Graph<Domain>>) input.readObject();
-            input.close();
-        } catch (IOException ex) {
-                System.err.println(ex);
-        } catch (ClassNotFoundException ex) {
-                System.err.println(ex);
-        }
-
-        return user_graphs;
-    }
-
-    /**
-     * Load the value of k used for k-NN Graphs.
-     * @return List of graphs
-     */
-    final int getK() {
-        int k = 0;
-        LOGGER.log(Level.INFO, "Reading k value from disk...");
-        try {
-            File file = new File(input_dir.toString(), "k.ser");
-            FileInputStream input_stream =
-                    new FileInputStream(file.toString());
-            ObjectInputStream input = new ObjectInputStream(
-                    new BufferedInputStream(input_stream));
-            k = (int) input.readInt();
-            input.close();
-        } catch (IOException ex) {
-                System.err.println(ex);
-        }
-
-        return k;
-    }
-
-    /**
      * Load the graphs needed.
      * @param users_graphs
      * @param start_time
@@ -667,7 +623,8 @@ public class RequestHandler {
         // (key = domain)
 
         for (String user_temp : users_list_store) {
-            LinkedList<Graph<Domain>> graphs_temp = getUserGraphs(user_temp);
+            LinkedList<Graph<Domain>> graphs_temp = FileManager.getUserGraphs(
+                    input_dir, user_temp);
 
             // List all domains
             for (Domain dom : graphs_temp.getFirst().getNodes()) {
@@ -876,12 +833,12 @@ public class RequestHandler {
         // Transform list in z score if needed
         if (z_bool) {
             for (int i = 0; i <= list.size() - 1; i++) {
-                list_func.add(i, getZ(mean, variance, list.get(i)));
+                list_func.add(i, Utility.getZ(mean, variance, list.get(i)));
             }
         } else {
             list_func = list;
         }
-        ArrayList<Double> max_min = getMaxMin(list_func);
+        ArrayList<Double> max_min = Utility.getMaxMin(list_func);
         double max = max_min.get(0);
         double min = max_min.get(1);
         double step;
@@ -925,7 +882,8 @@ public class RequestHandler {
     final double computePruneThreshold(final double mean,
             final double variance,
             final Double z_prune_threshold) {
-        double prune_threshold = fromZ(mean, variance, z_prune_threshold);
+        double prune_threshold
+                = Utility.fromZ(mean, variance, z_prune_threshold);
         if (prune_threshold < 0) {
             prune_threshold = 0;
         }
@@ -990,7 +948,7 @@ public class RequestHandler {
      */
     private double computeClusterSize(final double mean, final double variance,
             final Double z_max_cluster_size) {
-        double max_cluster_size_temp = fromZ(mean, variance,
+        double max_cluster_size_temp = Utility.fromZ(mean, variance,
                 z_max_cluster_size);
         int max_cluster_size = (int) Math.round(max_cluster_size_temp);
         if (max_cluster_size < 0) {
@@ -1224,75 +1182,5 @@ public class RequestHandler {
         output.setHistPruning(hist_pruning);
         output.setHistCluster(hist_cluster);
         return output;
-    }
-
-    /**
-     * Compute the mean of an ArrayList<Double>.
-     * @param list
-     * @return mean
-     */
-    private double getMean(final ArrayList<Double> list) {
-            double sum = 0.0;
-            for (double i : list) {
-                sum += i;
-            }
-            return sum / list.size();
-    }
-
-    /**
-     * Compute the mean and variance of an ArrayList<Double>.
-     * @param list
-     * @return ArrayList<Double> mean_variance
-     */
-    final ArrayList<Double> getMeanVariance(final ArrayList<Double> list) {
-        double mean = getMean(list);
-        double sum = 0.0;
-        for (double i :list) {
-            sum += (i - mean) * (i - mean);
-        }
-        ArrayList<Double> out = new ArrayList<Double>(2);
-        out.add(mean);
-        out.add(sum / list.size());
-        return out;
-    }
-
-    /**
-     * Compute the z score of a value.
-     * @param list
-     * @param value
-     * @return z
-     */
-    private double getZ(final double mean, final double variance,
-            final Double value) {
-        return (value - mean) / Math.sqrt(variance);
-    }
-
-    /**
-     * Compute the absolute value from the z score.
-     * @param list
-     * @param z
-     * @return absolute value
-     */
-    private double fromZ(final double mean, final double variance,
-            final Double z) {
-        return mean + z * Math.sqrt(variance);
-    }
-
-    /**
-     * Compute maximum and minimum of an ArrayList.
-     * @param list
-     * @return ArrayList<Double> max_min
-     */
-    private ArrayList<Double> getMaxMin(final ArrayList<Double> list) {
-        Double max = 0.0;
-        Double min = Double.MAX_VALUE;
-        for (Double d : list) {
-            max = Math.max(d, max);
-            min = Math.min(d, min);
-        }
-        ArrayList<Double> max_min = new ArrayList<Double>(2);
-        max_min.add(max);
-        max_min.add(min);
-        return max_min;
     }
 }
