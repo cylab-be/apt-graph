@@ -272,12 +272,11 @@ public class RequestHandler {
             user_store = user;
             k_store = getK();
 
-            Subnet sn = new Subnet();
             if (user.equals("0.0.0.0")) {
                 users_list_store = all_users_list_store;
-            } else if (sn.isSubnet(user)) {
+            } else if (Subnet.isSubnet(user)) {
                users_list_store =
-                       sn.getUsersInSubnet(user, all_users_list_store);
+                       Subnet.getUsersInSubnet(user, all_users_list_store);
             } else {
                 if (!users_list_store.isEmpty()) {
                     users_list_store.clear();

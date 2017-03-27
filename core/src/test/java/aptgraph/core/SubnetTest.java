@@ -65,28 +65,27 @@ public class SubnetTest extends TestCase {
         }
 
         // Test isSubnet
-        Subnet subnet = new Subnet();
-        assertTrue(subnet.isSubnet("192.168.1.0"));
-        assertTrue(subnet.isSubnet("192.0.1.0"));
-        assertTrue(subnet.isSubnet("192.168.0.0"));
-        assertTrue(subnet.isSubnet("192.0.0.0"));
-        assertFalse(subnet.isSubnet("192.168.1.1"));
-        assertFalse(subnet.isSubnet("192.0.1.1"));
-        assertFalse(subnet.isSubnet("192.0.0.1"));
-        assertFalse(subnet.isSubnet("0.0.0.1"));
+        assertTrue(Subnet.isSubnet("192.168.1.0"));
+        assertTrue(Subnet.isSubnet("192.0.1.0"));
+        assertTrue(Subnet.isSubnet("192.168.0.0"));
+        assertTrue(Subnet.isSubnet("192.0.0.0"));
+        assertFalse(Subnet.isSubnet("192.168.1.1"));
+        assertFalse(Subnet.isSubnet("192.0.1.1"));
+        assertFalse(Subnet.isSubnet("192.0.0.1"));
+        assertFalse(Subnet.isSubnet("0.0.0.1"));
 
         // Test getSubnet
-        assertEquals(subnet.getSubnet("192.168.1.0"), "192.168.1.");
-        assertEquals(subnet.getSubnet("192.0.1.0"), "192.0.1.");
-        assertEquals(subnet.getSubnet("0.0.1.0"), "0.0.1.");
-        assertEquals(subnet.getSubnet("192.168.0.0"), "192.168.");
-        assertEquals(subnet.getSubnet("0.168.0.0"), "0.168.");
-        assertEquals(subnet.getSubnet("192.0.0.0"), "192.");
+        assertEquals(Subnet.getSubnet("192.168.1.0"), "192.168.1.");
+        assertEquals(Subnet.getSubnet("192.0.1.0"), "192.0.1.");
+        assertEquals(Subnet.getSubnet("0.0.1.0"), "0.0.1.");
+        assertEquals(Subnet.getSubnet("192.168.0.0"), "192.168.");
+        assertEquals(Subnet.getSubnet("0.168.0.0"), "0.168.");
+        assertEquals(Subnet.getSubnet("192.0.0.0"), "192.");
 
         // Test getUsersSubnet
         String input_1 = "198.0.0.0";
-        String sn = subnet.getSubnet(input_1);
-        ArrayList<String> users_subnet = subnet.getUsersInSubnet(input_1, users);
+        String sn = Subnet.getSubnet(input_1);
+        ArrayList<String> users_subnet = Subnet.getUsersInSubnet(input_1, users);
         for (String user : users) {
             if (user.startsWith(sn)) {
                 assertTrue(users_subnet.contains(user));
@@ -97,7 +96,7 @@ public class SubnetTest extends TestCase {
         ArrayList<String> input = new ArrayList<String>();
         input.add("192.169.1.2");
         input.add("192.168.2.1");
-        ArrayList<String> subnet_list = subnet.getAllSubnets(input);
+        ArrayList<String> subnet_list = Subnet.getAllSubnets(input);
         // System.out.println("subnet_list = " + subnet_list);
         ArrayList<String> subnet_list_expected = new ArrayList<String>();
         subnet_list_expected.add("0.0.0.0");

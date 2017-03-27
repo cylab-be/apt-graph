@@ -336,10 +336,9 @@ public class RequestHandlerTest extends TestCase {
         // Creation of the data
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
-        Subnet sn = new Subnet();
         ArrayList<String> users = handler.getAllUsersListStore();
         handler.setUsersListStore(handler.getAllUsersListStore());
-        handler.setUsersListStore(sn.getUsersInSubnet("0.0.0.0", users));
+        handler.setUsersListStore(Subnet.getUsersInSubnet("0.0.0.0", users));
         HashMap<String, LinkedList<Graph<Domain>>> users_graphs
                 = new HashMap<String, LinkedList<Graph<Domain>>>();
         HashMap<String, HashMap<String, Domain>> all_domains

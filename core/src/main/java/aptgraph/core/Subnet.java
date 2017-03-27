@@ -29,8 +29,11 @@ import java.util.ArrayList;
  *
  * @author Thomas Gilon
  */
-public class Subnet {
+public final class Subnet {
     // This is only compatible with IPv4
+
+    private Subnet() {
+    }
 
     /**
      * Give the list of users in a specific subnet.
@@ -38,7 +41,7 @@ public class Subnet {
      * @param all_users
      * @return users_subnet
      */
-    public final ArrayList<String> getUsersInSubnet(
+    public static ArrayList<String> getUsersInSubnet(
             final String input, final ArrayList<String> all_users) {
         ArrayList<String> users_subnet = new ArrayList<String>();
         String subnet = getSubnet(input);
@@ -55,7 +58,7 @@ public class Subnet {
      * @param all_users
      * @return subnet_list
      */
-    public final ArrayList<String> getAllSubnets(
+    public static ArrayList<String> getAllSubnets(
             final ArrayList<String> all_users) {
         ArrayList<String> subnet_list = new ArrayList<String>();
         subnet_list.add("0.0.0.0");
@@ -86,7 +89,8 @@ public class Subnet {
      * @param ip_list
      * @return ArrayList<String>
      */
-    public final ArrayList<String> sortIPs(final ArrayList<String> ip_list) {
+    public static ArrayList<String> sortIPs(
+            final ArrayList<String> ip_list) {
         ArrayList<String> sorted_ip_list = new ArrayList<String>();
         ArrayList<String> ip_list_temp = new ArrayList<String>(ip_list);
         String selected;
@@ -135,7 +139,7 @@ public class Subnet {
      * @param input
      * @return subnet
      */
-    public final String getSubnet(final String input) {
+    public static String getSubnet(final String input) {
         String subnet = ".";
         String[] split = input.split("[.]");
         boolean found_end = false;
@@ -156,7 +160,7 @@ public class Subnet {
      * @param user
      * @return boolean
      */
-    public final boolean isSubnet(final String user) {
+    public static boolean isSubnet(final String user) {
         boolean bool = false;
         for (String ip_split : user.split("[.]")) {
             if (ip_split.equals("0")) {

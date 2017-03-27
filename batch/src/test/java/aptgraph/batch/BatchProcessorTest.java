@@ -85,8 +85,7 @@ public class BatchProcessorTest extends TestCase {
                 new FileInputStream(temp_file_2));
         ArrayList<String> deserialized_user_list
                 = (ArrayList<String>) ois_2.readObject();
-        Subnet sn_1 = new Subnet();
-        assertEquals(sn_1.sortIPs(user_list), deserialized_user_list);
+        assertEquals(Subnet.sortIPs(user_list), deserialized_user_list);
 
         File temp_file_3 =
                 new File(temp_dir.toString(), "subnets.ser");
@@ -94,8 +93,7 @@ public class BatchProcessorTest extends TestCase {
                 new FileInputStream(temp_file_3));
         ArrayList<String> deserialized_subnet_list
                 = (ArrayList<String>) ois_3.readObject();
-        Subnet sn_2 = new Subnet();
-        assertEquals(sn_2.getAllSubnets(user_list), deserialized_subnet_list);
+        assertEquals(Subnet.getAllSubnets(user_list), deserialized_subnet_list);
 
         File temp_file_4 =
                 new File(temp_dir.toString(), "k.ser");

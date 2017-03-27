@@ -583,8 +583,7 @@ public class BatchProcessor {
                 new FileOutputStream(file.toString());
             ObjectOutputStream output = new ObjectOutputStream(
                     new BufferedOutputStream(output_stream));
-            Subnet sn = new Subnet();
-            output.writeObject(sn.sortIPs(user_list));
+            output.writeObject(Subnet.sortIPs(user_list));
             output.close();
         } catch (IOException ex) {
                 System.err.println(ex);
@@ -607,8 +606,7 @@ public class BatchProcessor {
                 new FileOutputStream(file.toString());
             ObjectOutputStream output = new ObjectOutputStream(
                     new BufferedOutputStream(output_stream));
-            Subnet sn = new Subnet();
-            ArrayList<String> subnet_list = sn.getAllSubnets(user_list);
+            ArrayList<String> subnet_list = Subnet.getAllSubnets(user_list);
             output.writeObject(subnet_list);
             output.close();
         } catch (IOException ex) {
