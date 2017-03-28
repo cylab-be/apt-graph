@@ -155,7 +155,6 @@ public class RequestHandler {
      * @param prune_threshold_temp
      * @param feature_weights
      * @param max_cluster_size_temp
-     * @param children_bool
      * @param prune_z_bool
      * @param cluster_z_bool
      * @param whitelist_bool
@@ -170,7 +169,6 @@ public class RequestHandler {
             final double[] feature_ordered_weights,
             final double prune_threshold_temp,
             final double max_cluster_size_temp,
-            final boolean children_bool,
             final boolean prune_z_bool,
             final boolean cluster_z_bool,
             final boolean whitelist_bool,
@@ -181,7 +179,7 @@ public class RequestHandler {
         long start_time = System.currentTimeMillis();
 
         // Update users list and subnets list if needed
-        if (m.getAllUsersList().isEmpty() || m.getAllSubnetsList().isEmpty()) {
+        if (m.getAllUsersList() == null || m.getAllSubnetsList() == null) {
             getUsers();
         }
 
@@ -255,7 +253,8 @@ public class RequestHandler {
             long estimated_time_4 = System.currentTimeMillis() - start_time;
             System.out.println("4: " + estimated_time_4
                 + " (Fusion of users done)");
-
+        }
+        if (stages[2]) {
             ArrayList<Double> similarities = listSimilarities();
             m.setMeanVarSimilarities(Utility.getMeanVariance(similarities));
 
@@ -277,7 +276,7 @@ public class RequestHandler {
         m.concatStdout("<br>Total number of domains: "
                         + m.getAllDomains().get("all").values().size());
 
-        if (stages[2]) {
+        if (stages[3]) {
             Graph<Domain> pruned_graph = new Graph<Domain>(m.getMergedGraph());
             // Prune
             pruned_graph = doPruning(pruned_graph, start_time);
@@ -296,12 +295,13 @@ public class RequestHandler {
             long estimated_time_7 = System.currentTimeMillis() - start_time;
             System.out.println("7: " + estimated_time_7
                     + " (Clustering done)");
+        }
 
             // The json-rpc request was probably canceled by the user
             if (Thread.currentThread().isInterrupted()) {
                 return null;
             }
-
+        if (stages[4]) {
             ArrayList<Double> cluster_sizes = listClusterSizes(m.getClusters());
             m.setMeanVarClusters(Utility.getMeanVariance(cluster_sizes));
 
@@ -317,7 +317,7 @@ public class RequestHandler {
             return null;
         }
 
-        if (stages[3]) {
+        if (stages[5]) {
             // Filtering
             doFiltering(start_time);
 
@@ -326,10 +326,12 @@ public class RequestHandler {
                     + " (Filtering done)");
         }
 
-        if (stages[4]) {
+        if (stages[6]) {
             // White listing
             if (m.getWhitelistBool()) {
                 whiteListing();
+            } else {
+                m.setFilteredWhiteListed(m.getFiltered());
             }
 
             long estimated_time_10 = System.currentTimeMillis() - start_time;
@@ -342,7 +344,7 @@ public class RequestHandler {
             return null;
         }
 
-        if (stages[5]) {
+        if (stages[7]) {
             // Ranking
             showRanking();
 
@@ -461,7 +463,7 @@ public class RequestHandler {
         final boolean apt_search) {
 
         // By default all stages have changed
-        boolean[] stages = {true, true, true, true, true, true};
+        boolean[] stages = {true, true, true, true, true, true, true, true};
 
         if (m.getUser().equals(user)) {
             stages[0] = false;
@@ -471,23 +473,31 @@ public class RequestHandler {
                             feature_ordered_weights)) {
                 stages[1] = false;
 
-                if (m.getPruningThresholdTemp() == prune_threshold_temp
-                        && m.getPruneZBool() == prune_z_bool) {
+                if (m.getPruneZBool() == prune_z_bool) {
                     stages[2] = false;
 
-                    if (m.getMaxClusterSizeTemp() == max_cluster_size_temp
-                            && m.getClusterZBool() == cluster_z_bool) {
+                    if (m.getPruningThresholdTemp() == prune_threshold_temp) {
                         stages[3] = false;
 
-                        if (m.getWhitelistBool() == whitelist_bool
-                                && m.getWhiteOngo() != null
-                                && m.getWhiteOngo().equals(white_ongo)) {
+                        if (m.getClusterZBool() == cluster_z_bool) {
                             stages[4] = false;
 
-                            if (Arrays.equals(m.getRankingWeights(),
-                                    ranking_weights)
-                                    && m.getAptSearch() == apt_search) {
+                            if (m.getMaxClusterSizeTemp()
+                                    == max_cluster_size_temp) {
                                 stages[5] = false;
+
+                                if (m.getWhitelistBool() == whitelist_bool
+                                        && m.getWhiteOngo() != null
+                                        && m.getWhiteOngo()
+                                                .equals(white_ongo)) {
+                                    stages[6] = false;
+
+                                    if (Arrays.equals(m.getRankingWeights(),
+                                            ranking_weights)
+                                            && m.getAptSearch() == apt_search) {
+                                        stages[7] = false;
+                                    }
+                                }
                             }
                         }
                     }
@@ -662,6 +672,7 @@ public class RequestHandler {
      * Compute distribution of a list.
      * @param list
      * @param int_bool
+     * @param mode (= prune OR cluster)
      * @return HashMap<Double, Integer>
      */
     private void computeHistData(
