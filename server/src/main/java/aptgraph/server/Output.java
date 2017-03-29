@@ -129,5 +129,40 @@ public class Output implements Serializable {
     public final String toString() {
         return name;
     }
+
+    /**
+     * Compare two outputs.
+     * @param obj
+     * @return boolean
+     */
+    @Override
+    public final boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Output output = (Output) obj;
+        if (this.filtered.equals(output.filtered)
+            && this.hist_cluster.equals(output.hist_cluster)
+            && this.hist_pruning.equals(output.hist_pruning)
+            && this.name.equals(output.name)
+            && this.stdout.equals(output.stdout)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public final int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + this.name.hashCode()
+                + this.filtered.hashCode()
+                + this.hist_cluster.hashCode()
+                + this.hist_pruning.hashCode()
+                + this.stdout.hashCode();
+        return hash;
+    }
 }
 
