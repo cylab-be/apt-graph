@@ -265,7 +265,7 @@ public class RequestHandler {
             ArrayList<Double> similarities = listSimilarities();
             m.setMeanVarSimilarities(Utility.getMeanVariance(similarities));
 
-            computeHistData(similarities, false, "prune");
+            computeHistData(similarities, "prune");
 
             long estimated_time_5 = System.currentTimeMillis() - start_time;
             System.out.println("5: " + estimated_time_5
@@ -316,7 +316,7 @@ public class RequestHandler {
             ArrayList<Double> cluster_sizes = listClusterSizes(m.getClusters());
             m.setMeanVarClusters(Utility.getMeanVariance(cluster_sizes));
 
-            computeHistData(cluster_sizes, true, "cluster");
+            computeHistData(cluster_sizes, "cluster");
 
             long estimated_time_8 = System.currentTimeMillis() - start_time;
             System.out.println("8: " + estimated_time_8
@@ -696,13 +696,11 @@ public class RequestHandler {
     /**
      * Compute distribution of a list.
      * @param list
-     * @param int_bool
      * @param mode (= prune OR cluster)
      * @return HashMap<Double, Integer>
      */
     private void computeHistData(
             final ArrayList<Double> list,
-            final boolean int_bool,
             final String mode) {
         boolean z_bool;
         double mean;
@@ -731,7 +729,7 @@ public class RequestHandler {
         double max = max_min.get(0);
         double min = max_min.get(1);
         double step;
-        if (int_bool) {
+        if (mode.equals("cluster")) {
             max = Math.round(max);
             min = Math.round(min);
             step = 1.0;
@@ -745,7 +743,6 @@ public class RequestHandler {
         for (Double i = min; i <= max + step; i += step) {
             hist_data.put(i, 0.0);
         }
-        int total_links = list_func.size();
         for (Double d1 : list_func) {
             Double diff = Double.MAX_VALUE;
             Double bin = hist_data.keySet().iterator().next();
@@ -755,7 +752,8 @@ public class RequestHandler {
                     bin = d2;
                 }
             }
-            hist_data.put(bin, hist_data.get(bin) + 1.0 / total_links * 100);
+            hist_data.put(bin, hist_data.get(bin)
+                    + 1.0 / list_func.size() * 100);
         }
         // there ara actually (bins + 2) bins (to include max in the histogram)
         if (mode.equals("prune")) {
@@ -827,11 +825,11 @@ public class RequestHandler {
      * @return
      */
     final void whiteListing() {
-        LinkedList<Graph<Domain>> filtered_new
+        LinkedList<Graph<Domain>> filtered_whitelisted
                 = new LinkedList<Graph<Domain>>();
         // Deep clone
         for (Graph<Domain> graph : m.getFiltered()) {
-            filtered_new.add(new Graph<Domain>(graph));
+            filtered_whitelisted.add(new Graph<Domain>(graph));
         }
 
         List<String> whitelist = new ArrayList<String>();
@@ -846,7 +844,7 @@ public class RequestHandler {
                     .log(Level.SEVERE, null, ex);
         }
 
-        Iterator<Graph<Domain>> iterator_1 = filtered_new.iterator();
+        Iterator<Graph<Domain>> iterator_1 = filtered_whitelisted.iterator();
         while (iterator_1.hasNext()) {
             Graph<Domain> domain_graph = iterator_1.next();
             Iterator<Domain> iterator_2 = domain_graph.getNodes().iterator();
@@ -862,7 +860,7 @@ public class RequestHandler {
         }
 
         m.setWhitelisted(whitelisted);
-        m.setFilteredWhiteListed(filtered_new);
+        m.setFilteredWhiteListed(filtered_whitelisted);
     }
 
     /**

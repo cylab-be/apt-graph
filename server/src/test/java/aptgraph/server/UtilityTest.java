@@ -25,6 +25,8 @@ package aptgraph.server;
 
 import aptgraph.core.Domain;
 import info.debatty.java.graphs.Graph;
+import info.debatty.java.graphs.Neighbor;
+import info.debatty.java.graphs.NeighborList;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,6 +72,12 @@ public class UtilityTest {
         nodes.add(first_node);
         Utility.remove(merged_graph, nodes);
         assertFalse(merged_graph.containsKey(first_node));
+        for (Domain dom : merged_graph.getNodes()) {
+            NeighborList nl = merged_graph.getNeighbors(dom);
+            for (Neighbor<Domain> nb : nl) {
+                assertFalse(nb.node.equals(first_node));
+            }
+        }
     }
     
 }

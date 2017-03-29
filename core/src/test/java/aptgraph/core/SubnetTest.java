@@ -82,7 +82,7 @@ public class SubnetTest extends TestCase {
         assertEquals(Subnet.getSubnet("0.168.0.0"), "0.168.");
         assertEquals(Subnet.getSubnet("192.0.0.0"), "192.");
 
-        // Test getUsersSubnet
+        // Test getUsersInSubnet
         String input_1 = "198.0.0.0";
         String sn = Subnet.getSubnet(input_1);
         ArrayList<String> users_subnet = Subnet.getUsersInSubnet(input_1, users);

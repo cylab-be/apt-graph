@@ -182,7 +182,7 @@ public final class Utility {
         }
     }
 
-        /**
+    /**
      * Sorting function, based on the given index.
      * @param list_domain
      * @param index

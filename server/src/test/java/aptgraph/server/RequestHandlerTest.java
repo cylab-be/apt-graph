@@ -112,6 +112,8 @@ public class RequestHandlerTest extends TestCase {
                     for (Request req : dom) {
                         assertTrue(all_domains.get("all")
                                 .get(dom.getName()).contains(req));
+                        assertTrue(all_domains.get("byUsers")
+                                .get(user + ":" + dom.getName()).contains(req));
                     }
                 }
             }
@@ -188,14 +190,13 @@ public class RequestHandlerTest extends TestCase {
                     double similarity_temp = 0.0;
                     for (int i = 0; i < graphs.size(); i++) {
                         Graph<Domain> feature_graph = graphs.get(i);
-                        double feature_weight = weights[i];
                         for (Domain dom_21 : feature_graph.getNodes()) {
                             if (dom_21.equals(dom_11)) {
                                 NeighborList nl_dom_21 = feature_graph
                                         .getNeighbors(dom_21);
                                 for (Neighbor<Domain> dom_22 : nl_dom_21) {
                                     if (dom_22.node.equals(dom_12.node)) {
-                                        similarity_temp += feature_weight
+                                        similarity_temp += weights[i]
                                                 * dom_22.similarity;
                                     }
                                 }
@@ -230,13 +231,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionGraphs(graphs, handler.getMemory().getUser(),
                         new double[]{1.0, 0.0, 0.0}, new double[]{0.8, 0.2},
                         "byUsers");
-        for (Domain dom : merged_graph_time.getNodes()) {
-            assertTrue(time_graph.containsKey(dom));
-            NeighborList nb_list = time_graph.getNeighbors(dom);
-            for (Neighbor nb : merged_graph_time.getNeighbors(dom)) {
-                assertTrue(nb_list.contains(nb));   
-            }
-        }
+        assertEquals(time_graph, merged_graph_time);
 
         // Test domain weight
         Graph<Domain> domain_graph = graphs.get(1);
@@ -244,13 +239,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionGraphs(graphs, handler.getMemory().getUser(),
                         new double[]{0.0, 1.0, 0.0}, new double[]{0.8, 0.2},
                         "byUsers");
-        for (Domain dom : merged_graph_domain.getNodes()) {
-            assertTrue(domain_graph.containsKey(dom));
-            NeighborList nb_list = domain_graph.getNeighbors(dom);
-            for (Neighbor nb : merged_graph_domain.getNeighbors(dom)) {
-                assertTrue(nb_list.contains(nb));
-            }
-        }
+        assertEquals(domain_graph, merged_graph_domain);
 
         // Test URL weight (if activated)
         if (graphs.size() == 3) {
@@ -259,13 +248,7 @@ public class RequestHandlerTest extends TestCase {
                 handler.computeFusionGraphs(graphs, handler.getMemory().getUser(),
                         new double[]{0.0, 0.0, 1.0}, new double[]{0.8, 0.2},
                         "byUsers");
-            for (Domain dom : merged_graph_url.getNodes()) {
-                assertTrue(url_graph.containsKey(dom));
-                NeighborList nb_list = url_graph.getNeighbors(dom);
-                for (Neighbor nb : merged_graph_url.getNeighbors(dom)) {
-                    assertTrue(nb_list.contains(nb));
-                }
-            }
+            assertEquals(url_graph, merged_graph_url);
         }
     }
 
@@ -298,6 +281,8 @@ public class RequestHandlerTest extends TestCase {
                         users_weights, new double[] {0.0}, "all");
 
         // Test presence of all the domains and requests after users fusion
+        assertTrue(handler.getMemory().getAllDomains().get("all")
+                .values().size() == merged_graph.size());
         for (Domain dom_1 : handler.getMemory().getAllDomains().get("all").values()) {
             for (Domain dom_2 : merged_graph.getNodes()) {
                 if (dom_1.getName().equals(dom_2.getName())) {
@@ -326,6 +311,9 @@ public class RequestHandlerTest extends TestCase {
                                         handler.getMemory().getAllDomains()
                                         .get("byUsers").get(user_temp + ":"
                                                 + nb_merged.node.getName())));
+                                assertTrue(nb_merged.node.equals(
+                                        handler.getMemory().getAllDomains()
+                                        .get("all").get(nb.node.getName())));
                             }
                         }
                     }
@@ -342,7 +330,6 @@ public class RequestHandlerTest extends TestCase {
                     Graph<Domain> user_graph = merged_graph_users.get(i);
                     String user_temp = user_graph.getNodes().iterator()
                                 .next().element().getClient();
-                    double feature_weight = users_weights[i];
                     for (Domain dom_21 : user_graph.getNodes()) {
                         if (dom_21.equals(handler.getMemory().getAllDomains()
                                 .get("byUsers").get(user_temp
@@ -354,7 +341,7 @@ public class RequestHandlerTest extends TestCase {
                                         .getAllDomains().get("byUsers")
                                         .get(user_temp + ":"
                                                 + dom_12.node.getName()))) {
-                                    similarity_temp += feature_weight
+                                    similarity_temp += users_weights[i]
                                             * dom_22.similarity;
                                 }
                             }
@@ -408,7 +395,6 @@ public class RequestHandlerTest extends TestCase {
         handler.getMemory().setFeatureOrderedWeights(new double[]{0.0, 0.0});
         LinkedList<Graph<Domain>> merged_graph_users
                     = handler.computeUsersGraph();
-
         double[] users_weights = new double[merged_graph_users.size()];
         for (int i = 0; i < merged_graph_users.size(); i++) {
             users_weights[i] = 1.0 / merged_graph_users.size();
@@ -423,7 +409,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Test both method to prune
         handler.getMemory().setMeanVarSimilarities(Utility.getMeanVariance(similarities));
-        double prune_threshold = 0.4;
+        double prune_threshold = 0.01;
         handler.getMemory().setPruningThresholdTemp(prune_threshold);
         handler.getMemory().setPruneZBool(false);
         merged_graph_1 = handler.doPruning(merged_graph_1, (long) 0);
@@ -438,12 +424,17 @@ public class RequestHandlerTest extends TestCase {
         // System.out.println("Before pruning = " + merged_graph.getNodes());
         // System.out.println("After pruning (1) = " + merged_graph_1.getNodes());
         // System.out.println("After pruning (2) = " + merged_graph_2.getNodes());
-        for (Domain dom : handler.getMemory().getMergedGraph().getNodes()) {
-            assertTrue(merged_graph_1.containsKey(dom));
-            assertTrue(merged_graph_2.containsKey(dom));
-        }
+        for (Domain dom_1 : handler.getMemory().getMergedGraph().getNodes()) {
+            assertTrue(merged_graph_1.containsKey(dom_1));
+            assertTrue(merged_graph_2.containsKey(dom_1));
+            for (Domain dom_2 : merged_graph_1.getNodes()) {
+                if (dom_1.getName().equals(dom_2.getName())) {
+                    assertEquals(dom_1,dom_2);
+                }
+            }
+        }       
 
-        // Test similarities
+        // Test the lost of neighbors and the similarities
         for (Domain dom_11 : handler.getMemory().getMergedGraph().getNodes()) {
             NeighborList nl_dom_11 = handler.getMemory().getMergedGraph()
                     .getNeighbors(dom_11);
@@ -453,10 +444,17 @@ public class RequestHandlerTest extends TestCase {
                     if (dom_21.getName().equals(dom_11.getName())) {
                         NeighborList nl_dom_21 = merged_graph_1
                                 .getNeighbors(dom_21);
-                        if (dom_12.similarity > 0.4) {
-                            assertTrue(nl_dom_21.contains(dom_12));
+                        if (dom_12.similarity > prune_threshold) {
+                            assertTrue(nl_dom_21.containsNode(dom_12.node));
+                            for (Neighbor<Domain> dom_22 : nl_dom_21) {
+                                if (dom_12.node.getName().equals(dom_22.node.getName())) {
+                                    assertTrue(dom_12.similarity
+                                            == dom_22.similarity);
+                                    assertTrue(dom_12.equals(dom_22));
+                                }
+                            }
                         } else {
-                           assertFalse(nl_dom_21.contains(dom_12));
+                           assertFalse(nl_dom_21.containsNode(dom_12));
                         }
                     }
                 }
@@ -467,9 +465,16 @@ public class RequestHandlerTest extends TestCase {
                                 .getNeighbors(dom_21);
                         if (dom_12.similarity >
                                 handler.getMemory().getMeanVarSimilarities()[0]) {
-                            assertTrue(nl_dom_21.contains(dom_12));
+                            assertTrue(nl_dom_21.containsNode(dom_12.node));
+                            for (Neighbor<Domain> dom_22 : nl_dom_21) {
+                                if (dom_12.node.getName().equals(dom_22.node.getName())) {
+                                    assertTrue(dom_12.similarity
+                                            == dom_22.similarity);
+                                    assertTrue(dom_12.equals(dom_22));
+                                }
+                            }
                         } else {
-                           assertFalse(nl_dom_21.contains(dom_12));
+                           assertFalse(nl_dom_21.containsNode(dom_12));
                         }
                     }
                 }
@@ -508,20 +513,46 @@ public class RequestHandlerTest extends TestCase {
         merged_graph = handler.doPruning(merged_graph, (long) 0);
         ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
 
-        // Test
+        // Test presence of all domains
         // System.out.println("After prune = " + merged_graph.getNodes());
         // System.out.println("Clusters = " + clusters);
         boolean found_node;
-        for (Domain dom : merged_graph.getNodes()) {
+        for (Domain dom_1 : merged_graph.getNodes()) {
             found_node = false;
             for (Graph<Domain> graph : clusters) {
-                found_node = graph.containsKey(dom);
-                if (found_node) {
-                    break;
+                if (graph.containsKey(dom_1)) {
+                    for (Domain dom_2 : graph.getNodes()) {
+                        if (dom_1.equals(dom_2)) {
+                            found_node = true;
+                            break;
+                        }
+                    }
                 }
             }
-
             assertTrue(found_node);
+        }
+
+        // Test the lost of neighbors and similarities
+        for (Domain dom_11 : merged_graph.getNodes()) {
+            NeighborList nl_dom_11 = merged_graph.getNeighbors(dom_11);
+            for (Neighbor<Domain> dom_12 : nl_dom_11) {
+                for (Graph<Domain> graph : clusters) {
+                    for (Domain dom_21 : graph.getNodes()) {
+                        if (dom_11.getName().equals(dom_21.getName())) {
+                            NeighborList nl_dom_21 = graph.getNeighbors(dom_21);
+                            assertTrue(nl_dom_21.containsNode(dom_12.node));
+                            for (Neighbor<Domain> dom_22 : nl_dom_21) {
+                                if (dom_12.node.getName()
+                                        .equals(dom_22.node.getName())) {
+                                    assertTrue(dom_12.equals(dom_22));
+                                    assertTrue(dom_12.similarity
+                                            == dom_22.similarity);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -557,8 +588,17 @@ public class RequestHandlerTest extends TestCase {
         handler.getMemory().setMaxClusterSizeTemp(10);
         handler.getMemory().setClusterZBool(false);
         handler.doFiltering(System.currentTimeMillis());
-        for (Graph<Domain> graph : handler.getMemory().getFiltered()) {
-            assertTrue(graph.size() <= 10);
+        for (Graph<Domain> graph_1 : handler.getMemory().getClusters()) {
+            if (graph_1.size() < 10) {
+                boolean found_graph = false;
+                for (Graph<Domain> graph_2 : handler.getMemory().getFiltered()) {
+                    if (graph_1.equals(graph_2)) {
+                        found_graph = true;
+                        break;
+                    }
+                }
+                assertTrue(found_graph);
+            }
         }
         // Method 2
         handler.getMemory().setMaxClusterSizeTemp(0);
@@ -568,8 +608,17 @@ public class RequestHandlerTest extends TestCase {
         handler.getMemory().setMeanVarClusters(Utility.getMeanVariance(cluster_sizes));
         handler.getMemory().setStdout("");
         handler.doFiltering(System.currentTimeMillis());
-        for (Graph<Domain> graph : handler.getMemory().getFiltered()) {
-            assertTrue(graph.size() <= handler.getMemory().getMeanVarClusters()[0]);
+        for (Graph<Domain> graph_1 : handler.getMemory().getClusters()) {
+            if (graph_1.size() < handler.getMemory().getMeanVarClusters()[0]) {
+                boolean found_graph = false;
+                for (Graph<Domain> graph_2 : handler.getMemory().getFiltered()) {
+                    if (graph_1.equals(graph_2)) {
+                        found_graph = true;
+                        break;
+                    }
+                }
+                assertTrue(found_graph);
+            }
         }
     }
 
@@ -634,8 +683,26 @@ public class RequestHandlerTest extends TestCase {
         Graph<Domain> domain_graph_new_2
                 = handler.getMemory().getFilteredWhiteListed().getFirst();
         assertFalse(domain_graph_new_2.containsKey(domain_node_1));
+        for (Domain dom : domain_graph_new_2.getNodes()) {
+            NeighborList nl = domain_graph_new_2.getNeighbors(dom);
+            for (Neighbor<Domain> nb : nl) {
+                assertFalse(nb.node.equals(domain_node_1));
+            }
+        }
         assertFalse(domain_graph_new_2.containsKey(domain_node_2));
+        for (Domain dom : domain_graph_new_2.getNodes()) {
+            NeighborList nl = domain_graph_new_2.getNeighbors(dom);
+            for (Neighbor<Domain> nb : nl) {
+                assertFalse(nb.node.equals(domain_node_2));
+            }
+        }
         assertFalse(domain_graph_new_2.containsKey(domain_node_3));
+        for (Domain dom : domain_graph_new_2.getNodes()) {
+            NeighborList nl = domain_graph_new_2.getNeighbors(dom);
+            for (Neighbor<Domain> nb : nl) {
+                assertFalse(nb.node.equals(domain_node_3));
+            }
+        }
     }
 
     public void testStages() throws IOException, ClassNotFoundException {
@@ -800,7 +867,7 @@ public class RequestHandlerTest extends TestCase {
         Output out_31 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
                 new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
-                new double[]{0.5, 0.5, 0.0}, true);
+                new double[]{0.45, 0.45, 0.1}, false);
         assertFalse(out_30.equals(out_31));
         Output out_32 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
