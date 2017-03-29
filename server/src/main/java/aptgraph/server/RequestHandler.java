@@ -233,6 +233,13 @@ public class RequestHandler {
                 return null;
             }
         }
+
+        m.setStdout("<pre>Number of users selected: "
+                + m.getUsersList().size());
+        m.concatStdout("<br>k-NN Graph: k: " + m.getCurrentK());
+        m.concatStdout("<br>Total number of domains: "
+                        + m.getAllDomains().get("all").values().size());
+
         if (stages[1]) {
             // Compute each user graph
             LinkedList<Graph<Domain>> merged_graph_users
@@ -270,12 +277,6 @@ public class RequestHandler {
             return null;
         }
 
-        m.setStdout("<pre>Number of users selected: "
-                + m.getUsersList().size());
-        m.concatStdout("<br>k-NN Graph: k: " + m.getCurrentK());
-        m.concatStdout("<br>Total number of domains: "
-                        + m.getAllDomains().get("all").values().size());
-
         if (stages[3]) {
             Graph<Domain> pruned_graph = new Graph<Domain>(m.getMergedGraph());
             // Prune
@@ -297,10 +298,20 @@ public class RequestHandler {
                     + " (Clustering done)");
         }
 
-            // The json-rpc request was probably canceled by the user
-            if (Thread.currentThread().isInterrupted()) {
-                return null;
-            }
+        // The json-rpc request was probably canceled by the user
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
+
+        if (m.getPruneZBool()) {
+            m.concatStdout("<br>Prune Threshold : ");
+            m.concatStdout("<br>    Mean = " + m.getMeanVarSimilarities()[0]);
+            m.concatStdout("<br>    Variance = "
+                    + m.getMeanVarSimilarities()[1]);
+            m.concatStdout("<br>    Prune Threshold = "
+                    + m.getPruningThreshold());
+        }
+
         if (stages[4]) {
             ArrayList<Double> cluster_sizes = listClusterSizes(m.getClusters());
             m.setMeanVarClusters(Utility.getMeanVariance(cluster_sizes));
@@ -326,6 +337,14 @@ public class RequestHandler {
                     + " (Filtering done)");
         }
 
+        if (m.getClusterZBool()) {
+            m.concatStdout("<br>Cluster Size : ");
+            m.concatStdout("<br>    Mean = " + m.getMeanVarClusters()[0]);
+            m.concatStdout("<br>    Variance = " + m.getMeanVarClusters()[1]);
+            m.concatStdout("<br>    Max Cluster Size = "
+                    + m.getMaxClusterSize());
+        }
+
         if (stages[6]) {
             // White listing
             if (m.getWhitelistBool()) {
@@ -337,6 +356,11 @@ public class RequestHandler {
             long estimated_time_10 = System.currentTimeMillis() - start_time;
             System.out.println("10: " + estimated_time_10
                     + " (White listing done)");
+        }
+
+        if (m.getWhitelistBool()) {
+            m.concatStdout("<br>Number of white listed domains: "
+                    + m.getWhitelisted().size());
         }
 
         // The json-rpc request was probably canceled by the user
@@ -351,10 +375,11 @@ public class RequestHandler {
             long estimated_time_11 = System.currentTimeMillis() - start_time;
             System.out.println("11: " + estimated_time_11
                     + " (Ranking printed)");
-
-            m.concatStdout("<br>Found " + m.getFilteredWhiteListed().size()
-                + " clusters</pre>");
         }
+
+        m.concatStdout(m.getRankingPrint());
+        m.concatStdout("<br>Found " + m.getFilteredWhiteListed().size()
+            + " clusters</pre>");
 
         // Output
         return createOutput();
@@ -749,20 +774,15 @@ public class RequestHandler {
     final Graph<Domain> doPruning(
             final Graph<Domain> graph,
             final long start_time) {
-        double prune_threshold;
         if (m.getPruneZBool()) {
-            prune_threshold
-                = Utility.computePruneThreshold(m.getMeanVarSimilarities()[0],
-                        m.getMeanVarSimilarities()[1],
-                        m.getPruningThresholdTemp());
-        m.concatStdout("<br>Prune Threshold : ");
-        m.concatStdout("<br>    Mean = " + m.getMeanVarSimilarities()[0]);
-        m.concatStdout("<br>    Variance = " + m.getMeanVarSimilarities()[1]);
-        m.concatStdout("<br>    Prune Threshold = " + prune_threshold);
+            m.setPruningThreshold(Utility.computePruneThreshold(
+                    m.getMeanVarSimilarities()[0],
+                    m.getMeanVarSimilarities()[1],
+                        m.getPruningThresholdTemp()));
         } else {
-            prune_threshold = m.getPruningThresholdTemp();
+            m.setPruningThreshold(m.getPruningThresholdTemp());
         }
-        graph.prune(prune_threshold);
+        graph.prune(m.getPruningThreshold());
         return graph;
     }
 
@@ -787,20 +807,15 @@ public class RequestHandler {
      */
     final void doFiltering(final long start_time) {
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
-        double max_cluster_size;
         if (m.getClusterZBool()) {
-            max_cluster_size = Utility.computeClusterSize(
+            m.setMaxClusterSize(Utility.computeClusterSize(
                     m.getMeanVarClusters()[0], m.getMeanVarClusters()[0],
-                    m.getMaxClusterSizeTemp());
-            m.concatStdout("<br>Cluster Size : ");
-            m.concatStdout("<br>    Mean = " + m.getMeanVarClusters()[0]);
-            m.concatStdout("<br>    Variance = " + m.getMeanVarClusters()[1]);
-            m.concatStdout("<br>    Max Cluster Size = " + max_cluster_size);
+                    m.getMaxClusterSizeTemp()));
         } else {
-            max_cluster_size = m.getMaxClusterSizeTemp();
+            m.setMaxClusterSize(m.getMaxClusterSizeTemp());
         }
         for (Graph<Domain> subgraph : m.getClusters()) {
-            if (subgraph.size() <= max_cluster_size) {
+            if (subgraph.size() <= m.getMaxClusterSize()) {
                 filtered.add(subgraph);
             }
         }
@@ -813,7 +828,11 @@ public class RequestHandler {
      */
     final void whiteListing() {
         LinkedList<Graph<Domain>> filtered_new
-                = new LinkedList<Graph<Domain>>(m.getFiltered());
+                = new LinkedList<Graph<Domain>>();
+        // Deep clone
+        for (Graph<Domain> graph : m.getFiltered()) {
+            filtered_new.add(new Graph<Domain>(graph));
+        }
 
         List<String> whitelist = new ArrayList<String>();
         List<String> whitelist_ongo = new ArrayList<String>();
@@ -842,8 +861,7 @@ public class RequestHandler {
             Utility.remove(domain_graph, whitelisted);
         }
 
-        m.concatStdout("<br>Number of white listed domains: "
-                + whitelisted.size());
+        m.setWhitelisted(whitelisted);
         m.setFilteredWhiteListed(filtered_new);
     }
 
@@ -851,7 +869,6 @@ public class RequestHandler {
      * Print of the ranking list.
      */
     private void showRanking() {
-        //System.out.println("Stage 1");
         // Creation of a big graph with the result
         Graph<Domain> graph_all = new Graph<Domain>(Integer.MAX_VALUE);
         for (Graph<Domain> graph : m.getFilteredWhiteListed()) {
@@ -865,14 +882,12 @@ public class RequestHandler {
                 }
             }
         }
-        //System.out.println("Stage 2");
         // List all the remaining domains
         List<Domain> list_domain = new LinkedList<Domain>();
         for (Domain dom : graph_all.getNodes()) {
             list_domain.add(dom);
         }
-        m.concatStdout("<br>Number of domains shown: " + list_domain.size());
-        //System.out.println("Stage 3");
+        m.setRankingPrint("<br>Number of domains shown: " + list_domain.size());
         // Number of children
         HashMap<Domain, Integer> index_children =
                 new HashMap<Domain, Integer>();
@@ -889,14 +904,12 @@ public class RequestHandler {
             index_parents.put(dom, 0);
             index_requests.put(dom, dom.size());
         }
-        //System.out.println("Stage 4");
         // Number of parents
         for (Domain parent : graph_all.getNodes()) {
             for (Neighbor<Domain> child : graph_all.getNeighbors(parent)) {
                index_parents.put(child.node, index_parents.get(child.node) + 1);
             }
         }
-        //System.out.println("Stage 5");
         // Fusion of indexes
         HashMap<Domain, Double> index = new HashMap<Domain, Double>();
         for (Domain dom : graph_all.getNodes()) {
@@ -905,10 +918,8 @@ public class RequestHandler {
                     + m.getRankingWeights()[1] * index_children.get(dom)
                     + m.getRankingWeights()[2] * index_requests.get(dom));
         }
-        //System.out.println("Stage 6");
         //Sort
         ArrayList<Domain> sorted = Utility.sortByIndex(list_domain, index);
-        //System.out.println("Stage 7");
         // Print out
         if (m.getAptSearch()) {
             double top = 0.0;
@@ -926,19 +937,18 @@ public class RequestHandler {
                 }
             }
             if (founded) {
-                m.concatStdout("<br>TOP for APT.FINDME.be: "
+                m.concatRankingPrint("<br>TOP for APT.FINDME.be: "
                        + Math.round(top / m.getAllDomains()
                        .get("all").values().size() * 100 * 100) / 100.0 + "%");
             } else {
-                m.concatStdout("<br>TOP for APT.FINDME.be: NOT FOUND");
+                m.concatRankingPrint("<br>TOP for APT.FINDME.be: NOT FOUND");
             }
         }
-        m.concatStdout("<br>Ranking:");
+        m.concatRankingPrint("<br>Ranking:");
         for (Domain dom : sorted) {
-            m.concatStdout("<br>    ("
+            m.concatRankingPrint("<br>    ("
                     + Math.round(index.get(dom) * 100) / 100.0 + ") " + dom);
         }
-        //System.out.println("Stage 8");
     }
 
     /**

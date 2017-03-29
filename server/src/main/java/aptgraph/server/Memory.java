@@ -68,6 +68,8 @@ public class Memory {
     private HistData hist_similarities;
     // Pruning threshold given by user (before conversion, if needed)
     private double prune_threshold_temp;
+    // Pruning threshold used
+    private double prune_threshold;
     // Indicator for prune_threshold_temp : z value or not
     private boolean prune_z_bool;
     // Mean and Variance of the cluster sizes
@@ -78,6 +80,8 @@ public class Memory {
     private ArrayList<Graph<Domain>> clusters;
     // Max cluster size given by user (before conversion, if needed)
     private double max_cluster_size_temp;
+    // Max cluster size used
+    private double max_cluster_size;
     // Indicator for max_cluster_size_temp : z value or not
     private boolean cluster_z_bool;
     // List of graphs after filtering
@@ -88,12 +92,16 @@ public class Memory {
     private static final Path PATH = Paths.get("./src/main/resources/hosts");
     // List of white listed domains on the go
     private String white_ongo;
+    // List of effectivly whitelisted domains
+    private LinkedList<Domain> whitelisted;
     // List of graphs after filtering and white listing
     private LinkedList<Graph<Domain>> filtered_white_listed;
     // Ranking weights
     private double[] ranking_weights;
     // Indicator for search of APT.FINDME.be
     private boolean apt_search;
+    // Info of Ranking
+    private String ranking_print;
     // Standard output on UI
     private String stdout;
 
@@ -353,6 +361,23 @@ public class Memory {
     }
 
     /**
+     * Get the pruning threshold used.
+     * @return prune_threshold
+     */
+    public final double getPruningThreshold() {
+        return this.prune_threshold;
+    }
+
+    /**
+     * Set the pruning threshold used.
+     * @param prune_threshold
+     */
+    public final void setPruningThreshold(
+            final double prune_threshold) {
+        this.prune_threshold = prune_threshold;
+    }
+
+    /**
      * Get the indicator for prune_threshold_temp : z value or not.
      * @return prune_z_bool
      */
@@ -438,6 +463,23 @@ public class Memory {
     }
 
     /**
+     * Get the max cluster size used.
+     * @return max_cluster_size
+     */
+    public final double getMaxClusterSize() {
+        return this.max_cluster_size;
+    }
+
+    /**
+     * Set the max cluster size used.
+     * @param max_cluster_size
+     */
+    public final void setMaxClusterSize(
+            final double max_cluster_size) {
+        this.max_cluster_size = max_cluster_size;
+    }
+
+    /**
      * Get the indicator for max_cluster_size_temp : z value or not.
      * @return cluster_z_bool
      */
@@ -505,12 +547,29 @@ public class Memory {
     }
 
     /**
-     * Set the list of white listed domains on the go.
+     * Set the list of effectivly whitelisted domains.
      * @param white_ongo
      */
     public final void setWhiteOngo(
             final String white_ongo) {
         this.white_ongo = white_ongo;
+    }
+
+    /**
+     * Get the list of effectivly whitelisted domains.
+     * @return whitelisted
+     */
+    public final LinkedList<Domain> getWhitelisted() {
+        return this.whitelisted;
+    }
+
+    /**
+     * Set the list of white listed domains on the go.
+     * @param whitelisted
+     */
+    public final void setWhitelisted(
+            final LinkedList<Domain> whitelisted) {
+        this.whitelisted = whitelisted;
     }
 
     /**
@@ -562,6 +621,32 @@ public class Memory {
     public final void setAptSearch(
             final boolean apt_search) {
         this.apt_search = apt_search;
+    }
+
+    /**
+     * Get the info of Ranking.
+     * @return ranking_print
+     */
+    public final String getRankingPrint() {
+        return this.ranking_print;
+    }
+
+    /**
+     * Set the info of Ranking.
+     * @param ranking_print
+     */
+    public final void setRankingPrint(
+            final String ranking_print) {
+        this.ranking_print = ranking_print;
+    }
+
+    /**
+     * Concatenate input to the info of Ranking.
+     * @param ranking_print
+     */
+    public final void concatRankingPrint(
+            final String ranking_print) {
+        this.ranking_print = this.ranking_print.concat(ranking_print);
     }
 
     /**
