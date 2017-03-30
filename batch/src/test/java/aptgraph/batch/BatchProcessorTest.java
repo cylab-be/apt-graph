@@ -117,7 +117,8 @@ public class BatchProcessorTest extends TestCase {
             BatchProcessor processor = new BatchProcessor();
             HashMap<String, LinkedList<Request>> user_requests =
                 processor.computeUserLog(processor.parseFile(getClass()
-                        .getResourceAsStream("/simple.txt"), "squid"));
+                        .getResourceAsStream("/12_3_site_3_time_1_APT_ad.txt"),
+                        "squid"));
 
             for (Map.Entry<String, LinkedList<Request>> entry :
                     user_requests.entrySet()) {

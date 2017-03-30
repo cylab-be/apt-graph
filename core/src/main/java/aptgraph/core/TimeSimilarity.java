@@ -17,6 +17,8 @@ public class TimeSimilarity
      * @return
      */
     public final double similarity(final Request r1, final Request r2) {
-        return 1.0 / (1 + Math.abs(r1.getTime() - r2.getTime()));
+        return 1.0 / (1 + Math.abs(
+                Math.round(r1.getTime() / 1000.0)
+                        - Math.round(r2.getTime() / 1000.0)));
     }
 }
