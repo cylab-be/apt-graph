@@ -92,6 +92,8 @@ public class Memory {
     private static final Path PATH = Paths.get("./src/main/resources/hosts");
     // List of white listed domains on the go
     private String white_ongo;
+    // Minimum number of requests sent by user for a given domain
+    private double number_requests;
     // List of effectivly whitelisted domains
     private LinkedList<Domain> whitelisted;
     // List of graphs after filtering and white listing
@@ -553,6 +555,23 @@ public class Memory {
     public final void setWhiteOngo(
             final String white_ongo) {
         this.white_ongo = white_ongo;
+    }
+
+    /**
+     * Get the minimum number of requests sent by user for a given domain.
+     * @return number_requests
+     */
+    public final double getNumberRequests() {
+        return this.number_requests;
+    }
+
+    /**
+     * Set the minimum number of requests sent by user for a given domain.
+     * @param number_requests
+     */
+    public final void setNumberRequests(
+            final double number_requests) {
+        this.number_requests = number_requests;
     }
 
     /**

@@ -82,7 +82,7 @@ public class RequestHandlerTest extends TestCase {
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
         handler.getUsers();
         handler.analyze("253.115.106.54", new double[]{0.7, 0.1, 0.2},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
     }
 
@@ -677,6 +677,7 @@ public class RequestHandlerTest extends TestCase {
         assertTrue(domain_graph_new_1.containsKey(domain_node_2));
         assertTrue(domain_graph_new_1.containsKey(domain_node_3));
         handler.getMemory().setWhiteOngo("ss.symcd.com");
+        handler.getMemory().setNumberRequests(0);
         handler.whiteListing();
 
         // System.out.println("After whitelisting = " + filtered);
@@ -703,176 +704,214 @@ public class RequestHandlerTest extends TestCase {
                 assertFalse(nb.node.equals(domain_node_3));
             }
         }
+
+        // Test white listing by minimum number of requests (based on graph
+        // without any domain to whitelist)
+        handler.getMemory().setNumberRequests(2);
+        handler.whiteListing();
+        Graph<Domain> domain_graph_new_3 = handler.getMemory().getFilteredWhiteListed().getFirst();
+        for (Domain dom : domain_graph_new_2.getNodes()) {
+            for (String user : handler.getMemory().getUsersList()) {
+                if (handler.getMemory().getAllDomains().get("byUsers").get(user
+                            + ":" + dom.toString()) != null) {
+                    if (handler.getMemory().getAllDomains().get("byUsers")
+                        .get(user + ":" + dom.toString()).toArray().length < 2) {
+                        assertFalse(domain_graph_new_3.containsKey(dom));
+                    } else {
+                        assertTrue(domain_graph_new_3.containsKey(dom));
+                    }
+                }       
+            }
+        }
+        
     }
 
     public void testStages() throws IOException, ClassNotFoundException {
         System.out.println("Test Stages");
 
         RequestHandler handler =
-                new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+                new RequestHandler(Paths.get(
+                        "src/test/resources/dummyDir_whitelist"));
         handler.getUsers();
 
         // Test Stage 0
         Output out_0 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
         Output out_1 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
         assertTrue(out_0.equals(out_1));
         Output out_2 =
                 handler.analyze("253.115.106.54", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
         assertFalse(out_1.equals(out_2));
         Output out_3 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
         assertTrue(out_1.equals(out_3));
 
         // Test Stage 1
         Output out_4 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
         assertTrue(out_1.equals(out_4));
         Output out_5 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.2, 0.1},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
         assertFalse(out_4.equals(out_5));
         Output out_6 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
         assertTrue(out_4.equals(out_6));
 
         // Test Stage 2
-        Output out_9 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+        Output out_7 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_1.equals(out_9));
-        Output out_10 =
+        assertTrue(out_1.equals(out_7));
+        Output out_8 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, false, true, true, "",
+                new double[]{0.8, 0.2}, 0.0, 1000.0, true, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertFalse(out_9.equals(out_10));
-        Output out_11 =
+        assertFalse(out_7.equals(out_8));
+        Output out_9 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_9.equals(out_11));
+        assertTrue(out_7.equals(out_9));
 
         // Test Stage 3
-        Output out_12 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+        Output out_10 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_1.equals(out_12));
-        Output out_13 =
+        assertTrue(out_1.equals(out_10));
+        Output out_11 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.5, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.01, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertFalse(out_12.equals(out_13));
-        Output out_14 =
+        assertFalse(out_10.equals(out_11));
+        Output out_12 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_12.equals(out_14));
+        assertTrue(out_10.equals(out_12));
 
         // Test Stage 4
-        Output out_15 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+        Output out_13 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_1.equals(out_15));
-        Output out_16 =
+        assertTrue(out_1.equals(out_13));
+        Output out_14 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, false, true, "",
+                new double[]{0.8, 0.2}, 0.02, 0.0, false, true, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertFalse(out_15.equals(out_16));
-        Output out_17 =
+        assertFalse(out_13.equals(out_14));
+        Output out_15 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_15.equals(out_17));
+        assertTrue(out_13.equals(out_15));
 
         // Test Stage 5
-        Output out_18 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+        Output out_16 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_1.equals(out_18));
-        Output out_19 =
+        assertTrue(out_1.equals(out_16));
+        Output out_17 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 1.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 5.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertFalse(out_18.equals(out_19));
+        assertFalse(out_16.equals(out_17));
+        Output out_18 =
+                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
+                new double[]{0.45, 0.45, 0.1}, true);
+        assertTrue(out_16.equals(out_18));
+
+        // Test Stage 6
+        Output out_19 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
+                new double[]{0.45, 0.45, 0.1}, true);
+        assertTrue(out_1.equals(out_19));
         Output out_20 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, false, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_18.equals(out_20));
+        assertFalse(out_19.equals(out_20));
+        Output out_21 =
+                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
+                new double[]{0.45, 0.45, 0.1}, true);
+        assertTrue(out_19.equals(out_21));
 
         // Test Stage 6
-        Output out_21 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+        Output out_22 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_1.equals(out_21));
-        Output out_22 =
-                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, false, "",
-                new double[]{0.45, 0.45, 0.1}, true);
-        assertFalse(out_21.equals(out_22));
+        assertTrue(out_1.equals(out_22));
         Output out_23 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true,
+                "e.visualdna.com", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_21.equals(out_23));
+        assertFalse(out_22.equals(out_23));
+        Output out_24 =
+                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
+                new double[]{0.45, 0.45, 0.1}, true);
+        assertTrue(out_22.equals(out_24));
 
         // Test Stage 6
-        Output out_24 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+        Output out_25 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_1.equals(out_24));
-        Output out_25 =
-                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true,
-                "rkfko.apyeqwrqg.cm",
-                new double[]{0.45, 0.45, 0.1}, true);
-        assertFalse(out_24.equals(out_25));
+        assertTrue(out_1.equals(out_25));
         Output out_26 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true,
+                "", 1,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_24.equals(out_26));
+        assertFalse(out_25.equals(out_26));
+        Output out_27 =
+                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
+                new double[]{0.45, 0.45, 0.1}, true);
+        assertTrue(out_25.equals(out_27));
 
         // Test Stage 7
-        Output out_27 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+        Output out_28 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_1.equals(out_27));
-        Output out_28 =
-                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
-                new double[]{0.5, 0.5, 0.0}, true);
-        assertFalse(out_27.equals(out_28));
+        assertTrue(out_1.equals(out_28));
         Output out_29 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
+                new double[]{0.5, 0.5, 0.0}, true);
+        assertFalse(out_28.equals(out_29));
+        Output out_30 =
+                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_27.equals(out_29));
+        assertTrue(out_28.equals(out_30));
 
         // Test Stage 7
-        Output out_30 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+        Output out_31 = handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_1.equals(out_30));
-        Output out_31 =
-                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
-                new double[]{0.45, 0.45, 0.1}, false);
-        assertFalse(out_30.equals(out_31));
+        assertTrue(out_1.equals(out_31));
         Output out_32 =
                 handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
-                new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "",
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
+                new double[]{0.45, 0.45, 0.1}, false);
+        assertFalse(out_31.equals(out_32));
+        Output out_33 =
+                handler.analyze("0.0.0.0", new double[]{0.7, 0.3, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
-        assertTrue(out_30.equals(out_32));
+        assertTrue(out_31.equals(out_33));
     }
 }

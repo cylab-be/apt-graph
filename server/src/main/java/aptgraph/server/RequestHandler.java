@@ -159,6 +159,7 @@ public class RequestHandler {
      * @param cluster_z_bool
      * @param whitelist_bool
      * @param white_ongo
+     * @param number_requests
      * @param ranking_weights
      * @param apt_search
      * @return Output
@@ -173,6 +174,7 @@ public class RequestHandler {
             final boolean cluster_z_bool,
             final boolean whitelist_bool,
             final String white_ongo,
+            final double number_requests,
             final double[] ranking_weights,
             final boolean apt_search) {
 
@@ -186,13 +188,14 @@ public class RequestHandler {
         // Check input of the user
         if (!checkInputUser(user, feature_weights, feature_ordered_weights,
                 prune_threshold_temp, max_cluster_size_temp,
-                prune_z_bool, cluster_z_bool, ranking_weights)) {
+                prune_z_bool, cluster_z_bool, number_requests,
+                ranking_weights)) {
             return null;
         }
         boolean[] stages = checkInputChanges(user, feature_weights,
                 feature_ordered_weights, prune_threshold_temp,
                 max_cluster_size_temp, prune_z_bool,
-                cluster_z_bool, whitelist_bool, white_ongo,
+                cluster_z_bool, whitelist_bool, white_ongo, number_requests,
                 ranking_weights, apt_search);
         m.setCurrentK(FileManager.getK(input_dir));
         m.setUser(user);
@@ -204,6 +207,7 @@ public class RequestHandler {
         m.setClusterZBool(cluster_z_bool);
         m.setWhitelistBool(whitelist_bool);
         m.setWhiteOngo(white_ongo);
+        m.setNumberRequests(number_requests);
         m.setRankingWeights(ranking_weights);
         m.setAptSearch(apt_search);
 
@@ -405,6 +409,7 @@ public class RequestHandler {
             final double max_cluster_size_temp,
             final boolean prune_z_bool,
             final boolean cluster_z_bool,
+            final double number_requests,
             final double[] ranking_weights) {
         // Check if user exists
         if (!m.getAllUsersList().contains(user)
@@ -438,6 +443,11 @@ public class RequestHandler {
         }
         // Verify input of user for clustering
         if (!cluster_z_bool && max_cluster_size_temp < 0) {
+            return false;
+        }
+
+        // Verify input of user for min number of requests by user
+        if (number_requests < 0) {
             return false;
         }
 
@@ -484,6 +494,7 @@ public class RequestHandler {
         final boolean cluster_z_bool,
         final boolean whitelist_bool,
         final String white_ongo,
+        final double number_requests,
         final double[] ranking_weights,
         final boolean apt_search) {
 
@@ -514,7 +525,9 @@ public class RequestHandler {
                                 if (m.getWhitelistBool() == whitelist_bool
                                         && m.getWhiteOngo() != null
                                         && m.getWhiteOngo()
-                                                .equals(white_ongo)) {
+                                                .equals(white_ongo)
+                                        && m.getNumberRequests()
+                                        == number_requests) {
                                     stages[6] = false;
 
                                     if (Arrays.equals(m.getRankingWeights(),
@@ -854,6 +867,17 @@ public class RequestHandler {
                         || whitelist_ongo.contains(dom.getName()))
                         && !whitelisted.contains(dom)) {
                     whitelisted.add(dom);
+                }
+                for (String user : m.getUsersList()) {
+                    if (m.getAllDomains().get("byUsers").get(user
+                            + ":" + dom.toString()) != null) {
+                        if (m.getAllDomains().get("byUsers").get(user
+                                + ":" + dom.toString()).toArray().length
+                                < m.getNumberRequests()
+                            && !whitelisted.contains(dom)) {
+                            whitelisted.add(dom);
+                        }
+                    }
                 }
             }
             Utility.remove(domain_graph, whitelisted);

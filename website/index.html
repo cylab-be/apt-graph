@@ -173,6 +173,12 @@
                 </div>
               </div>
               <div class="form-group">
+                <label for="number_requests" class="col-md-4 control-label" style="text-align: left; width: 200px">Min. Number of requests (/user/dom):</label>
+                <div class="col-md-2">
+                  <input type="number" step="1" class="form-control" id="number_requests" value="1" style="width: 80px;">
+                </div>
+              </div>
+              <div class="form-group">
                <label for="whitelist" class="col-md-4 control-label" style="text-align: left; width: 200px;">WHITE LISTING</label>
                <div class="col-md-2">
                  <input type="checkbox" id="whitelist" value="" checked>
@@ -698,6 +704,7 @@ function printRequests(d) {
           (cluster_absolute.checked == cluster_z.checked) ||
           (cluster_absolute.checked && $("#max_cluster_size").val() < 0) ||
           !$("#rank_parent").val() || !$("#rank_child").val() || !$("#rank_req").val() ||
+          parseFloat($("#number_requests").val()) < 0.0 ||
           parseFloat($("#rank_parent").val()) < 0.0 || parseFloat($("#rank_child").val()) < 0.0 || parseFloat($("#rank_req").val()) < 0.0 ||
           ((parseFloat($("#rank_parent").val()) + parseFloat($("#rank_child").val()) + parseFloat($("#rank_req").val())) != 1.0)){
             alert("Some of the parameter values are wrong!");
@@ -723,6 +730,7 @@ function printRequests(d) {
 	                        cluster_z.checked,
 	                        whitelist.checked,
 	                        white_ongo_text,
+                          $("#number_requests").val(),
 	                        [$("#rank_parent").val(), $("#rank_child").val(), $("#rank_req").val()],
                           apt_search.checked],
 	                        "id": 167
