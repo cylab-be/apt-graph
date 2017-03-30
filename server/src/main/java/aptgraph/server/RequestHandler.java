@@ -454,9 +454,9 @@ public class RequestHandler {
         // Verify the non negativity of weights and
         // the sum of the weights for ranking
         double sum_ranking_weights = 0;
-        for (double d : ranking_weights) {
-            sum_ranking_weights += d;
-            if (d < 0) {
+        for (int i = 0; i < ranking_weights.length; i++) {
+            sum_ranking_weights += ranking_weights[i];
+            if (ranking_weights[i] < 0 && i != 2) {
                 return false;
             }
         }
@@ -911,25 +911,28 @@ public class RequestHandler {
         }
         m.setRankingPrint("<br>Number of domains shown: " + list_domain.size());
         // Number of children
-        HashMap<Domain, Integer> index_children =
-                new HashMap<Domain, Integer>();
+        HashMap<Domain, Double> index_children =
+                new HashMap<Domain, Double>();
         // Number of parents
-        HashMap<Domain, Integer> index_parents =
-                new HashMap<Domain, Integer>();
+        HashMap<Domain, Double> index_parents =
+                new HashMap<Domain, Double>();
         // Number of requests index
-        HashMap<Domain, Integer> index_requests =
-                new HashMap<Domain, Integer>();
+        HashMap<Domain, Double> index_requests =
+                new HashMap<Domain, Double>();
 
         // Number of children & Number of requests
         for (Domain dom : graph_all.getNodes()) {
-            index_children.put(dom, graph_all.getNeighbors(dom).size());
-            index_parents.put(dom, 0);
-            index_requests.put(dom, dom.size());
+            index_children.put(dom, 0.0);
+            index_parents.put(dom, 0.0);
+            index_requests.put(dom, (double) dom.size());
         }
         // Number of parents
         for (Domain parent : graph_all.getNodes()) {
             for (Neighbor<Domain> child : graph_all.getNeighbors(parent)) {
-               index_parents.put(child.node, index_parents.get(child.node) + 1);
+               index_children.put(parent,
+                        index_children.get(parent) + child.similarity);
+                index_parents.put(child.node,
+                       index_parents.get(child.node) + child.similarity);
             }
         }
         // Fusion of indexes

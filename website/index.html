@@ -705,7 +705,7 @@ function printRequests(d) {
           (cluster_absolute.checked && $("#max_cluster_size").val() < 0) ||
           !$("#rank_parent").val() || !$("#rank_child").val() || !$("#rank_req").val() ||
           parseFloat($("#number_requests").val()) < 0.0 ||
-          parseFloat($("#rank_parent").val()) < 0.0 || parseFloat($("#rank_child").val()) < 0.0 || parseFloat($("#rank_req").val()) < 0.0 ||
+          parseFloat($("#rank_parent").val()) < 0.0 || parseFloat($("#rank_child").val()) < 0.0 || 
           ((parseFloat($("#rank_parent").val()) + parseFloat($("#rank_child").val()) + parseFloat($("#rank_req").val())) != 1.0)){
             alert("Some of the parameter values are wrong!");
             return;
