@@ -123,7 +123,7 @@ public class BatchProcessor {
         LinkedList<Request> requests = new LinkedList<Request>();
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(file, "UTF-8"));
-        String line = null;
+        String line;
 
         while ((line = in.readLine()) != null) {
             requests.add(parseLine(line, format));

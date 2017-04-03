@@ -102,6 +102,7 @@ public class ApplyAPT {
      * @param duration
      * @param injection_day
      * @param proportion
+     * @param delay
      * @throws IOException
      * @throws java.text.ParseException
      */
@@ -114,7 +115,9 @@ public class ApplyAPT {
         final long delta_time,
         final long duration,
         final int injection_day,
-        final double proportion)
+        final double proportion,
+        final long distance_time,
+        final long delay)
         throws IOException, ParseException {
 
         BufferedReader in = new BufferedReader(
@@ -123,9 +126,8 @@ public class ApplyAPT {
         String line;
         int counter_apt_daily = 0; // number of effective daily injections
         int counter_apt_total_daily = 0; // number of potential daily injections
-        int counter_total_daily = 0; // number of daily requests
         int counter_apt_total = 0; // total number of injected APT
-        long last_injection = 0;
+        long last_injection = 0; // Last injection
 
         String line_1 = in.readLine();
         Request request_1 = batch.parseLine(line_1, format);
@@ -139,15 +141,14 @@ public class ApplyAPT {
 
         long[] out_1 = verifyTraffic(request_1, request_2,
                 day, delta_time, time, duration, counter_apt_daily,
-                counter_apt_total_daily, counter_total_daily, counter_apt_total,
-                injection_day, last_injection, proportion, apt_domain, user,
-                output_file, format);
+                counter_apt_total_daily, counter_apt_total,
+                injection_day, last_injection, proportion, distance_time, delay,
+                apt_domain, user, output_file, format);
         time = out_1[0];
         last_injection = out_1[1];
         counter_apt_daily = (int) out_1[2];
         counter_apt_total_daily = (int) out_1[3];
-        counter_total_daily = (int) out_1[4];
-        counter_apt_total = (int) out_1[5];
+        counter_apt_total = (int) out_1[4];
 
         while ((line = in.readLine()) != null) {
             request_1 = request_2;
@@ -156,15 +157,14 @@ public class ApplyAPT {
 
             long[] out_2 = verifyTraffic(request_1, request_2,
                 day, delta_time, time, duration, counter_apt_daily,
-                counter_apt_total_daily, counter_total_daily, counter_apt_total,
-                injection_day, last_injection, proportion, apt_domain, user,
-                output_file, format);
+                counter_apt_total_daily, counter_apt_total,
+                injection_day, last_injection, proportion, distance_time, delay,
+                apt_domain, user, output_file, format);
             time = out_2[0];
             last_injection = out_2[1];
             counter_apt_daily = (int) out_2[2];
             counter_apt_total_daily = (int) out_2[3];
-            counter_total_daily = (int) out_2[4];
-            counter_apt_total = (int) out_2[5];
+            counter_apt_total = (int) out_2[4];
         }
 
         LOGGER.log(Level.INFO, "Number of trafficAPT injected : {0}",
@@ -177,17 +177,22 @@ public class ApplyAPT {
      * @param request_2
      * @param day
      * @param delta_time
-     * @param time
+     * @param time_in
      * @param duration
-     * @param daily_counter
-     * @param daily_counter_total
+     * @param counter_apt_daily_in
+     * @param counter_apt_total_daily_in
+     * @param counter_apt_total_in
      * @param injection_day
-     * @param last_injection
+     * @param last_injection_in
+     * @param proportion
+     * @param distance_time
+     * @param delay
      * @param apt_domain
      * @param user
      * @param output_file
      * @param format
-     * @return long[] {time_out, last_injection_out, daily_counter_out}
+     * @return long[] {time, last_injection, counter_apt_daily,
+     * counter_apt_total_daily, counter_apt_total}
      * @throws ParseException
      * @throws IOException
      */
@@ -196,16 +201,16 @@ public class ApplyAPT {
             final long time_in, final long duration,
             final int counter_apt_daily_in,
             final int counter_apt_total_daily_in,
-            final int counter_total_daily_in, final int counter_apt_total_in,
+            final int counter_apt_total_in,
             final int injection_day, final long last_injection_in,
-            final double proportion, final String apt_domain, final String user,
+            final double proportion, final long distance_time, final long delay,
+            final String apt_domain, final String user,
             final OutputStream output_file, final String format)
             throws ParseException, IOException {
         long time = time_in;
         long last_injection = last_injection_in;
         int counter_apt_daily = counter_apt_daily_in;
         int counter_apt_total_daily = counter_apt_total_daily_in;
-        int counter_total_daily = counter_total_daily_in + 1;
         int counter_apt_total = counter_apt_total_in;
 
         if (day == getDay(request_2.getTime())) {
@@ -215,9 +220,11 @@ public class ApplyAPT {
             if (delta_time_requests <= delta_time) {
                 // The second request is close enough
                 if (request_2.getTime() - time >= duration
-                        && last_injection != time) {
+                        && last_injection != time
+                        && (last_injection + distance_time
+                        <= request_2.getTime())) {
                     // Traffic is dense enough and no APT have
-                    // been inject in this burst
+                    // been inject in this burst or too shortly
                     if (counter_apt_total_daily < injection_day) {
                         // APT could be insert but number of injection
                         // is limited by proportion
@@ -227,7 +234,7 @@ public class ApplyAPT {
                             / (double) counter_apt_total_daily - proportion)
                                 < 1E-10) {
                             // Proportion is respected and APT is injected
-                            writeRequest(buildAPT((long) request_2.getTime(),
+                            writeRequest(buildAPT(time + delay,
                                 apt_domain, user), output_file, format);
                             counter_apt_daily += 1;
                             counter_apt_total += 1;
@@ -241,11 +248,10 @@ public class ApplyAPT {
             time = request_2.getTime();
             counter_apt_daily = 0;
             counter_apt_total_daily = 0;
-            counter_total_daily = 0;
         }
         long[] output = {time, last_injection,
             (long) counter_apt_daily, (long) counter_apt_total_daily,
-            (long) counter_total_daily, (long) counter_apt_total};
+            (long) counter_apt_total};
         return output;
     }
 

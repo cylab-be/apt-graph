@@ -42,6 +42,9 @@ import org.apache.commons.cli.ParseException;
 public final class Main {
 
     private static final String DEFAULT_FORMAT = "squid";
+    private static final double DEFAULT_PROPORTION = 1.0;
+    private static final int DEFAULT_INJECTION = Integer.MAX_VALUE;
+    private static final long DEFAULT_DISTANCE = 0L;
 
     /**
      * @param args the command line arguments
@@ -56,6 +59,10 @@ public final class Main {
             IllegalArgumentException, java.text.ParseException {
         // Default value of arguments
         String format = DEFAULT_FORMAT;
+        double proportion = DEFAULT_PROPORTION;
+        int injection_day = DEFAULT_INJECTION;
+        long distance_time = DEFAULT_DISTANCE;
+        long delay = 0L;
 
         // Parse command line arguments
         Options options = new Options();
@@ -90,7 +97,8 @@ public final class Main {
         options.addOption(arg_duration);
         Option arg_injection_day = Option.builder("injection")
                 .optionalArg(true)
-                .desc("Daily number of injection (required for traffic APT)")
+                .desc("Daily number of injection (option for traffic APT,"
+                        + " default : no limitation)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
@@ -98,11 +106,29 @@ public final class Main {
         Option arg_proportion = Option.builder("proportion")
                 .optionalArg(true)
                 .desc("Injection rate in the bursts (1 = inject in all "
-                        + "the burst) (required for traffic APT)")
+                        + "possible burst) (option for traffic APT,"
+                        + " default : 1)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_proportion);
+        Option arg_distance = Option.builder("distance")
+                .optionalArg(true)
+                .desc("Minimal time distance between two injections"
+                        + " (option for traffic APT, default : no limitation)")
+                .hasArg(true)
+                .numberOfArgs(1)
+                .build();
+        options.addOption(arg_distance);
+        Option arg_delay = Option.builder("delay")
+                .optionalArg(true)
+                .desc("Delay between start of the burst and injection "
+                        + "(option for traffic APT, default :"
+                        + " middle of the burst)")
+                .hasArg(true)
+                .numberOfArgs(1)
+                .build();
+        options.addOption(arg_delay);
         Option arg_format = Option.builder("f")
                 .optionalArg(true)
                 .desc("Specify format of input file (default : squid)")
@@ -139,9 +165,7 @@ public final class Main {
 
         long time_step = 0L;
         long delta_time = Long.MAX_VALUE;
-        long duration = 0;
-        int injection_day = 0;
-        double proportion = 1.0;
+        long duration = 0L;
         try {
             if (type.equals("periodic")) {
                 if (!cmd.hasOption("step")) {
@@ -162,20 +186,23 @@ public final class Main {
                             "Duration is not given");
                 } else {
                     duration = Long.parseLong(cmd.getOptionValue("duration"));
+                    delay = duration / 2; // Default value
+                    if (cmd.hasOption("delay")) {
+                        delay = Long.parseLong(
+                                cmd.getOptionValue("delay"));
+                    }
                 }
-                if (!cmd.hasOption("injection")) {
-                    throw new IllegalArgumentException(
-                            "Injection by Day is not given");
-                } else {
+                if (cmd.hasOption("injection")) {
                     injection_day = Integer.parseInt(
                             cmd.getOptionValue("injection"));
                 }
-                if (!cmd.hasOption("proportion")) {
-                    throw new IllegalArgumentException(
-                            "Proportion is not given");
-                } else {
+                if (cmd.hasOption("proportion")) {
                     proportion = Double.parseDouble(
                             cmd.getOptionValue("proportion"));
+                }
+                if (cmd.hasOption("distance")) {
+                    distance_time = Long.parseLong(
+                            cmd.getOptionValue("distance"));
                 }
             }
         } catch (IllegalArgumentException ex) {
@@ -216,7 +243,9 @@ public final class Main {
                         delta_time,
                         duration,
                         injection_day,
-                        proportion);
+                        proportion,
+                        distance_time,
+                        delay);
             }
         } finally {
             output_stream.close();

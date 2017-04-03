@@ -92,7 +92,8 @@ public class ApplyTest extends TestCase {
         apt.trafficAPT(getClass().getResourceAsStream(
                 "/1000_http_requests.txt"),
                 new FileOutputStream(temp_file),
-                "APT.FINDME.be", "167.167.167.167", "squid", 20, 100L, 10, 0.5);
+                "APT.FINDME.be", "167.167.167.167", "squid", 20, 100L, 10, 0.5,
+                1800000, 50L);
 
         BufferedReader in_1 = new BufferedReader(
                 new InputStreamReader(new FileInputStream(temp_file), "UTF-8"));
