@@ -126,11 +126,25 @@ public class BatchProcessor {
         String line = null;
 
         while ((line = in.readLine()) != null) {
-            try {
+            requests.add(parseLine(line, format));
+        }
+
+        return requests;
+    }
+
+    /**
+     * Parse a given line.
+     * @param line
+     * @param format
+     * @return Request
+     */
+    public final Request parseLine(final String line, final String format) {
+        Request request = null;
+        try {
                 if (format.equals("squid")) {
-                    requests.add(parseLineSquid(line));
+                    request = parseLineSquid(line);
                 } else if (format.equals("json")) {
-                    requests.add(parseLineJson(line));
+                    request = parseLineJson(line);
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -138,9 +152,7 @@ public class BatchProcessor {
             } catch (IllegalArgumentException ex) {
                 System.err.println(ex.getMessage());
             }
-        }
-
-        return requests;
+        return request;
     }
 
     /**

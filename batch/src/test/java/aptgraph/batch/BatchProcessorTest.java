@@ -352,7 +352,7 @@ public class BatchProcessorTest extends TestCase {
                         }
                     }
                     assertTrue(Math.abs(dom_2.similarity - similarity_temp)
-                            <= 1E-15);
+                            <= 1E-10);
                 }
             }
         }

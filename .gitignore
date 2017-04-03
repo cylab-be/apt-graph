@@ -109,3 +109,5 @@ hs_err_pid*
 /server/nbproject/
 /integration/nbproject/
 /integration/target/
+/study/target/
+/infection/target/

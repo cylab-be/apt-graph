@@ -11,5 +11,6 @@
         <module>../core</module>
         <module>../server</module>
         <module>../integration</module>
+        <module>../infection</module>
     </modules>
 </project>
