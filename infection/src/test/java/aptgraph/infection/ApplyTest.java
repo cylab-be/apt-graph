@@ -165,12 +165,14 @@ public class ApplyTest extends TestCase {
         BufferedReader in_json = new BufferedReader(
                 new InputStreamReader(new FileInputStream(temp_file_json), "UTF-8"));
 
-        String json_request_string = "{\"@version\":\"0\",\"@timestamp\":\"2015-02-18T08:57:51.229Z\",\"type\":\"0\",\"timestamp\":\"0\",\"tk_username\":\"127.0.0.1\",\"tk_url\":\"http://APT.FINDME.be\",\"tk_size\":10,\"tk_date_field\":\"0\",\"tk_protocol\":\"0\",\"tk_mime_content\":\"text/html\",\"tk_client_ip\":\"127.0.0.1\",\"tk_server_ip\":\"167.167.167.167\",\"tk_domain\":\"0\",\"tk_path\":\"0\",\"tk_operation\":\"GET\",\"tk_uid\":\"0\",\"tk_category\":\"0\",\"tk_category_type\":\"0\",\"geoip\":{\"ip\":\"0\",\"country_code2\":\"0\",\"country_code3\":\"0\",\"country_name\":\"0\",\"continent_code\":\"0\",\"latitude\":0,\"longitude\":0,\"timezone\":\"0\",\"location\":[0,0]},\"category\":\"0\"}";
+        String json_request_string = "{\"@version\":\"0\",\"@timestamp\":\"2015-02-18T07:57:51.229Z\",\"type\":\"0\",\"timestamp\":\"0\",\"tk_username\":\"127.0.0.1\",\"tk_url\":\"http://APT.FINDME.be\",\"tk_size\":10,\"tk_date_field\":\"0\",\"tk_protocol\":\"0\",\"tk_mime_content\":\"text/html\",\"tk_client_ip\":\"127.0.0.1\",\"tk_server_ip\":\"167.167.167.167\",\"tk_domain\":\"0\",\"tk_path\":\"0\",\"tk_operation\":\"GET\",\"tk_uid\":\"0\",\"tk_category\":\"0\",\"tk_category_type\":\"0\",\"geoip\":{\"ip\":\"0\",\"country_code2\":\"0\",\"country_code3\":\"0\",\"country_name\":\"0\",\"continent_code\":\"0\",\"latitude\":0,\"longitude\":0,\"timezone\":\"0\",\"location\":[0,0]},\"category\":\"0\"}";
         Request json_request = batch.parseLine(json_request_string, "json");
 
         apt.writeRequest(apt_request, new FileOutputStream(temp_file_json), "json");
         String apt_string_json = in_json.readLine();
 
+        System.out.println("apt_string_json = " + apt_string_json);
+        System.out.println("json_req_string = " + json_request_string);
         assertEquals(apt_string_json, json_request_string); // compare string
         assertEquals(apt_request, json_request); // compare requests
     }

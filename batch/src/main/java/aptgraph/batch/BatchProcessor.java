@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -220,6 +221,7 @@ public class BatchProcessor {
         try {
         SimpleDateFormat sdf =
                 new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = sdf.parse(obj.getString("@timestamp"));
         Long timestamp = date.getTime();
 

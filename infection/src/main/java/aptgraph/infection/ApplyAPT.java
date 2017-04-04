@@ -279,6 +279,7 @@ public class ApplyAPT {
         } else if (format.equals("json")) {
             SimpleDateFormat formatter
                 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
             String time_string = formatter.format(new Date(request.getTime()));
             String[] time_string_split = time_string.split(" ");
             time_string = time_string_split[0] + "T"
