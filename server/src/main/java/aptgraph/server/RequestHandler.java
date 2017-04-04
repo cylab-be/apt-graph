@@ -982,7 +982,7 @@ public class RequestHandler {
      */
     private Output createOutput() {
         Output output = new Output();
-        output.setFiltered(m.getFilteredWhiteListed());
+        output.setFilteredWhiteListed(m.getFilteredWhiteListed());
         output.setStdout(m.getStdout());
         output.setHistPruning(m.getHistDataSimilarities());
         output.setHistCluster(m.getHistDataClusters());

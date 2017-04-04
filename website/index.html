@@ -659,11 +659,11 @@ function printRequests(d) {
 // Functions to manage the print of requests
     $("#show_all_domains_button").click(function() {
     var domains_printed = [];
-    for (var i = 0; i < json.result.filtered.length; i++) {
-      for (var j = 0; j < json.result.filtered[i].nodes.length; j++) {
-        var name = json.result.filtered[i].nodes[j].name;
+    for (var i = 0; i < json.result.filteredWhiteListed.length; i++) {
+      for (var j = 0; j < json.result.filteredWhiteListed[i].nodes.length; j++) {
+        var name = json.result.filteredWhiteListed[i].nodes[j].name;
         if (!domains_printed.includes(name)) {
-          printRequests(json.result.filtered[i].nodes[j].requests);
+          printRequests(json.result.filteredWhiteListed[i].nodes[j].requests);
           domains_printed.push(name);
         }
       }
@@ -743,8 +743,8 @@ function printRequests(d) {
 	            //console.log("Server Response: " + json.result);
 	            $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
 	            $("#panel_head").css('color', 'green');
-	            $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
-	            draw_graph(json.result.filtered, printRequests); 
+	            $("#panel_body").text("Server Response: " + json.result.filteredWhiteListed.length + " Clusters");
+	            draw_graph(json.result.filteredWhiteListed, printRequests); 
 	            $("#request_text").html("");
 	            var domains_printed = [];
 	            $("#stdout_body").prepend(json.result.stdout);
@@ -758,7 +758,7 @@ function printRequests(d) {
 	        } else {
 	          $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
 	          $("#panel_head").css('color', 'red');
-	          $("#panel_body").text("Server Response: " + json.result.filtered.length + " Clusters");
+	          $("#panel_body").text("Server Response: " + json.result.filteredWhiteListed.length + " Clusters");
 
 	        } 
 	      });

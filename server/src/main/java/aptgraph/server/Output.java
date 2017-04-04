@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 Thomas.
+ * Copyright 2017 Thomas Gilon.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,11 +30,11 @@ import java.util.LinkedList;
 
 /**
  *
- * @author Thomas
+ * @author Thomas Gilon
  */
 public class Output implements Serializable {
     private String name = "";
-    private LinkedList<Graph<Domain>> filtered;
+    private LinkedList<Graph<Domain>> filtered_white_listed;
     private String stdout;
     private HistData hist_pruning;
     private HistData hist_cluster;
@@ -48,11 +48,11 @@ public class Output implements Serializable {
     }
 
     /**
-     * Return filtered.
+     * Return filtered_white_listed.
      * @return
      */
-    public final LinkedList<Graph<Domain>> getFiltered() {
-        return filtered;
+    public final LinkedList<Graph<Domain>> getFilteredWhiteListed() {
+        return filtered_white_listed;
     }
 
     /**
@@ -88,11 +88,12 @@ public class Output implements Serializable {
     }
 
     /**
-     * Set filtered.
-     * @param filtered
+     * Set filtered_white_listed.
+     * @param filtered_white_listed
      */
-    public final void setFiltered(final LinkedList<Graph<Domain>> filtered) {
-        this.filtered = filtered;
+    public final void setFilteredWhiteListed(
+            final LinkedList<Graph<Domain>> filtered_white_listed) {
+        this.filtered_white_listed = filtered_white_listed;
     }
 
     /**
@@ -144,7 +145,7 @@ public class Output implements Serializable {
             return false;
         }
         final Output output = (Output) obj;
-        if (this.filtered.equals(output.filtered)
+        if (this.filtered_white_listed.equals(output.filtered_white_listed)
             && this.hist_cluster.equals(output.hist_cluster)
             && this.hist_pruning.equals(output.hist_pruning)
             && this.name.equals(output.name)
@@ -158,7 +159,7 @@ public class Output implements Serializable {
     public final int hashCode() {
         int hash = 5;
         hash = 23 * hash + this.name.hashCode()
-                + this.filtered.hashCode()
+                + this.filtered_white_listed.hashCode()
                 + this.hist_cluster.hashCode()
                 + this.hist_pruning.hashCode()
                 + this.stdout.hashCode();

@@ -87,8 +87,8 @@ public class ApplyAPT {
             output_file.write((line + "\n").getBytes("UTF-8"));
         }
 
-        LOGGER.log(Level.INFO, "Number of periodAPT injected : {0}",
-                counter_apt_total);
+        LOGGER.log(Level.INFO, "Number of periodAPT injected : {0} ({1})",
+                new Object[]{counter_apt_total, apt_domain});
     }
 
     /**
@@ -167,8 +167,8 @@ public class ApplyAPT {
             counter_apt_total = (int) out_2[4];
         }
 
-        LOGGER.log(Level.INFO, "Number of trafficAPT injected : {0}",
-                counter_apt_total);
+        LOGGER.log(Level.INFO, "Number of periodAPT injected : {0} ({1})",
+                new Object[]{counter_apt_total, apt_domain});
     }
 
     /**

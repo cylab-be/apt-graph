@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 Thomas.
+ * Copyright 2017 Thomas Gilon.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import java.io.IOException;
 
 /**
  *
- * @author Thomas
+ * @author Thomas Gilon
  */
 public class HistDataSerializer extends StdSerializer<HistData> {
 

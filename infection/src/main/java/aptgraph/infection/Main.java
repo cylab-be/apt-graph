@@ -69,7 +69,7 @@ public final class Main {
         options.addOption("i", true, "Input file (required)");
         options.addOption("o", true, "Output file (required)");
         options.addOption("d", true, "APT domain (required)");
-        options.addOption("t", true, "Type (required)");
+        options.addOption("t", true, "Type (periodic or traffic) (required)");
         options.addOption("u", true, "User (required)");
         Option arg_time_step = Option.builder("step")
                 .optionalArg(true)
