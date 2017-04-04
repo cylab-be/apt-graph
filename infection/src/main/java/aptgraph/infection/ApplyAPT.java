@@ -36,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.TimeZone;
 
 /**
  *
@@ -339,6 +340,7 @@ public class ApplyAPT {
     final long getDay(final long time) throws ParseException {
         SimpleDateFormat formatter
                 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         String time_string = formatter.format(new Date(time * 1L));
         // System.out.println("time_string = " + time_string);
         String[] time_split = time_string.split(" ");

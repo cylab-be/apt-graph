@@ -128,8 +128,8 @@ public class ApplyTest extends TestCase {
         System.out.println("Test getDay()");
 
         ApplyAPT apt = new ApplyAPT();
-        assertTrue(apt.getDay(1424214000000L) == 1424214000000L);
-        assertTrue(apt.getDay(1424246271229L) == 1424214000000L);
+        assertTrue(apt.getDay(1424217600000L) == 1424217600000L);
+        assertTrue(apt.getDay(1424246271229L) == 1424217600000L);
     }
 
     /**
