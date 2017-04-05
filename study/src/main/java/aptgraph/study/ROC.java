@@ -85,7 +85,7 @@ public final class ROC {
         for (Entry<Double, LinkedList<Domain>> entry : ranking.entrySet()) {
             LinkedList<Domain> list = entry.getValue();
             for (Domain dom : list) {
-                if (dom.getName().contains("APT")) {
+                if (dom.getName().endsWith(".apt")) {
                     n_apt += 1.0;
                 } else {
                     n_dom += 1.0;

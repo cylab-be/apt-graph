@@ -959,22 +959,22 @@ public class RequestHandler {
             double rank = Double.MAX_VALUE;
             boolean founded = false;
             for (Domain dom : sorted) {
-                if (dom.getName().equals("APT.FINDME.be")) {
+                if (dom.getName().endsWith(".apt")) {
                     rank = index.get(dom);
                     top++;
                     founded = true;
                 }
-                if (!dom.getName().equals("APT.FINDME.be")
+                if (!dom.getName().endsWith(".apt")
                         && index.get(dom) <= rank) {
                     top++;
                 }
             }
             if (founded) {
-                m.concatRankingPrint("<br>TOP for APT.FINDME.be: "
+                m.concatRankingPrint("<br>TOP for first APT: "
                        + Math.round(top / m.getAllDomains()
                        .get("all").values().size() * 100 * 100) / 100.0 + "%");
             } else {
-                m.concatRankingPrint("<br>TOP for APT.FINDME.be: NOT FOUND");
+                m.concatRankingPrint("<br>TOP for APT: NOT FOUND");
             }
         }
         m.concatRankingPrint("<br>Ranking:");
