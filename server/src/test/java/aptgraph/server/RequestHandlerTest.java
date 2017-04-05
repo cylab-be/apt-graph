@@ -108,7 +108,7 @@ public class RequestHandlerTest extends TestCase {
             for (Graph<Domain> graph : graphs) {
                 for (Domain dom : graph.getNodes()) {
                     assertTrue(all_domains.get("byUsers")
-                            .get(user + ":" + dom).equals(dom));
+                            .get(user + ":" + dom.getName()).equals(dom));
                     for (Request req : dom) {
                         assertTrue(all_domains.get("all")
                                 .get(dom.getName()).contains(req));
@@ -660,13 +660,13 @@ public class RequestHandlerTest extends TestCase {
         Domain domain_node_2 = new Domain();
         Domain domain_node_3 = new Domain();
         for (Domain dom : domain_graph.getNodes()) {
-            if (dom.toString().equals("stats.g.doubleclick.net")) {
+            if (dom.getName().equals("stats.g.doubleclick.net")) {
               domain_node_1 = dom;
             }
-            if (dom.toString().equals("ad.doubleclick.net")) {
+            if (dom.getName().equals("ad.doubleclick.net")) {
                 domain_node_2 = dom;
             }
-            if (dom.toString().equals("ss.symcd.com")) {
+            if (dom.getName().equals("ss.symcd.com")) {
                 domain_node_3 = dom;
             }
         }
@@ -713,9 +713,9 @@ public class RequestHandlerTest extends TestCase {
         for (Domain dom : domain_graph_new_2.getNodes()) {
             for (String user : handler.getMemory().getUsersList()) {
                 if (handler.getMemory().getAllDomains().get("byUsers").get(user
-                            + ":" + dom.toString()) != null) {
+                            + ":" + dom.getName()) != null) {
                     if (handler.getMemory().getAllDomains().get("byUsers")
-                        .get(user + ":" + dom.toString()).toArray().length < 2) {
+                        .get(user + ":" + dom.getName()).toArray().length < 2) {
                         assertFalse(domain_graph_new_3.containsKey(dom));
                     } else {
                         assertTrue(domain_graph_new_3.containsKey(dom));

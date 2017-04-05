@@ -227,6 +227,8 @@ public class RequestHandler {
             }
 
             // Load users graphs
+            m.setAllDomains(new HashMap<String, Domain>(),
+                    new HashMap<String, Domain>());
             loadUsersGraphs(start_time);
 
             long estimated_time_2 = System.currentTimeMillis() - start_time;
@@ -551,6 +553,7 @@ public class RequestHandler {
      * @return
      */
     final void loadUsersGraphs(final long start_time) {
+        m.setUsersGraphs(new HashMap<String, LinkedList<Graph<Domain>>>());
         for (String user_temp : m.getUsersList()) {
             LinkedList<Graph<Domain>> graphs_temp = FileManager.getUserGraphs(
                     input_dir, user_temp);
@@ -870,9 +873,9 @@ public class RequestHandler {
                 }
                 for (String user : m.getUsersList()) {
                     if (m.getAllDomains().get("byUsers").get(user
-                            + ":" + dom.toString()) != null) {
+                            + ":" + dom.getName()) != null) {
                         if (m.getAllDomains().get("byUsers").get(user
-                                + ":" + dom.toString()).toArray().length
+                                + ":" + dom.getName()).toArray().length
                                 < m.getNumberRequests()
                             && !whitelisted.contains(dom)) {
                             whitelisted.add(dom);
@@ -951,12 +954,12 @@ public class RequestHandler {
             double rank = Double.MAX_VALUE;
             boolean founded = false;
             for (Domain dom : sorted) {
-                if (dom.toString().equals("APT.FINDME.be")) {
+                if (dom.getName().equals("APT.FINDME.be")) {
                     rank = index.get(dom);
                     top++;
                     founded = true;
                 }
-                if (!dom.toString().equals("APT.FINDME.be")
+                if (!dom.getName().equals("APT.FINDME.be")
                         && index.get(dom) <= rank) {
                     top++;
                 }
