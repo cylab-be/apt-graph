@@ -27,6 +27,7 @@ import aptgraph.core.Domain;
 import info.debatty.java.graphs.Graph;
 import java.io.Serializable;
 import java.util.LinkedList;
+import java.util.TreeMap;
 
 /**
  *
@@ -36,6 +37,7 @@ public class Output implements Serializable {
     private String name = "";
     private LinkedList<Graph<Domain>> filtered_white_listed;
     private String stdout;
+    private TreeMap<Double, LinkedList<Domain>> ranking;
     private HistData hist_pruning;
     private HistData hist_cluster;
 
@@ -61,6 +63,14 @@ public class Output implements Serializable {
      */
     public final String getStdout() {
         return stdout;
+    }
+
+    /**
+     * Return ranking TreeMap.
+     * @return
+     */
+    public final TreeMap<Double, LinkedList<Domain>> getRanking() {
+        return ranking;
     }
 
     /**
@@ -102,6 +112,15 @@ public class Output implements Serializable {
      */
     public final void setStdout(final String stdout) {
         this.stdout = stdout;
+    }
+
+    /**
+     * Set ranking TreeMap.
+     * @param ranking
+     */
+    public final void setRanking(
+            final TreeMap<Double, LinkedList<Domain>> ranking) {
+        this.ranking = ranking;
     }
 
     /**
@@ -149,7 +168,8 @@ public class Output implements Serializable {
             && this.hist_cluster.equals(output.hist_cluster)
             && this.hist_pruning.equals(output.hist_pruning)
             && this.name.equals(output.name)
-            && this.stdout.equals(output.stdout)) {
+            && this.stdout.equals(output.stdout)
+            && this.ranking.equals(output.ranking)) {
             return true;
         }
         return false;
@@ -162,7 +182,8 @@ public class Output implements Serializable {
                 + this.filtered_white_listed.hashCode()
                 + this.hist_cluster.hashCode()
                 + this.hist_pruning.hashCode()
-                + this.stdout.hashCode();
+                + this.stdout.hashCode()
+                + this.ranking.hashCode();
         return hash;
     }
 }

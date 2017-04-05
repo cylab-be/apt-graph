@@ -46,6 +46,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.TreeMap;
 
 /**
  *
@@ -59,7 +60,11 @@ public class RequestHandler {
 
     private final Memory m = new Memory();
 
-    RequestHandler(final Path input_dir) {
+    /**
+     * Create new handler.
+     * @param input_dir
+     */
+    public RequestHandler(final Path input_dir) {
         this.input_dir = input_dir;
     }
 
@@ -67,7 +72,7 @@ public class RequestHandler {
      * Give access to the internal memory of server.
      * @return m
      */
-    final Memory getMemory() {
+    public final Memory getMemory() {
         return this.m;
     }
 
@@ -973,9 +978,18 @@ public class RequestHandler {
             }
         }
         m.concatRankingPrint("<br>Ranking:");
+        m.setRanking(new TreeMap<Double, LinkedList<Domain>>());
         for (Domain dom : sorted) {
             m.concatRankingPrint("<br>    ("
-                    + Math.round(index.get(dom) * 100) / 100.0 + ") " + dom);
+                    + Math.round(index.get(dom) * 100) / 100.0 + ") "
+                    + dom.getName());
+            if (!m.getRanking().keySet().contains(index.get(dom))) {
+                LinkedList<Domain> list = new LinkedList<Domain>();
+                list.add(dom);
+                m.getRanking().put(index.get(dom), list);
+            } else {
+                m.getRanking().get(index.get(dom)).add(dom);
+            }
         }
     }
 
@@ -989,6 +1003,7 @@ public class RequestHandler {
         output.setStdout(m.getStdout());
         output.setHistPruning(m.getHistDataSimilarities());
         output.setHistCluster(m.getHistDataClusters());
+        output.setRanking(m.getRanking());
         return output;
     }
 }

@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.TreeMap;
 
 /**
  *
@@ -102,8 +103,11 @@ public class Memory {
     private double[] ranking_weights;
     // Indicator for search of APT.FINDME.be
     private boolean apt_search;
-    // Info of Ranking
+    // Info of Ranking for print
     private String ranking_print;
+    // Info of Ranking
+    private TreeMap<Double, LinkedList<Domain>> ranking
+            = new TreeMap<Double, LinkedList<Domain>>();
     // Standard output on UI
     private String stdout;
 
@@ -643,7 +647,7 @@ public class Memory {
     }
 
     /**
-     * Get the info of Ranking.
+     * Get the info of Ranking for print.
      * @return ranking_print
      */
     public final String getRankingPrint() {
@@ -651,7 +655,7 @@ public class Memory {
     }
 
     /**
-     * Set the info of Ranking.
+     * Set the info of Ranking for print.
      * @param ranking_print
      */
     public final void setRankingPrint(
@@ -660,12 +664,29 @@ public class Memory {
     }
 
     /**
-     * Concatenate input to the info of Ranking.
+     * Concatenate input to the info of Ranking for print.
      * @param ranking_print
      */
     public final void concatRankingPrint(
             final String ranking_print) {
         this.ranking_print = this.ranking_print.concat(ranking_print);
+    }
+
+    /**
+     * Get the info of Ranking.
+     * @return ranking
+     */
+    public final TreeMap<Double, LinkedList<Domain>> getRanking() {
+        return this.ranking;
+    }
+
+    /**
+     * Set the info of Ranking.
+     * @param ranking
+     */
+    public final void setRanking(
+            final TreeMap<Double, LinkedList<Domain>> ranking) {
+        this.ranking = ranking;
     }
 
     /**

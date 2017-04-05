@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 import static junit.framework.Assert.assertTrue;
 import junit.framework.TestCase;
 
@@ -913,5 +914,35 @@ public class RequestHandlerTest extends TestCase {
                 new double[]{0.8, 0.2}, 0.02, 1000.0, false, false, true, "", 2,
                 new double[]{0.45, 0.45, 0.1}, true);
         assertTrue(out_31.equals(out_33));
+
+        // Test integrity of Domains
+        RequestHandler handler_bis =
+                new RequestHandler(Paths.get(
+                        "src/test/resources/dummyDir/"));
+        Output out_34 =
+                handler_bis.analyze("202.154.66.0", new double[]{0.6, 0.4, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 5, false, false, true, "", 1,
+                new double[]{0.45, 0.45, 0.1}, true);
+        Output out_35 =
+                handler_bis.analyze("219.253.0.0", new double[]{0.6, 0.4, 0.0},
+                new double[]{0.8, 0.2}, 0.02, 5, false, false, true, "", 1,
+                new double[]{0.45, 0.45, 0.1}, true);
+        assertFalse(out_34.equals(out_35));
+        for (Entry<Double, LinkedList<Domain>> entry_2 : out_34.getRanking().entrySet()) {
+            for (Domain dom : entry_2.getValue()) {
+                for (Request req : dom) {
+                    assertFalse(req.getClient().startsWith("219.253."));
+                    assertTrue(req.getClient().startsWith("202.154.66."));
+                }
+            }
+        }
+        for (Entry<Double, LinkedList<Domain>> entry_1 : out_35.getRanking().entrySet()) {
+            for (Domain dom : entry_1.getValue()) {
+                for (Request req : dom) {
+                    assertFalse(req.getClient().startsWith("202.154.66."));
+                    assertTrue(req.getClient().startsWith("219.253."));
+                }
+            }
+        }
     }
 }
