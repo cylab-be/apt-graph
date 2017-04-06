@@ -136,11 +136,12 @@ public final class Main {
                 if (!(new File(cmd.getOptionValue("o"))).exists()
                     || first_write) {
                     Files.write(Paths.get(cmd.getOptionValue("o")),
-                            config_lines_sweeped);
+                            config_lines_sweeped, StandardCharsets.UTF_8);
                     first_write = false;
                 } else {
                     Files.write(Paths.get(cmd.getOptionValue("o")),
-                            config_lines_sweeped, StandardOpenOption.APPEND);
+                            config_lines_sweeped, StandardCharsets.UTF_8,
+                            StandardOpenOption.APPEND);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName())
