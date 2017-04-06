@@ -23,6 +23,7 @@
  */
 package aptgraph.study;
 
+import aptgraph.batch.BatchProcessor;
 import aptgraph.core.Domain;
 import aptgraph.server.RequestHandler;
 import aptgraph.server.Output;
@@ -53,6 +54,8 @@ import org.json.JSONObject;
 public final class Main {
 
     private static final boolean DEFAULT_OVERWRITE_BOOL = false;
+    private static final Logger LOGGER = Logger.getLogger(
+            BatchProcessor.class.getName());
 
     /**
      * @param args the command line arguments
@@ -67,7 +70,7 @@ public final class Main {
         options.addOption("i", true, "Input config file (required)");
         Option arg_overwrite = Option.builder("x")
                 .optionalArg(true)
-                .desc("Overwrite existing graphs (default : false)")
+                .desc("Overwrite existing files (default : false)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
@@ -142,6 +145,9 @@ public final class Main {
                 ROC.makeROC(ranking, handler.getMemory().getAllDomains()
                         .get("all").values().size() - n_apt_tot, n_apt_tot,
                         obj.getString("output_file"));
+            } else {
+                LOGGER.log(Level.INFO,
+                "File {0} has been skipped...", obj.getString("output_file"));
             }
         }
     }
