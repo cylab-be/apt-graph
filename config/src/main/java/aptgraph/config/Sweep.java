@@ -58,7 +58,7 @@ public final class Sweep {
             JSONObject obj_new = new JSONObject(obj.toString());
             obj_new.put(field, value.toString());
             if (!multi.isEmpty()) {
-                obj_new.put(multi, BigDecimal.ONE.subtract(value).toString());
+                obj_new.put(multi, stop.subtract(value).toString());
             }
             String[] output_file_new_temp =
                     obj.getString("output_file").split("\\.");
@@ -71,7 +71,7 @@ public final class Sweep {
                     + "_" + value.toString();
             if (!multi.isEmpty()) {
                 output_file_new = output_file_new + "_" + multi
-                    + "_" + BigDecimal.ONE.subtract(value).toString();
+                    + "_" + stop.subtract(value).toString();
             }
             output_file_new = output_file_new + "."
                     + output_file_new_temp[output_file_new_temp.length - 1];
