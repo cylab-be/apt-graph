@@ -27,6 +27,7 @@ import aptgraph.core.Domain;
 import aptgraph.server.RequestHandler;
 import aptgraph.server.Output;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -73,7 +74,8 @@ public final class Main {
         List<String> config = null;
         try {
             config = Files.readAllLines(
-                    Paths.get(cmd.getOptionValue("i")));
+                    Paths.get(cmd.getOptionValue("i")),
+                    StandardCharsets.UTF_8);
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
