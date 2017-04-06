@@ -12,6 +12,7 @@
         <module>../server</module>
         <module>../integration</module>
         <module>../infection</module>
+        <module>../config</module>
         <module>../study</module>
     </modules>
 </project>
