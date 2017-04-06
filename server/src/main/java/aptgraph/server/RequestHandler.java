@@ -56,7 +56,7 @@ public class RequestHandler {
     private final Path input_dir;
 
     private static final Logger LOGGER
-            = Logger.getLogger(JsonRpcServer.class.getName());
+            = Logger.getLogger(RequestHandler.class.getName());
 
     private final Memory m = new Memory();
 

@@ -23,7 +23,6 @@
  */
 package aptgraph.study;
 
-import aptgraph.batch.BatchProcessor;
 import aptgraph.core.Domain;
 import aptgraph.server.RequestHandler;
 import aptgraph.server.Output;
@@ -55,7 +54,7 @@ public final class Main {
 
     private static final boolean DEFAULT_OVERWRITE_BOOL = false;
     private static final Logger LOGGER = Logger.getLogger(
-            BatchProcessor.class.getName());
+            Main.class.getName());
 
     /**
      * @param args the command line arguments
@@ -83,7 +82,7 @@ public final class Main {
                 || !cmd.hasOption("i")) {
 
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("java -jar infection-<version>.jar", options);
+            formatter.printHelp("java -jar study-<version>.jar", options);
             return;
         }
         try {

@@ -23,7 +23,6 @@
  */
 package aptgraph.config;
 
-import aptgraph.server.JsonRpcServer;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -52,7 +51,7 @@ import org.json.JSONObject;
 public final class Main {
 
     private static final Logger LOGGER
-            = Logger.getLogger(JsonRpcServer.class.getName());
+            = Logger.getLogger(Main.class.getName());
 
     /**
      * @param args the command line arguments
@@ -89,7 +88,7 @@ public final class Main {
                 || !cmd.hasOption("step")) {
 
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("java -jar infection-<version>.jar", options);
+            formatter.printHelp("java -jar config-<version>.jar", options);
             return;
         }
 

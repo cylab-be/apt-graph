@@ -44,7 +44,7 @@ public final class FileManager {
     }
 
     private static final Logger LOGGER
-            = Logger.getLogger(JsonRpcServer.class.getName());
+            = Logger.getLogger(FileManager.class.getName());
 
     /**
      * Load the list of graphs for a given user.

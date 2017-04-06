@@ -25,7 +25,6 @@ package aptgraph.infection;
 
 import aptgraph.batch.BatchProcessor;
 import aptgraph.core.Request;
-import aptgraph.server.JsonRpcServer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +44,7 @@ import java.util.TimeZone;
 public class ApplyAPT {
 
     private static final Logger LOGGER
-            = Logger.getLogger(JsonRpcServer.class.getName());
+            = Logger.getLogger(ApplyAPT.class.getName());
 
     /**
      * Infect a log file with a periodic APT.

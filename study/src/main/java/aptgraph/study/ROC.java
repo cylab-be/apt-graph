@@ -24,7 +24,6 @@
 package aptgraph.study;
 
 import aptgraph.core.Domain;
-import aptgraph.server.JsonRpcServer;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +43,7 @@ public final class ROC {
     }
 
     private static final Logger LOGGER
-            = Logger.getLogger(JsonRpcServer.class.getName());
+            = Logger.getLogger(ROC.class.getName());
 
     /**
      * Build the file with ROC curve based on the ranking.
