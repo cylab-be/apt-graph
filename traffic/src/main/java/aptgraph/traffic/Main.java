@@ -71,7 +71,6 @@ public final class Main {
         options.addOption("i", true, "Input config file (required)");
         options.addOption("o", true, "Output config file (required)");
         options.addOption("r", true, "Resolution (required)");
-        options.addOption("f", true, "Resolution (required)");
         Option arg_format = Option.builder("f")
                 .optionalArg(true)
                 .desc("Specify format of input file (default : squid)")
@@ -96,6 +95,16 @@ public final class Main {
         double res = 0.0;
         try {
             res = Double.parseDouble(cmd.getOptionValue("r"));
+        } catch (IllegalArgumentException ex) {
+                System.err.println(ex);
+        }
+        try {
+            if (cmd.hasOption("f")) {
+                format = cmd.getOptionValue("f");
+                if (!format.equals("squid") && !format.equals("json")) {
+                    throw new IllegalArgumentException("Wrong format option");
+                }
+            }
         } catch (IllegalArgumentException ex) {
                 System.err.println(ex);
         }
