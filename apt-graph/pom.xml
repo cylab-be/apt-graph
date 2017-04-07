@@ -14,5 +14,6 @@
         <module>../infection</module>
         <module>../config</module>
         <module>../study</module>
+        <module>../traffic</module>
     </modules>
 </project>

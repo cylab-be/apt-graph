@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -117,17 +118,24 @@ public class BatchProcessor {
      * @param format
      * @return LinkedList<Request>
      */
-    final LinkedList<Request> parseFile(final InputStream file,
-            final String format)
-            throws IOException {
+    public final LinkedList<Request> parseFile(final InputStream file,
+            final String format) {
 
         LinkedList<Request> requests = new LinkedList<Request>();
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(file, "UTF-8"));
-        String line;
+        try {
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(file, "UTF-8"));
+            String line;
 
-        while ((line = in.readLine()) != null) {
-            requests.add(parseLine(line, format));
+            while ((line = in.readLine()) != null) {
+                requests.add(parseLine(line, format));
+            }
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(BatchProcessor.class.getName()).log(Level.SEVERE,
+                    null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BatchProcessor.class.getName()).log(Level.SEVERE,
+                    null, ex);
         }
 
         return requests;

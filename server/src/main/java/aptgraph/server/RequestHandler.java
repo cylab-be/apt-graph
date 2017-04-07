@@ -740,7 +740,7 @@ public class RequestHandler {
         ArrayList<Double> list_func = new ArrayList<Double>(list.size());
         // Transform list in z score if needed
         if (z_bool) {
-            for (int i = 0; i <= list.size() - 1; i++) {
+            for (int i = 0; i < list.size(); i++) {
                 list_func.add(i, Utility.getZ(mean, variance, list.get(i)));
             }
         } else {
@@ -760,22 +760,10 @@ public class RequestHandler {
             }
             step = 0.01;
         }
-        HistData hist_data = new HistData();
-        for (Double i = min; i <= max + step; i += step) {
-            hist_data.put(i, 0.0);
-        }
-        for (Double d1 : list_func) {
-            Double diff = Double.MAX_VALUE;
-            Double bin = hist_data.keySet().iterator().next();
-            for (Double d2 : hist_data.keySet()) {
-                if (Math.abs(d2 - d1) < diff) {
-                    diff = Math.abs(d2 - d1);
-                    bin = d2;
-                }
-            }
-            hist_data.put(bin, hist_data.get(bin)
-                    + 1.0 / list_func.size() * 100);
-        }
+
+        HistData hist_data = Utility.computeHistogram(
+                list_func, min, max, step);
+
         // there ara actually (bins + 2) bins (to include max in the histogram)
         if (mode.equals("prune")) {
             m.setHistDataSimilarities(hist_data);

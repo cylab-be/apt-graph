@@ -183,6 +183,38 @@ public final class Utility {
     }
 
     /**
+     * Compute the histogram of a given list.
+     * @param list
+     * @param min
+     * @param max
+     * @param step
+     * @return HistData
+     */
+    public static HistData computeHistogram(
+        final ArrayList<Double> list,
+        final double min,
+        final double max,
+        final double step) {
+        HistData hist_data = new HistData();
+        for (Double i = min; i <= max + step; i += step) {
+            hist_data.put(i, 0.0);
+        }
+        for (Double d1 : list) {
+            Double diff = Double.MAX_VALUE;
+            Double bin = hist_data.keySet().iterator().next();
+            for (Double d2 : hist_data.keySet()) {
+                if (Math.abs(d2 - d1) < diff) {
+                    diff = Math.abs(d2 - d1);
+                    bin = d2;
+                }
+            }
+            hist_data.put(bin, hist_data.get(bin)
+                    + 1.0 / list.size() * 100);
+        }
+        return hist_data;
+    }
+
+    /**
      * Sorting function, based on the given index.
      * @param list_domain
      * @param index
