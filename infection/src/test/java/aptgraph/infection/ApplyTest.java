@@ -52,7 +52,7 @@ public class ApplyTest extends TestCase {
         apt.periodicAPT(getClass().getResourceAsStream(
                 "/1000_http_requests.txt"),
                 new FileOutputStream(temp_file),
-                "APT.FINDME.be", "167.167.167.167", "squid", 1000L);
+                "APT.FINDME.be", "314.15.238.23", "squid", 1000L);
 
         BufferedReader in_1 = new BufferedReader(
                 new InputStreamReader(new FileInputStream(temp_file), "UTF-8"));
@@ -85,15 +85,15 @@ public class ApplyTest extends TestCase {
      * @throws java.text.ParseException 
      */
     public final void testTrafficAPT() throws IOException, ParseException {
-        System.out.println("Test periodicAPT()");
+        System.out.println("Test testTrafficAPT()");
         File temp_file = File.createTempFile("file", ".log");
 
         ApplyAPT apt = new ApplyAPT();
         apt.trafficAPT(getClass().getResourceAsStream(
                 "/1000_http_requests.txt"),
                 new FileOutputStream(temp_file),
-                "APT.FINDME.be", "167.167.167.167", "squid", 20, 100L, 10, 0.5,
-                1800000, 50L);
+                "APT.FINDME.be", "314.15.238.23", "squid", 100L, 100L, 5, 1,
+                1000, 50L);
 
         BufferedReader in_1 = new BufferedReader(
                 new InputStreamReader(new FileInputStream(temp_file), "UTF-8"));

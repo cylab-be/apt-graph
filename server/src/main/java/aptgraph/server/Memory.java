@@ -90,7 +90,7 @@ public class Memory {
     // Indicator for white listing
     private boolean whitelist_bool;
     // Path of the white list
-    private static final Path PATH = Paths.get("./src/main/resources/hosts");
+    private static final Path PATH = Paths.get("src/main/resources/hosts");
     // List of white listed domains on the go
     private String white_ongo;
     // Minimum number of requests sent by user for a given domain

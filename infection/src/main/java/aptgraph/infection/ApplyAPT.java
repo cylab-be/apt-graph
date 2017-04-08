@@ -132,42 +132,67 @@ public class ApplyAPT {
         String line_1 = in.readLine();
         Request request_1 = batch.parseLine(line_1, format);
         output_file.write((line_1 + "\n").getBytes("UTF-8"));
-        Long time = request_1.getTime();
-        Long day = getDay(time);
+        // check if the request came from the targeted user
+        while (!request_1.getClient().equals(user)
+                && (line_1 = in.readLine()) != null) {
+            request_1 = batch.parseLine(line_1, format);
+            output_file.write((line_1 + "\n").getBytes("UTF-8"));
+        }
+        if (line_1 != null) {
+            Long time = request_1.getTime();
+            Long day = getDay(time);
 
-        String line_2 = in.readLine();
-        Request request_2 = batch.parseLine(line_2, format);
-        output_file.write((line_2 + "\n").getBytes("UTF-8"));
+            String line_2 = in.readLine();
+            Request request_2 = batch.parseLine(line_2, format);
+            output_file.write((line_2 + "\n").getBytes("UTF-8"));
+            // check if the request came from the targeted user
+            while (!request_2.getClient().equals(user)
+                    && (line_2 = in.readLine()) != null) {
+                request_2 = batch.parseLine(line_2, format);
+                output_file.write((line_2 + "\n").getBytes("UTF-8"));
+            }
 
-        long[] out_1 = verifyTraffic(request_1, request_2,
-                day, delta_time, time, duration, counter_apt_daily,
-                counter_apt_total_daily, counter_apt_total,
-                injection_day, last_injection, proportion, distance_time, delay,
-                apt_domain, user, output_file, format);
-        time = out_1[0];
-        last_injection = out_1[1];
-        counter_apt_daily = (int) out_1[2];
-        counter_apt_total_daily = (int) out_1[3];
-        counter_apt_total = (int) out_1[4];
+            if (line_2 != null) {
+                long[] out_1 = verifyTraffic(request_1, request_2,
+                        day, delta_time, time, duration, counter_apt_daily,
+                        counter_apt_total_daily, counter_apt_total,
+                        injection_day, last_injection, proportion,
+                        distance_time, delay,
+                        apt_domain, user, output_file, format);
+                time = out_1[0];
+                last_injection = out_1[1];
+                counter_apt_daily = (int) out_1[2];
+                counter_apt_total_daily = (int) out_1[3];
+                counter_apt_total = (int) out_1[4];
 
-        while ((line = in.readLine()) != null) {
-            request_1 = request_2;
-            request_2 = batch.parseLine(line, format);
-            output_file.write((line + "\n").getBytes("UTF-8"));
+                while ((line = in.readLine()) != null) {
+                    request_1 = request_2;
+                    request_2 = batch.parseLine(line, format);
+                    output_file.write((line + "\n").getBytes("UTF-8"));
+                    while (!request_2.getClient().equals(user)
+                            && (line = in.readLine()) != null) {
+                        request_2 = batch.parseLine(line, format);
+                        output_file.write((line + "\n").getBytes("UTF-8"));
+                    }
 
-            long[] out_2 = verifyTraffic(request_1, request_2,
-                day, delta_time, time, duration, counter_apt_daily,
-                counter_apt_total_daily, counter_apt_total,
-                injection_day, last_injection, proportion, distance_time, delay,
-                apt_domain, user, output_file, format);
-            time = out_2[0];
-            last_injection = out_2[1];
-            counter_apt_daily = (int) out_2[2];
-            counter_apt_total_daily = (int) out_2[3];
-            counter_apt_total = (int) out_2[4];
+                    if (line != null) {
+                        long[] out_2 = verifyTraffic(request_1, request_2,
+                            day, delta_time, time, duration, counter_apt_daily,
+                            counter_apt_total_daily, counter_apt_total,
+                            injection_day, last_injection, proportion,
+                            distance_time, delay,
+                            apt_domain, user, output_file, format);
+                        time = out_2[0];
+                        last_injection = out_2[1];
+                        counter_apt_daily = (int) out_2[2];
+                        counter_apt_total_daily = (int) out_2[3];
+                        counter_apt_total = (int) out_2[4];
+                    }
+                }
+            }
         }
 
-        LOGGER.log(Level.INFO, "Number of periodAPT injected : {0} ({1})",
+        LOGGER.log(Level.INFO, "Number of trafficAPT injected : {0} ({1})",
                 new Object[]{counter_apt_total, apt_domain});
     }
 
