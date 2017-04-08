@@ -570,7 +570,7 @@ public class RequestHandler {
                 if (!m.getAllDomains().get("all").containsKey(dom.getName())) {
                     m.getAllDomains().get("all").put(dom.getName(), dom);
                 } else if (!m.getAllDomains().get("all")
-                        .get(dom.getName()).equals(dom)) {
+                        .get(dom.getName()).deepEquals(dom)) {
                     m.getAllDomains().get("all").put(dom.getName(),
                             m.getAllDomains().get("all")
                                     .get(dom.getName()).merge(dom));

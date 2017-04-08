@@ -161,11 +161,11 @@ public class DomainTest {
         dom_6.add(req_2);
 
         // Test
-        assertTrue(dom_1.equals(dom_2));
-        assertFalse(dom_1.equals(dom_3));
-        assertFalse(dom_1.equals(dom_4));
-        assertFalse(dom_1.equals(dom_5));
-        assertFalse(dom_1.equals(dom_6));
+        assertTrue(dom_1.deepEquals(dom_2));
+        assertFalse(dom_1.deepEquals(dom_3));
+        assertFalse(dom_1.deepEquals(dom_4));
+        assertFalse(dom_1.deepEquals(dom_5));
+        assertFalse(dom_1.deepEquals(dom_6));
     }
     
 }

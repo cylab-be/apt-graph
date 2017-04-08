@@ -23,7 +23,6 @@
  */
 package aptgraph.core;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -71,8 +70,7 @@ public class Domain extends LinkedList<Request> {
      * @param obj
      * @return boolean
      */
-    @Override
-    public final boolean equals(final Object obj) {
+    public final boolean deepEquals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -92,14 +90,6 @@ public class Domain extends LinkedList<Request> {
                 }
         }
         return output;
-    }
-
-    @Override
-    public final int hashCode() {
-        int hash = 5;
-        hash = 23 * hash + this.name.hashCode()
-                + Arrays.hashCode(this.toArray());
-        return hash;
     }
 
     /**
