@@ -209,7 +209,7 @@ public final class Utility {
                 }
             }
             hist_data.put(bin, hist_data.get(bin)
-                    + 1.0 / list.size() * 100);
+                    + 1.0); // / list.size() * 100);
         }
         return hist_data;
     }
