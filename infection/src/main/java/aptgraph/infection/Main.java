@@ -74,7 +74,7 @@ public final class Main {
         Option arg_time_step = Option.builder("step")
                 .optionalArg(true)
                 .desc("Specify time step between periodic"
-                        + " injection [min] (required for periodic APT)")
+                        + " injection (required for periodic APT)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();

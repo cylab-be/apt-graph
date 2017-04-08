@@ -160,10 +160,11 @@ public class ApplyAPT {
                         distance_time, delay,
                         apt_domain, user, output_file, format);
                 time = out_1[0];
-                last_injection = out_1[1];
-                counter_apt_daily = (int) out_1[2];
-                counter_apt_total_daily = (int) out_1[3];
-                counter_apt_total = (int) out_1[4];
+                day = out_1[1];
+                last_injection = out_1[2];
+                counter_apt_daily = (int) out_1[3];
+                counter_apt_total_daily = (int) out_1[4];
+                counter_apt_total = (int) out_1[5];
 
                 while ((line = in.readLine()) != null) {
                     request_1 = request_2;
@@ -183,10 +184,11 @@ public class ApplyAPT {
                             distance_time, delay,
                             apt_domain, user, output_file, format);
                         time = out_2[0];
-                        last_injection = out_2[1];
-                        counter_apt_daily = (int) out_2[2];
-                        counter_apt_total_daily = (int) out_2[3];
-                        counter_apt_total = (int) out_2[4];
+                        day = out_2[1];
+                        last_injection = out_2[2];
+                        counter_apt_daily = (int) out_2[3];
+                        counter_apt_total_daily = (int) out_2[4];
+                        counter_apt_total = (int) out_2[5];
                     }
                 }
             }
@@ -200,7 +202,7 @@ public class ApplyAPT {
      * Verify the traffic and inject APT if needed.
      * @param request_1
      * @param request_2
-     * @param day
+     * @param day_in
      * @param delta_time
      * @param time_in
      * @param duration
@@ -222,7 +224,7 @@ public class ApplyAPT {
      * @throws IOException
      */
     private long[] verifyTraffic(final Request request_1,
-            final Request request_2, final long day, final long delta_time,
+            final Request request_2, final long day_in, final long delta_time,
             final long time_in, final long duration,
             final int counter_apt_daily_in,
             final int counter_apt_total_daily_in,
@@ -233,6 +235,7 @@ public class ApplyAPT {
             final OutputStream output_file, final String format)
             throws ParseException, IOException {
         long time = time_in;
+        long day = day_in;
         long last_injection = last_injection_in;
         int counter_apt_daily = counter_apt_daily_in;
         int counter_apt_total_daily = counter_apt_total_daily_in;
@@ -271,10 +274,11 @@ public class ApplyAPT {
             }
         } else {
             time = request_2.getTime();
+            day = getDay(time);
             counter_apt_daily = 0;
             counter_apt_total_daily = 0;
         }
-        long[] output = {time, last_injection,
+        long[] output = {time, day, last_injection,
             (long) counter_apt_daily, (long) counter_apt_total_daily,
             (long) counter_apt_total};
         return output;
