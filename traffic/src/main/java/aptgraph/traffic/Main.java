@@ -68,8 +68,8 @@ public final class Main {
 
         // Parse command line arguments
         Options options = new Options();
-        options.addOption("i", true, "Input config file (required)");
-        options.addOption("o", true, "Output config file (required)");
+        options.addOption("i", true, "Input log file (required)");
+        options.addOption("o", true, "Output CSV file (required)");
         options.addOption("r", true, "Resolution (required)");
         Option arg_format = Option.builder("f")
                 .optionalArg(true)
