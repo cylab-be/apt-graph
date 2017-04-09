@@ -674,12 +674,7 @@ public class RequestHandlerTest extends TestCase {
             }
         }
 
-        System.out.println("domain_graph = " + domain_graph);
         Graph<Domain> domain_graph_new_1 = new Graph<Domain>(domain_graph);
-        System.out.println("dom_gr_new_1 = " + domain_graph_new_1);
-        assertTrue(domain_graph.containsKey(domain_node_1));
-        assertTrue(domain_graph.containsKey(domain_node_2));
-        assertTrue(domain_graph.containsKey(domain_node_3));
         assertTrue(domain_graph.equals(domain_graph_new_1));
         assertTrue(domain_graph_new_1.containsKey(domain_node_1));
         assertTrue(domain_graph_new_1.containsKey(domain_node_2));
@@ -690,7 +685,6 @@ public class RequestHandlerTest extends TestCase {
 
         Graph<Domain> domain_graph_new_2
                 = handler.getMemory().getFilteredWhiteListed().getFirst();
-        System.out.println("dom_gr_new_2 = " + domain_graph_new_2);
         assertFalse(domain_graph_new_2.containsKey(domain_node_1));
         for (Domain dom : domain_graph_new_2.getNodes()) {
             NeighborList nl = domain_graph_new_2.getNeighbors(dom);
