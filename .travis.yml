@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - oraclejdk8
 
 # node_js comes pre-installed in every travis-ci box...
 env:
