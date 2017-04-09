@@ -77,7 +77,7 @@ public class RequestHandlerTest extends TestCase {
      * @throws java.lang.ClassNotFoundException
      */
     public void testAnalyze() throws IOException, ClassNotFoundException {
-        System.out.println("analyze");
+        System.out.println("\nanalyze");
 
         RequestHandler handler =
                 new RequestHandler(Paths.get("src/test/resources/dummyDir"));
@@ -674,8 +674,13 @@ public class RequestHandlerTest extends TestCase {
             }
         }
 
-        // System.out.println("Before whitelisting = " + filtered);
+        System.out.println("domain_graph = " + domain_graph);
         Graph<Domain> domain_graph_new_1 = new Graph<Domain>(domain_graph);
+        System.out.println("dom_gr_new_1 = " + domain_graph_new_1);
+        assertTrue(domain_graph.containsKey(domain_node_1));
+        assertTrue(domain_graph.containsKey(domain_node_2));
+        assertTrue(domain_graph.containsKey(domain_node_3));
+        assertTrue(domain_graph.equals(domain_graph_new_1));
         assertTrue(domain_graph_new_1.containsKey(domain_node_1));
         assertTrue(domain_graph_new_1.containsKey(domain_node_2));
         assertTrue(domain_graph_new_1.containsKey(domain_node_3));
@@ -683,9 +688,9 @@ public class RequestHandlerTest extends TestCase {
         handler.getMemory().setNumberRequests(0);
         handler.whiteListing();
 
-        // System.out.println("After whitelisting = " + filtered);
         Graph<Domain> domain_graph_new_2
                 = handler.getMemory().getFilteredWhiteListed().getFirst();
+        System.out.println("dom_gr_new_2 = " + domain_graph_new_2);
         assertFalse(domain_graph_new_2.containsKey(domain_node_1));
         for (Domain dom : domain_graph_new_2.getNodes()) {
             NeighborList nl = domain_graph_new_2.getNeighbors(dom);
@@ -730,7 +735,7 @@ public class RequestHandlerTest extends TestCase {
     }
 
     public void testStages() throws IOException, ClassNotFoundException {
-        System.out.println("Test Stages");
+        System.out.println("\nTest Stages");
 
         RequestHandler handler =
                 new RequestHandler(Paths.get(
