@@ -270,7 +270,7 @@ public class BatchProcessorTest extends TestCase {
         for (Request req : time_graph_old.getNodes()) {
             NeighborList nl = time_graph_old.getNeighbors(req);
             for (Neighbor<Request> nb : nl) {
-                if (nb.node.getTime() >= req.getTime()) {
+                if (nb.getNode().getTime() >= req.getTime()) {
                     assertTrue(time_graph.getNeighbors(req).contains(nb));
                 } else {
                     assertFalse(time_graph.getNeighbors(req).contains(nb));
@@ -328,10 +328,10 @@ public class BatchProcessorTest extends TestCase {
                         time_domain_graph.getNeighbors(
                                 domains.get(req.getDomain()));
                 for (Neighbor<Request> nb : nl_req) {
-                    if(nb.similarity != 0
-                            && !nb.node.getDomain().equals(req.getDomain())) {
+                    if(nb.getSimilarity() != 0
+                            && !nb.getNode().getDomain().equals(req.getDomain())) {
                         assertTrue(nl_dom.containsNode(
-                                domains.get(nb.node.getDomain())));
+                                domains.get(nb.getNode().getDomain())));
                     }
                 } 
             }
@@ -345,13 +345,13 @@ public class BatchProcessorTest extends TestCase {
                         if (req_1.getDomain().equals(dom_1.getName())) {
                             NeighborList nl_req_1 = time_graph.getNeighbors(req_1);
                             for (Neighbor<Request> req_2 : nl_req_1) {
-                                if (req_2.node.getDomain().equals(dom_2.node.getName())) {
-                                    similarity_temp += req_2.similarity;
+                                if (req_2.getNode().getDomain().equals(dom_2.getNode().getName())) {
+                                    similarity_temp += req_2.getSimilarity();
                                 }
                             }   
                         }
                     }
-                    assertTrue(Math.abs(dom_2.similarity - similarity_temp)
+                    assertTrue(Math.abs(dom_2.getSimilarity() - similarity_temp)
                             <= 1E-10);
                 }
             }

@@ -653,35 +653,34 @@ public class RequestHandler {
 
                         for (Neighbor<Domain> neighbor_temp : neighbors_temp) {
                             double new_similarity =
-                                    weights[i] * neighbor_temp.similarity;
+                                    weights[i] * neighbor_temp.getSimilarity();
 
                             if (mode.equals("byUsers") && all_neighbors
-                                    .containsKey(neighbor_temp.node)) {
-                                new_similarity +=
-                                        all_neighbors.get(neighbor_temp.node);
+                                    .containsKey(neighbor_temp.getNode())) {
+                                new_similarity += all_neighbors.get(
+                                        neighbor_temp.getNode());
                             } else if (mode.equals("all")
                                     && all_neighbors.containsKey(
                                             m.getAllDomains().get("all")
-                                            .get(neighbor_temp.node
+                                            .get(neighbor_temp.getNode()
                                                     .getName()))) {
                                 new_similarity +=
                                         all_neighbors.get(m.getAllDomains()
-                                            .get("all").get(neighbor_temp.node
-                                                    .getName()));
+                                            .get("all").get(neighbor_temp
+                                                    .getNode().getName()));
                             }
 
                             if (new_similarity != 0) {
                                 if (mode.equals("all")) {
                                     all_neighbors.put(
                                       m.getAllDomains().get(mode)
-                                      .get(neighbor_temp.node.getName()),
+                                      .get(neighbor_temp.getNode().getName()),
                                       new_similarity);
                                 } else if (mode.equals("byUsers")) {
                                     all_neighbors.put(
                                       m.getAllDomains().get(mode)
-                                      .get(user + ":"
-                                              + neighbor_temp.node.getName()),
-                                      new_similarity);
+                                      .get(user + ":" + neighbor_temp
+                                      .getNode().getName()), new_similarity);
                                 }
                             }
 
@@ -708,7 +707,7 @@ public class RequestHandler {
         for (Domain dom : m.getMergedGraph().getNodes()) {
             NeighborList neighbors = m.getMergedGraph().getNeighbors(dom);
             for (Neighbor<Domain> neighbor : neighbors) {
-                similarities.add(neighbor.similarity);
+                similarities.add(neighbor.getSimilarity());
             }
         }
         return similarities;
@@ -926,9 +925,9 @@ public class RequestHandler {
         for (Domain parent : graph_all.getNodes()) {
             for (Neighbor<Domain> child : graph_all.getNeighbors(parent)) {
                index_children.put(parent,
-                        index_children.get(parent) + child.similarity);
-                index_parents.put(child.node,
-                       index_parents.get(child.node) + child.similarity);
+                        index_children.get(parent) + child.getSimilarity());
+                index_parents.put(child.getNode(), index_parents.get(
+                        child.getNode()) + child.getSimilarity());
             }
         }
         // Fusion of indexes

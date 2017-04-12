@@ -93,7 +93,7 @@
         <dependency>
             <groupId>info.debatty</groupId>
             <artifactId>java-graphs</artifactId>
-            <version>0.39</version>
+            <version>0.40</version>
         </dependency>
         <dependency>
             <groupId>net.jcip</groupId>

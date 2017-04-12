@@ -175,7 +175,7 @@ public final class Utility {
             Iterator<Neighbor> iterator_2 = neighborlist.iterator();
             while (iterator_2.hasNext()) {
                 Neighbor<U> neighbor = iterator_2.next();
-                if (nodes.contains(neighbor.node)) {
+                if (nodes.contains(neighbor.getNode())) {
                     iterator_2.remove();
                 }
             }

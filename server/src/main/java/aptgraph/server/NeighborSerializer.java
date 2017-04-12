@@ -65,8 +65,8 @@ public class NeighborSerializer extends StdSerializer<Neighbor> {
 
 
         jgen.writeStartObject();
-        jgen.writeStringField("node", neighbor.node.toString());
-        jgen.writeNumberField("similarity", neighbor.similarity);
+        jgen.writeStringField("node", neighbor.getNode().toString());
+        jgen.writeNumberField("similarity", neighbor.getSimilarity());
         jgen.writeEndObject();
     }
 

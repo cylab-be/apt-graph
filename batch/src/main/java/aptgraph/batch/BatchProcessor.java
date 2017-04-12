@@ -453,7 +453,7 @@ public class BatchProcessor {
             NeighborList neighbors_new = new NeighborList(Integer.MAX_VALUE);
             NeighborList neighbors = graph.getNeighbors(req);
             for (Neighbor<Request> neighbor : neighbors) {
-                if (req.getTime() <= neighbor.node.getTime()) {
+                if (req.getTime() <= neighbor.getNode().getTime()) {
                     neighbors_new.add(neighbor);
                 }
             }
@@ -526,13 +526,13 @@ public class BatchProcessor {
                         graph.getNeighbors(request_node);
                 for (Neighbor<Request> neighbor : neighbors) {
                     // Find the corresponding domain name
-                    String other_domain_name = neighbor.node.getDomain();
+                    String other_domain_name = neighbor.getNode().getDomain();
                     if (other_domain_name.equals(domain_name)) {
                         continue;
                     }
 
                     Domain other_domain = domains.get(other_domain_name);
-                    double new_similarity = neighbor.similarity;
+                    double new_similarity = neighbor.getSimilarity();
                     if (other_domains_sim.containsKey(other_domain)) {
                         new_similarity +=
                                 other_domains_sim.get(other_domain);

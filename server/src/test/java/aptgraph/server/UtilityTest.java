@@ -75,7 +75,7 @@ public class UtilityTest {
         for (Domain dom : merged_graph.getNodes()) {
             NeighborList nl = merged_graph.getNeighbors(dom);
             for (Neighbor<Domain> nb : nl) {
-                assertFalse(nb.node.deepEquals(first_node));
+                assertFalse(nb.getNode().deepEquals(first_node));
             }
         }
     }
