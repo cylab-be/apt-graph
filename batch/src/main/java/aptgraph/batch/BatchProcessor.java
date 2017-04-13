@@ -12,6 +12,7 @@ import info.debatty.java.graphs.NeighborList;
 import info.debatty.java.graphs.SimilarityInterface;
 import info.debatty.java.graphs.build.ThreadedNNDescent;
 import info.debatty.java.graphs.build.Brute;
+import info.debatty.java.graphs.build.NNDescent;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -427,6 +428,12 @@ public class BatchProcessor {
         Graph<Request> graph;
         if (requests.size() < 2 * k) {
             Brute<Request> nndes = new Brute<Request>();
+            nndes.setSimilarity(similarity);
+            nndes.setK(k);
+            graph = nndes.computeGraph(requests);
+        } else if (requests.size() >= 2 * k && requests.size() < 500) {
+            NNDescent<Request> nndes =
+                    new NNDescent<Request>();
             nndes.setSimilarity(similarity);
             nndes.setK(k);
             graph = nndes.computeGraph(requests);
