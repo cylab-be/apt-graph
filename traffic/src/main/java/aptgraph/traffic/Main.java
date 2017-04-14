@@ -125,6 +125,12 @@ public final class Main {
         ArrayList<Double> list = new ArrayList<Double>();
         for (int i = 0; i < requests.size(); i++) {
             list.add(i, (double) requests.get(i).getTime());
+            if (requests.get(i).getTime() < start_time) {
+                start_time = requests.get(i).getTime();
+            }
+            if (requests.get(i).getTime() > stop_time) {
+                stop_time = requests.get(i).getTime();
+            }
         }
         LOGGER.log(Level.INFO, "List generated");
         HistData histogram = Utility.computeHistogram(list,

@@ -229,7 +229,7 @@ public class BatchProcessor {
         Request request = null;
         try {
         SimpleDateFormat sdf =
-                new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS");
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = sdf.parse(obj.getString("@timestamp"));
         Long timestamp = date.getTime();
