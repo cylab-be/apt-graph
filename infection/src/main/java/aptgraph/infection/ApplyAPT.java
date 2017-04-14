@@ -78,7 +78,7 @@ public class ApplyAPT {
         while ((line = in.readLine()) != null) {
             request = batch.parseLine(line, format);
 
-            if (time + time_step < request.getTime()) {
+            while (time + time_step < request.getTime()) {
                 writeRequest(buildAPT(time + time_step, apt_domain,
                         user), output_file, format);
                 time = time + time_step;
@@ -306,12 +306,9 @@ public class ApplyAPT {
                    + " " + request.getType() + "\n";
         } else if (format.equals("json")) {
             SimpleDateFormat formatter
-                = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
             String time_string = formatter.format(new Date(request.getTime()));
-            String[] time_string_split = time_string.split(" ");
-            time_string = time_string_split[0] + "T"
-                    + time_string_split[1] + "Z";
             request_string = "{\"@version\":\"0\","
                    + "\"@timestamp\":\"" + time_string + "\","
                    + "\"type\":\"0\","
