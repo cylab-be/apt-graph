@@ -263,7 +263,7 @@ public class RequestHandler {
             // Fusion of the users (Graph of Domains)
             double[] users_weights = new double[merged_graph_users.size()];
             for (int i = 0; i < merged_graph_users.size(); i++) {
-                users_weights[i] = 1.0 / merged_graph_users.size();
+                users_weights[i] = 1.0;
             }
             m.setMergedGraph(computeFusionGraphs(merged_graph_users, "",
                             users_weights, new double[] {0.0}, "all"));
