@@ -369,7 +369,7 @@ public class BatchProcessor {
         HashMap<String, Domain> domains = computeDomainNodes(requests);
 
         LOGGER.log(Level.INFO,
-                "Build the time based graph for user {0} ...", user);
+                "Build the Time based graph for user {0} ...", user);
         Graph<Request> time_graph =
                 computeRequestGraph(requests, k, new TimeSimilarity());
         // Selection of the temporal children only
