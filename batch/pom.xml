@@ -150,5 +150,11 @@
             <artifactId>json</artifactId>
             <version>20160810</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.24</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 </project>
