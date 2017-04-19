@@ -27,6 +27,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 /**
+ * Test file for Domain object.
  *
  * @author Thomas Gilon
  */
@@ -167,5 +168,5 @@ public class DomainTest {
         assertFalse(dom_1.deepEquals(dom_5));
         assertFalse(dom_1.deepEquals(dom_6));
     }
-    
+
 }

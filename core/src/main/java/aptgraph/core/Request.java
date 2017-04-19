@@ -1,16 +1,42 @@
+/*
+ * The MIT License
+ *
+ * Copyright 2016 Thibault Debatty & Thomas Gilon.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package aptgraph.core;
 
 import java.io.Serializable;
 import net.jcip.annotations.Immutable;
 
 /**
- * Represents a single Request.
- * The class is immutable (once it is created, it cannot be modified anymore),
- * which is very handy for multi-threaded programming.
+ * Represents a single Request. The class is immutable (once it is created, it
+ * cannot be modified anymore), which is very handy for multi-threaded
+ * programming.
+ *
  * @author Thibault Debatty
+ * @author Thomas Gilon
  */
 @Immutable
 public class Request implements Serializable {
+
     /**
      * Request time in ms.
      */
@@ -28,20 +54,22 @@ public class Request implements Serializable {
     private final String type;
 
     /**
-     * Create a new immutable request.
+     * Create a new immutable request (see
+     * http://wiki.squid-cache.org/Features/LogFormat for futher details about
+     * format).
      *
-     * @param time
-     * @param elapsed
-     * @param client
-     * @param code
-     * @param status
-     * @param bytes
-     * @param method
-     * @param url
-     * @param domain
-     * @param peerstatus
-     * @param peerhost
-     * @param type
+     * @param time Unix timestamp as UTC ms
+     * @param elapsed Elapsed time in ms
+     * @param client IP address of the requesting instance
+     * @param code Squid result code
+     * @param status Status code
+     * @param bytes Size
+     * @param method Request method
+     * @param url URL requested
+     * @param domain Domain name
+     * @param peerstatus Hierarchy codes
+     * @param peerhost IP address where the request was forwarded
+     * @param type Content type
      */
     public Request(
             final long time,
@@ -72,96 +100,109 @@ public class Request implements Serializable {
     }
 
     /**
-     * Unix Timestamp as UTC seconds with a millisecond resolution.
-     * @return
+     * Get Unix Timestamp as UTC milliseconds.
+     *
+     * @return long : Unix timestamp as UTC ms
      */
     public final long getTime() {
         return time;
     }
 
     /**
-     * In millisecond.
-     * @return
+     * Get elapsed time in millisecond.
+     *
+     * @return int : Elapsed time in ms
      */
     public final int getElapsed() {
         return elapsed;
     }
 
     /**
+     * Get IP address of the requesting instance.
      *
-     * @return
+     * @return String : IP address of the requesting instance
      */
     public final String getClient() {
         return client;
     }
 
     /**
+     * Get squid result code.
      *
-     * @return
+     * @return String : Squid result code
      */
     public final String getCode() {
         return code;
     }
 
     /**
+     * Get status code.
      *
-     * @return
+     * @return int : Status code
      */
     public final int getStatus() {
         return status;
     }
 
     /**
+     * Get size.
      *
-     * @return
+     * @return int : Size
      */
     public final int getBytes() {
         return bytes;
     }
 
     /**
+     * Get request method.
      *
-     * @return
+     * @return String : Request method
      */
     public final String getMethod() {
         return method;
     }
 
     /**
+     * Get URL requested.
      *
-     * @return
+     * @return url : URL requested
      */
     public final String getUrl() {
         return url;
     }
 
     /**
+     * Get domain name.
      *
-     * @return
+     * @return String : Domain name
      */
     public final String getDomain() {
         return domain;
     }
 
     /**
+     * Get hierarchy codes.
      *
-     * @return
+     * @return peerstatus : Hierarchy codes
      */
     public final String getPeerstatus() {
         return peerstatus;
     }
 
     /**
-     * This is the origin IP of the server if peerstatus is DIRECT.
-     * @return
+     * Get IP address where the request was forwarded, this is the origin IP of
+     * the server if peerstatus is DIRECT.
+     *
+     * @return String : IP address where the request was forwarded
      */
     public final String getPeerhost() {
         return peerhost;
     }
 
     /**
+     * Get content type.
      *
-     * @return
+     * @return String : Content type
      */
     public final String getType() {
         return type;

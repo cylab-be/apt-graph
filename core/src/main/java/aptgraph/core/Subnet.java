@@ -26,25 +26,26 @@ package aptgraph.core;
 import java.util.ArrayList;
 
 /**
+ * Represent a subnet. This is only compatible with IPv4.
  *
  * @author Thomas Gilon
  */
 public final class Subnet {
-    // This is only compatible with IPv4
 
     private Subnet() {
     }
 
     /**
      * Give the list of users in a specific subnet.
-     * @param input
-     * @param all_users
-     * @return users_subnet
+     *
+     * @param subnet_input Targeted subnet
+     * @param all_users List of all available users
+     * @return users_subnet : List of users in the given subnet
      */
     public static ArrayList<String> getUsersInSubnet(
-            final String input, final ArrayList<String> all_users) {
+            final String subnet_input, final ArrayList<String> all_users) {
         ArrayList<String> users_subnet = new ArrayList<String>();
-        String subnet = getSubnet(input);
+        String subnet = getSubnet(subnet_input);
         for (String ip : all_users) {
             if (ip.startsWith(subnet)) {
                 users_subnet.add(ip);
@@ -55,8 +56,10 @@ public final class Subnet {
 
     /**
      * Compute all the possible subnets based on the given users list.
-     * @param all_users
-     * @return subnet_list
+     *
+     * @param all_users List of all available users
+     * @return subnet_list : List of all possible subnets based on given user
+     * list
      */
     public static ArrayList<String> getAllSubnets(
             final ArrayList<String> all_users) {
@@ -86,8 +89,9 @@ public final class Subnet {
 
     /**
      * Simple method to sort IPv4 list.
-     * @param ip_list
-     * @return ArrayList<String>
+     *
+     * @param ip_list : List of IP address
+     * @return ArrayList&lt;String&gt; : Sorted list of IP address
      */
     public static ArrayList<String> sortIPs(
             final ArrayList<String> ip_list) {
@@ -103,29 +107,26 @@ public final class Subnet {
 
                 if ((Integer.parseInt(split[0])
                         < Integer.parseInt(selected_split[0]))
-
-                    || (Integer.parseInt(split[0])
+                        || (Integer.parseInt(split[0])
                         == Integer.parseInt(selected_split[0])
                         && Integer.parseInt(split[1])
-                            < Integer.parseInt(selected_split[1]))
-
-                    || (Integer.parseInt(split[0])
+                        < Integer.parseInt(selected_split[1]))
+                        || (Integer.parseInt(split[0])
                         == Integer.parseInt(selected_split[0])
                         && Integer.parseInt(split[1])
-                            == Integer.parseInt(selected_split[1])
+                        == Integer.parseInt(selected_split[1])
                         && Integer.parseInt(split[2])
-                            < Integer.parseInt(selected_split[2]))
-
-                    || (Integer.parseInt(split[0])
+                        < Integer.parseInt(selected_split[2]))
+                        || (Integer.parseInt(split[0])
                         == Integer.parseInt(selected_split[0])
                         && Integer.parseInt(split[1])
-                            == Integer.parseInt(selected_split[1])
+                        == Integer.parseInt(selected_split[1])
                         && Integer.parseInt(split[2])
-                            == Integer.parseInt(selected_split[2])
+                        == Integer.parseInt(selected_split[2])
                         && Integer.parseInt(split[3])
-                                < Integer.parseInt(selected_split[3]))) {
-                                selected = ip;
-                                selected_split = selected.split("[.]");
+                        < Integer.parseInt(selected_split[3]))) {
+                    selected = ip;
+                    selected_split = selected.split("[.]");
                 }
             }
             sorted_ip_list.add(selected);
@@ -135,13 +136,14 @@ public final class Subnet {
     }
 
     /**
-     * Compute the subnet based on the string given by user.
-     * @param input
-     * @return subnet
+     * Compute the subnet based on the IP given by user.
+     *
+     * @param user IP address
+     * @return subnet : Subnet of the given IP address
      */
-    public static String getSubnet(final String input) {
+    public static String getSubnet(final String user) {
         String subnet = ".";
-        String[] split = input.split("[.]");
+        String[] split = user.split("[.]");
         boolean found_end = false;
         for (int i = split.length - 1; i >= 0; i--) {
             if (found_end || !split[i].equals("0")) {
@@ -156,13 +158,14 @@ public final class Subnet {
     }
 
     /**
-     * Verify if the user given is a subnet.
-     * @param user
-     * @return boolean
+     * Verify if the given user is a subnet.
+     *
+     * @param input : Input (IP address or subnet)
+     * @return boolean : True if the input is a subnet
      */
-    public static boolean isSubnet(final String user) {
+    public static boolean isSubnet(final String input) {
         boolean bool = false;
-        for (String ip_split : user.split("[.]")) {
+        for (String ip_split : input.split("[.]")) {
             if (ip_split.equals("0")) {
                 bool = true;
             } else {

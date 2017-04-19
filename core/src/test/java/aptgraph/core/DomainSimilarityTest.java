@@ -26,6 +26,7 @@ package aptgraph.core;
 import static junit.framework.Assert.assertTrue;
 
 /**
+ * Test file for Domain Similarity.
  *
  * @author Thomas Gilon
  */
@@ -107,14 +108,14 @@ public class DomainSimilarityTest {
 
         DomainSimilarity sim = new DomainSimilarity();
         assertTrue(sim.similarity(req_1, req_2) == 1.0);
-        assertTrue(sim.similarity(req_1, req_3) == 1.0/2);
+        assertTrue(sim.similarity(req_1, req_3) == 1.0 / 2);
         assertTrue(sim.similarity(req_1, req_4) == 0.0);
-        assertTrue(sim.similarity(req_1, req_5) == 1.0/3);
+        assertTrue(sim.similarity(req_1, req_5) == 1.0 / 3);
         assertTrue(sim.similarity(req_1, req_6) == 0.0);
-        assertTrue(sim.similarity(req_6, req_7) == 2.0/3);
+        assertTrue(sim.similarity(req_6, req_7) == 2.0 / 3);
         assertTrue(sim.similarity(req_7, req_8) == 1.0);
         assertTrue(sim.similarity(req_9, req_10) == 1.0);
         assertTrue(sim.similarity(req_9, req_11) == 0.0);
     }
-    
+
 }

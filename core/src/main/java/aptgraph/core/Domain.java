@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2016 Thibault Debatty.
+ * Copyright 2016 Thibault Debatty & Thomas Gilon.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,15 +26,19 @@ package aptgraph.core;
 import java.util.LinkedList;
 
 /**
+ * Domain object.
  *
  * @author Thibault Debatty
+ * @author Thomas Gilon
  */
 public class Domain extends LinkedList<Request> {
+
     private String name = "";
 
     /**
      * Domain name.
-     * @return
+     *
+     * @return String : Domain name
      */
     public final String getName() {
         return name;
@@ -42,7 +46,8 @@ public class Domain extends LinkedList<Request> {
 
     /**
      * Set domain name.
-     * @param name
+     *
+     * @param name Domain name
      */
     public final void setName(final String name) {
         this.name = name;
@@ -50,8 +55,9 @@ public class Domain extends LinkedList<Request> {
 
     /**
      * Merge domains with the same name but different requests.
-     * @param dom
-     * @return dom_out
+     *
+     * @param dom Domain to merge with the Domain object
+     * @return dom_out : Domain after merge
      */
     public final Domain merge(final Domain dom) {
         Domain dom_out = (Domain) this.clone();
@@ -67,8 +73,9 @@ public class Domain extends LinkedList<Request> {
 
     /**
      * Compare two domains (size, name and requests).
-     * @param obj
-     * @return boolean
+     *
+     * @param obj Domain
+     * @return boolean : True if two Domains are identical
      */
     public final boolean deepEquals(final Object obj) {
         if (obj == null) {
@@ -80,21 +87,22 @@ public class Domain extends LinkedList<Request> {
         final Domain dom = (Domain) obj;
         boolean output = false;
         if (this.getName().equals(dom.getName())
-            && this.size() == dom.size()) {
-                for (Request req : this) {
-                    if (dom.contains(req)) {
-                        output = true;
-                    } else {
-                        return false;
-                    }
+                && this.size() == dom.size()) {
+            for (Request req : this) {
+                if (dom.contains(req)) {
+                    output = true;
+                } else {
+                    return false;
                 }
+            }
         }
         return output;
     }
 
     /**
      * Return domain name.
-     * @return
+     *
+     * @return String : Domain name
      */
     @Override
     public final String toString() {

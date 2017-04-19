@@ -37,12 +37,13 @@ import static junit.framework.Assert.assertTrue;
 import junit.framework.TestCase;
 
 /**
+ * Test file for Subnet object.
  *
  * @author Thomas Gilon
  */
 public class SubnetTest extends TestCase {
 
-     /**
+    /**
      * Test subnet tools.
      */
     public void testSubnet() {
@@ -52,16 +53,16 @@ public class SubnetTest extends TestCase {
         try {
             Path input_dir = Paths.get("src/test/resources/dummyDir_users");
             File file = new File(input_dir.toString(), "users.ser");
-            FileInputStream input_stream =
-                    new FileInputStream(file.toString());
+            FileInputStream input_stream
+                    = new FileInputStream(file.toString());
             ObjectInputStream input = new ObjectInputStream(
                     new BufferedInputStream(input_stream));
             users = (ArrayList<String>) input.readObject();
             input.close();
         } catch (IOException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         } catch (ClassNotFoundException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         }
 
         // Test isSubnet
@@ -106,5 +107,5 @@ public class SubnetTest extends TestCase {
         subnet_list_expected.add("192.169.0.0");
         subnet_list_expected.add("192.169.1.0");
         assertEquals(subnet_list, subnet_list_expected);
-    }    
+    }
 }
