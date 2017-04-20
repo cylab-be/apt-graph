@@ -39,7 +39,7 @@ import junit.framework.TestCase;
  *
  * @author Thomas Gilon
  */
-public class ApplyTest extends TestCase {
+public class ApplyAPTTest extends TestCase {
 
     /**
      * Test of periodicAPT() method.
