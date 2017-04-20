@@ -45,6 +45,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * Main class for Config.
  *
  * @author Thomas Gilon
  */
@@ -54,7 +55,9 @@ public final class Main {
             = Logger.getLogger(Main.class.getName());
 
     /**
-     * @param args the command line arguments
+     * Main method of Config.
+     *
+     * @param args Arguments from the command line
      * @throws org.apache.commons.cli.ParseException If text can't be parsed
      */
     public static void main(final String[] args) throws ParseException {
@@ -111,7 +114,7 @@ public final class Main {
             stop = new BigDecimal(cmd.getOptionValue("stop"));
             step = new BigDecimal(cmd.getOptionValue("step"));
         } catch (IllegalArgumentException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         }
         String multi = "";
         try {
@@ -119,7 +122,7 @@ public final class Main {
                 multi = cmd.getOptionValue("multi");
             }
         } catch (IllegalArgumentException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         }
 
         boolean first_write = true;
@@ -129,11 +132,11 @@ public final class Main {
             } catch (JSONException ex) {
                 throw new JSONException(ex + "\nJSON did not match ");
             }
-            LinkedList<String> config_lines_sweeped =
-                    Sweep.sweepObj(obj, field, start, stop, step, multi);
+            LinkedList<String> config_lines_sweeped
+                    = Sweep.sweepObj(obj, field, start, stop, step, multi);
             try {
                 if (!(new File(cmd.getOptionValue("o"))).exists()
-                    || first_write) {
+                        || first_write) {
                     Files.write(Paths.get(cmd.getOptionValue("o")),
                             config_lines_sweeped, StandardCharsets.UTF_8);
                     first_write = false;

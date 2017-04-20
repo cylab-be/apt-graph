@@ -28,50 +28,55 @@ import java.util.LinkedList;
 import org.json.JSONObject;
 
 /**
+ * Definition file for the sweep of a specific parameter of the configuration.
  *
  * @author Thomas Gilon
  */
 public final class Sweep {
+
     private Sweep() {
     }
 
     /**
      * Create config lines, sweeping a given field in the config.
-     * @param obj
-     * @param field
-     * @param start
-     * @param stop
-     * @param step
-     * @param multi
-     * @return LinkedList<String> config_lines_sweeped
+     *
+     * @param obj Reference JSON configuration object
+     * @param field Field to sweep
+     * @param start Start value of sweep
+     * @param stop Stop value
+     * @param step Step of the sweep
+     * @param multi In case of complementary field, second field which will be
+     * equal to "STOP - FIELD VALUE"
+     * @return LinkedList&lt;String&gt; : List of lines of configuration (sweep
+     * done)
      */
     public static LinkedList<String> sweepObj(
-        final JSONObject obj,
-        final String field,
-        final BigDecimal start,
-        final BigDecimal stop,
-        final BigDecimal step,
-        final String multi) {
+            final JSONObject obj,
+            final String field,
+            final BigDecimal start,
+            final BigDecimal stop,
+            final BigDecimal step,
+            final String multi) {
         LinkedList<String> config_lines_sweeped = new LinkedList<String>();
         for (BigDecimal value = start; comparator(step, value, stop);
-             value = value.add(step)) {
+                value = value.add(step)) {
             JSONObject obj_new = new JSONObject(obj.toString());
             obj_new.put(field, value.toString());
             if (!multi.isEmpty()) {
                 obj_new.put(multi, stop.subtract(value).toString());
             }
-            String[] output_file_new_temp =
-                    obj.getString("output_file").split("\\.");
+            String[] output_file_new_temp
+                    = obj.getString("output_file").split("\\.");
             String output_file_new = output_file_new_temp[0];
             for (int i = 1; i < output_file_new_temp.length - 1; i += 1) {
-               output_file_new =
-                       output_file_new.concat("." + output_file_new_temp[i]);
+                output_file_new
+                        = output_file_new.concat("." + output_file_new_temp[i]);
             }
             output_file_new = output_file_new + "_" + field
                     + "_" + value.toString();
             if (!multi.isEmpty()) {
                 output_file_new = output_file_new + "_" + multi
-                    + "_" + stop.subtract(value).toString();
+                        + "_" + stop.subtract(value).toString();
             }
             output_file_new = output_file_new + "."
                     + output_file_new_temp[output_file_new_temp.length - 1];
@@ -82,17 +87,20 @@ public final class Sweep {
     }
 
     /**
-     * Comparator is adapted in function of the step.
-     * @param step
-     * @param value
-     * @param stop
-     * @return boolean
+     * Compare a value to the stop value. Comparator is adapted in function of
+     * the sine of the step.
+     *
+     * @param step Step
+     * @param value Value to compare to stop value
+     * @param stop Stop value
+     * @return boolean : If step positive = True if value is smaller then stop
+     * value ; If step negative = True if value is greater then stop value ;
      */
     private static boolean comparator(
             final BigDecimal step,
             final BigDecimal value,
             final BigDecimal stop) {
-        if (step.compareTo(BigDecimal.ZERO) >= 0)  {
+        if (step.compareTo(BigDecimal.ZERO) >= 0) {
             return value.compareTo(stop) <= 0;
         } else {
             return value.compareTo(stop) >= 0;
