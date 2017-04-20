@@ -36,6 +36,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 /**
+ * Main class for Infection.
  *
  * @author Thomas Gilon
  */
@@ -47,7 +48,9 @@ public final class Main {
     private static final long DEFAULT_DISTANCE = 0L;
 
     /**
-     * @param args the command line arguments
+     * Main method of Infection.
+     *
+     * @param args Arguments from the command line
      * @throws ParseException If we cannot parse command line args
      * @throws FileNotFoundException If the input file does not exist
      * @throws IOException If we cannot read the input file
@@ -55,7 +58,7 @@ public final class Main {
      * @throws java.text.ParseException If text can't be parsed
      */
     public static void main(final String[] args)
-        throws ParseException, FileNotFoundException, IOException,
+            throws ParseException, FileNotFoundException, IOException,
             IllegalArgumentException, java.text.ParseException {
         // Default value of arguments
         String format = DEFAULT_FORMAT;
@@ -217,11 +220,11 @@ public final class Main {
                 }
             }
         } catch (IllegalArgumentException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         }
 
-        FileOutputStream output_stream =
-                new FileOutputStream(cmd.getOptionValue("o"));
+        FileOutputStream output_stream
+                = new FileOutputStream(cmd.getOptionValue("o"));
 
         try {
             ApplyAPT apt = new ApplyAPT();

@@ -35,6 +35,7 @@ import java.text.ParseException;
 import junit.framework.TestCase;
 
 /**
+ * Test file for ApplyAPT.
  *
  * @author Thomas Gilon
  */
@@ -42,7 +43,8 @@ public class ApplyTest extends TestCase {
 
     /**
      * Test of periodicAPT() method.
-     * @throws IOException 
+     *
+     * @throws IOException If files can not be read and written
      */
     public final void testPeriodicAPT() throws IOException {
         System.out.println("Test periodicAPT()");
@@ -58,7 +60,7 @@ public class ApplyTest extends TestCase {
                 new InputStreamReader(new FileInputStream(temp_file), "UTF-8"));
         BufferedReader in_2 = new BufferedReader(
                 new InputStreamReader(getClass().getResourceAsStream(
-                "/1000_http_requests.txt"), "UTF-8"));
+                        "/1000_http_requests.txt"), "UTF-8"));
 
         String line_1;
         Request request_1;
@@ -68,7 +70,7 @@ public class ApplyTest extends TestCase {
         while ((line_1 = in_1.readLine()) != null
                 && (line_2 = in_2.readLine()) != null) {
             request_1 = batch.parseLine(line_1, "squid");
-            request_2 = batch.parseLine(line_2,"squid");
+            request_2 = batch.parseLine(line_2, "squid");
             if (request_1.getDomain().equals("APT.FINDME.be")) {
                 line_1 = in_1.readLine();
                 request_1 = batch.parseLine(line_1, "squid");
@@ -81,8 +83,9 @@ public class ApplyTest extends TestCase {
 
     /**
      * Test of trafficAPT() method.
-     * @throws IOException 
-     * @throws java.text.ParseException 
+     *
+     * @throws IOException If files can not be read and written
+     * @throws java.text.ParseException If expression can not be parsed
      */
     public final void testTrafficAPT() throws IOException, ParseException {
         System.out.println("Test testTrafficAPT()");
@@ -99,7 +102,7 @@ public class ApplyTest extends TestCase {
                 new InputStreamReader(new FileInputStream(temp_file), "UTF-8"));
         BufferedReader in_2 = new BufferedReader(
                 new InputStreamReader(getClass().getResourceAsStream(
-                "/1000_http_requests.txt"), "UTF-8"));
+                        "/1000_http_requests.txt"), "UTF-8"));
 
         String line_1;
         Request request_1;
@@ -109,7 +112,7 @@ public class ApplyTest extends TestCase {
         while ((line_1 = in_1.readLine()) != null
                 && (line_2 = in_2.readLine()) != null) {
             request_1 = batch.parseLine(line_1, "squid");
-            request_2 = batch.parseLine(line_2,"squid");
+            request_2 = batch.parseLine(line_2, "squid");
             if (request_1.getDomain().equals("APT.FINDME.be")) {
                 line_1 = in_1.readLine();
                 request_1 = batch.parseLine(line_1, "squid");
@@ -122,7 +125,8 @@ public class ApplyTest extends TestCase {
 
     /**
      * Test generation of the UNIX day timestamp.
-     * @throws ParseException 
+     *
+     * @throws ParseException If expression can not be parsed
      */
     public final void testGetDay() throws ParseException {
         System.out.println("Test getDay()");
@@ -134,7 +138,8 @@ public class ApplyTest extends TestCase {
 
     /**
      * Test generation of APT log entry.
-     * @throws IOException 
+     *
+     * @throws IOException If file can not be read and written
      */
     public final void testBuildAPT() throws IOException {
         System.out.println("Test buildAPT()");

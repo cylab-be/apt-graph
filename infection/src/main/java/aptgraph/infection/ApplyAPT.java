@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import java.util.TimeZone;
 
 /**
+ * Definition file for the application of APT in log files.
  *
  * @author Thomas Gilon
  */
@@ -48,22 +49,23 @@ public class ApplyAPT {
 
     /**
      * Infect a log file with a periodic APT.
-     * @param input_file
-     * @param output_file
-     * @param apt_domain
-     * @param user
-     * @param format
-     * @param time_step
-     * @throws IOException
+     *
+     * @param input_file File to infect
+     * @param output_file Output file
+     * @param apt_domain Domain of APT
+     * @param user Targeted user
+     * @param format File format (SQUID or JSON)
+     * @param time_step Time step in ms between injections
+     * @throws IOException If request can not be written
      */
     final void periodicAPT(
-        final InputStream input_file,
-        final OutputStream output_file,
-        final String apt_domain,
-        final String user,
-        final String format,
-        final long time_step)
-        throws IOException {
+            final InputStream input_file,
+            final OutputStream output_file,
+            final String apt_domain,
+            final String user,
+            final String format,
+            final long time_step)
+            throws IOException {
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(input_file, "UTF-8"));
@@ -93,32 +95,36 @@ public class ApplyAPT {
 
     /**
      * Infect a log file with an APT following the traffic pattern of a user.
-     * @param input_file
-     * @param output_file
-     * @param apt_domain
-     * @param user
-     * @param format
-     * @param delta_time
-     * @param duration
-     * @param injection_day
-     * @param proportion
-     * @param delay
-     * @throws IOException
-     * @throws java.text.ParseException
+     *
+     * @param input_file File to infect
+     * @param output_file Output file
+     * @param apt_domain Domain of APT
+     * @param user Targeted user
+     * @param format File format (SQUID or JSON)
+     * @param delta_time Time difference in ms between request to consider them
+     * as part of a burst
+     * @param duration Duration in ms expected of the burst of data to assess it
+     * as burst
+     * @param injection_day Number of injection allowed each day
+     * @param proportion Proportion of APT effectively injected in all the
+     * possible burst of data
+     * @param delay Delay in ms between start of the burst and injection of APT
+     * @throws IOException If request can not be written
+     * @throws java.text.ParseException If file cannot be parsed
      */
     final void trafficAPT(
-        final InputStream input_file,
-        final OutputStream output_file,
-        final String apt_domain,
-        final String user,
-        final String format,
-        final long delta_time,
-        final long duration,
-        final int injection_day,
-        final double proportion,
-        final long distance_time,
-        final long delay)
-        throws IOException, ParseException {
+            final InputStream input_file,
+            final OutputStream output_file,
+            final String apt_domain,
+            final String user,
+            final String format,
+            final long delta_time,
+            final long duration,
+            final int injection_day,
+            final double proportion,
+            final long distance_time,
+            final long delay)
+            throws IOException, ParseException {
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(input_file, "UTF-8"));
@@ -178,11 +184,11 @@ public class ApplyAPT {
 
                     if (line != null) {
                         long[] out_2 = verifyTraffic(request_1, request_2,
-                            day, delta_time, time, duration, counter_apt_daily,
-                            counter_apt_total_daily, counter_apt_total,
-                            injection_day, last_injection, proportion,
-                            distance_time, delay,
-                            apt_domain, user, output_file, format);
+                                day, delta_time, time, duration, counter_apt_daily,
+                                counter_apt_total_daily, counter_apt_total,
+                                injection_day, last_injection, proportion,
+                                distance_time, delay,
+                                apt_domain, user, output_file, format);
                         time = out_2[0];
                         day = out_2[1];
                         last_injection = out_2[2];
@@ -199,29 +205,35 @@ public class ApplyAPT {
     }
 
     /**
-     * Verify the traffic and inject APT if needed.
-     * @param request_1
-     * @param request_2
-     * @param day_in
-     * @param delta_time
-     * @param time_in
-     * @param duration
-     * @param counter_apt_daily_in
-     * @param counter_apt_total_daily_in
-     * @param counter_apt_total_in
-     * @param injection_day
-     * @param last_injection_in
-     * @param proportion
-     * @param distance_time
-     * @param delay
-     * @param apt_domain
-     * @param user
-     * @param output_file
-     * @param format
-     * @return long[] {time, last_injection, counter_apt_daily,
-     * counter_apt_total_daily, counter_apt_total}
-     * @throws ParseException
-     * @throws IOException
+     * Verify the traffic between two requests to search for burst of data and
+     * inject APT if needed.
+     *
+     * @param request_1 Request 1
+     * @param request_2 Request 2
+     * @param day_in UNIX timestamp of actual day in ms
+     * @param delta_time Time difference in ms between request to consider them
+     * as part of a burst
+     * @param time_in Time of the start of the burst of data in ms
+     * @param duration Duration in ms expected of the burst of data to assess it
+     * as burst
+     * @param counter_apt_daily_in Number of APT already injected during the day
+     * @param counter_apt_total_daily_in Number of APT that could already be
+     * injected during the day if a proportion of 1 has been given
+     * @param counter_apt_total_in Number of APT already injected in the file
+     * @param injection_day Number of injection allowed each day
+     * @param last_injection_in UNIX timestamp of the last injection
+     * @param proportion Proportion of APT effectively injected in all the
+     * possible burst of data
+     * @param distance_time Minimal duration between two injection in ms
+     * @param delay Delay in ms between start of the burst and injection of APT
+     * @param apt_domain Domain of APT
+     * @param user Targeted user
+     * @param output_file Output file
+     * @param format File format (SQUID or JSON)
+     * @return long[] : Update of variables {time, last_injection,
+     * counter_apt_daily, counter_apt_total_daily, counter_apt_total}
+     * @throws ParseException If expression can not be parsed
+     * @throws IOException If request can not be written
      */
     private long[] verifyTraffic(final Request request_1,
             final Request request_2, final long day_in, final long delta_time,
@@ -259,11 +271,11 @@ public class ApplyAPT {
                         counter_apt_total_daily += 1;
                         last_injection = time;
                         if (Math.abs((double) (counter_apt_daily + 1)
-                            / (double) counter_apt_total_daily - proportion)
+                                / (double) counter_apt_total_daily - proportion)
                                 < 1E-10) {
                             // Proportion is respected and APT is injected
                             writeRequest(buildAPT(time + delay,
-                                apt_domain, user), output_file, format);
+                                    apt_domain, user), output_file, format);
                             counter_apt_daily += 1;
                             counter_apt_total += 1;
                         }
@@ -286,57 +298,58 @@ public class ApplyAPT {
 
     /**
      * Write the given request to the output file.
-     * @param request
-     * @param output_file
-     * @param format
-     * @throws IOException
+     *
+     * @param request Request to write
+     * @param output_file Output file
+     * @param format File format (SQUID or JSON)
+     * @throws IOException If request can not be written
      */
     final void writeRequest(final Request request,
             final OutputStream output_file, final String format)
             throws IOException {
         String request_string = "";
         if (format.equals("squid")) {
-           request_string = String.valueOf(request.getTime()).substring(0, 10)
-                   + "." + String.valueOf(request.getTime()).substring(10, 13)
-                   + "    " + request.getElapsed() + " "
-                   + request.getClient() + " " + request.getCode() + "/"
-                   + request.getStatus() + " " + request.getBytes() + " "
-                   + request.getMethod() + " " + request.getUrl() + " - "
-                   + request.getPeerstatus() + "/" + request.getPeerhost()
-                   + " " + request.getType() + "\n";
+            request_string = String.valueOf(request.getTime()).substring(0, 10)
+                    + "." + String.valueOf(request.getTime()).substring(10, 13)
+                    + "    " + request.getElapsed() + " "
+                    + request.getClient() + " " + request.getCode() + "/"
+                    + request.getStatus() + " " + request.getBytes() + " "
+                    + request.getMethod() + " " + request.getUrl() + " - "
+                    + request.getPeerstatus() + "/" + request.getPeerhost()
+                    + " " + request.getType() + "\n";
         } else if (format.equals("json")) {
             SimpleDateFormat formatter
-                = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                    = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
             String time_string = formatter.format(new Date(request.getTime()));
             request_string = "{\"@version\":\"0\","
-                   + "\"@timestamp\":\"" + time_string + "\","
-                   + "\"type\":\"0\","
-                   + "\"timestamp\":\"0\","
-                   + "\"tk_username\":\"" + request.getClient() + "\","
-                   + "\"tk_url\":\"" + request.getUrl() + "\","
-                   + "\"tk_size\":" + request.getBytes() + ","
-                   + "\"tk_date_field\":\"0\","
-                   + "\"tk_protocol\":\"0\","
-                   + "\"tk_mime_content\":\"" + request.getType() + "\","
-                   + "\"tk_client_ip\":\"" + request.getClient() + "\","
-                   + "\"tk_server_ip\":\"" + request.getPeerhost() + "\","
-                   + "\"tk_domain\":\"0\","
-                   + "\"tk_path\":\"0\","
-                   + "\"tk_operation\":\"" + request.getMethod() + "\","
-                   + "\"tk_uid\":\"0\","
-                   + "\"tk_category\":\"0\","
-                   + "\"tk_category_type\":\"0\","
-                   + "\"geoip\":{\"ip\":\"0\","
-                   + "\"country_code2\":\"0\","
-                   + "\"country_code3\":\"0\","
-                   + "\"country_name\":\"0\","
-                   + "\"continent_code\":\"0\","
-                   + "\"latitude\":0,"
-                   + "\"longitude\":0,"
-                   + "\"timezone\":\"0\","
-                   + "\"location\":[0,0]},"
-                   + "\"category\":\"0\"}" + "\n";
+                    + "\"@timestamp\":\"" + time_string + "\","
+                    + "\"type\":\"0\","
+                    + "\"timestamp\":\"0\","
+                    + "\"tk_username\":\"" + request.getClient() + "\","
+                    + "\"tk_url\":\"" + request.getUrl() + "\","
+                    + "\"tk_size\":" + request.getBytes() + ","
+                    + "\"tk_date_field\":\"0\","
+                    + "\"tk_protocol\":\"0\","
+                    + "\"tk_mime_content\":\"" + request.getType() + "\","
+                    + "\"tk_client_ip\":\"" + request.getClient() + "\","
+                    + "\"tk_server_ip\":\"" + request.getPeerhost() + "\","
+                    + "\"tk_domain\":\"0\","
+                    + "\"tk_path\":\"0\","
+                    + "\"tk_operation\":\"" + request.getMethod() + "\","
+                    + "\"tk_uid\":\"0\","
+                    + "\"tk_category\":\"0\","
+                    + "\"tk_category_type\":\"0\","
+                    + "\"geoip\":{\"ip\":\"0\","
+                    + "\"country_code2\":\"0\","
+                    + "\"country_code3\":\"0\","
+                    + "\"country_name\":\"0\","
+                    + "\"continent_code\":\"0\","
+                    + "\"latitude\":0,"
+                    + "\"longitude\":0,"
+                    + "\"timezone\":\"0\","
+                    + "\"location\":[0,0]},"
+                    + "\"category\":\"0\"}" + "\n";
         }
 
         output_file.write(request_string.getBytes("UTF-8"));
@@ -344,24 +357,26 @@ public class ApplyAPT {
 
     /**
      * Build up a fake request for the APT.
-     * @param time
-     * @param apt_domain
-     * @param user
-     * @return Request
+     *
+     * @param time Time of the request
+     * @param apt_domain Domain of APT
+     * @param user Targeted user
+     * @return Request : Request of the APT
      */
     final Request buildAPT(final long time, final String apt_domain,
             final String user) {
         Request request = new Request(
-            time, 10, user, "TCP_APT", 200, 10, "GET", "http://" + apt_domain,
-            "-", "HIER_DIRECT", "167.167.167.167", "text/html");
+                time, 10, user, "TCP_APT", 200, 10, "GET", "http://" + apt_domain,
+                "-", "HIER_DIRECT", "167.167.167.167", "text/html");
         return request;
     }
 
     /**
      * Give the UNIX timestamp of midnight of the current day.
-     * @param time
-     * @return long
-     * @throws ParseException
+     *
+     * @param time UNIX timestamp
+     * @return long : UNIX timestamp of midnight of the current day
+     * @throws ParseException If expression can not be parsed
      */
     final long getDay(final long time) throws ParseException {
         SimpleDateFormat formatter
