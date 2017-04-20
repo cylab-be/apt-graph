@@ -35,10 +35,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Definition file for the computation of ROC curves.
  *
  * @author Thomas Gilon
  */
 public final class ROC {
+
     private ROC() {
     }
 
@@ -46,18 +48,19 @@ public final class ROC {
             = Logger.getLogger(ROC.class.getName());
 
     /**
-     * Build the file with ROC curve based on the ranking.
-     * @param ranking
-     * @param n_dom_tot
-     * @param n_apt_tot
-     * @param output_file
+     * Build the CSV file with ROC curve based on the ranking.
+     *
+     * @param ranking Info of Ranking
+     * @param n_dom_tot Total number of domains
+     * @param n_apt_tot Total number of APT domains
+     * @param output_file Output file (CSV format)
      */
     public static void makeROC(
             final TreeMap<Double, LinkedList<Domain>> ranking,
             final int n_dom_tot, final int n_apt_tot,
             final String output_file) {
-        ArrayList<double[]> roc_curve =
-                computeROC(ranking, n_dom_tot, n_apt_tot);
+        ArrayList<double[]> roc_curve
+                = computeROC(ranking, n_dom_tot, n_apt_tot);
         LOGGER.log(Level.INFO, "ROC curve created");
         try {
             exportROC(roc_curve, new FileOutputStream(output_file));
@@ -70,10 +73,11 @@ public final class ROC {
 
     /**
      * Compute the ROC curve based on the ranking.
-     * @param ranking
-     * @param n_dom_tot
-     * @param n_apt_tot
-     * @return ROC_curve
+     *
+     * @param ranking Info of Ranking
+     * @param n_dom_tot Total number of domains
+     * @param n_apt_tot Total number of APT domains
+     * @return ArrayList&lt;double[]&gt; : ROC curve as list of [x y]
      */
     private static ArrayList<double[]> computeROC(
             final TreeMap<Double, LinkedList<Domain>> ranking,
@@ -89,8 +93,7 @@ public final class ROC {
                 } else {
                     n_dom += 1.0;
                 }
-                roc_curve.add(new double[]
-                    {n_dom / n_dom_tot, n_apt / n_apt_tot});
+                roc_curve.add(new double[]{n_dom / n_dom_tot, n_apt / n_apt_tot});
             }
         }
         return roc_curve;
@@ -98,9 +101,10 @@ public final class ROC {
 
     /**
      * Export the ROC curve in CSV.
-     * @param ROC_curve
-     * @param output_file
-     * @throws IOException
+     *
+     * @param ROC_curve ROC curve as list of [x y]
+     * @param output_file Output file (CSV format)
+     * @throws IOException If file can not be written
      */
     private static void exportROC(
             final ArrayList<double[]> roc_curve,

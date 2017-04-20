@@ -47,6 +47,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * Main class for Study.
  *
  * @author Thomas Gilon
  */
@@ -57,7 +58,9 @@ public final class Main {
             Main.class.getName());
 
     /**
-     * @param args the command line arguments
+     * Main method of Study.
+     *
+     * @param args Arguments from the command line
      * @throws org.apache.commons.cli.ParseException If text can't be parsed
      */
     public static void main(final String[] args) throws ParseException {
