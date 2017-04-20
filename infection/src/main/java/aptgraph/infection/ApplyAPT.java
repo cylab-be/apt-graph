@@ -184,7 +184,8 @@ public class ApplyAPT {
 
                     if (line != null) {
                         long[] out_2 = verifyTraffic(request_1, request_2,
-                                day, delta_time, time, duration, counter_apt_daily,
+                                day, delta_time, time, duration,
+                                counter_apt_daily,
                                 counter_apt_total_daily, counter_apt_total,
                                 injection_day, last_injection, proportion,
                                 distance_time, delay,
@@ -366,8 +367,9 @@ public class ApplyAPT {
     final Request buildAPT(final long time, final String apt_domain,
             final String user) {
         Request request = new Request(
-                time, 10, user, "TCP_APT", 200, 10, "GET", "http://" + apt_domain,
-                "-", "HIER_DIRECT", "167.167.167.167", "text/html");
+                time, 10, user, "TCP_APT", 200, 10, "GET", "http://"
+                + apt_domain, "-", "HIER_DIRECT", "167.167.167.167",
+                "text/html");
         return request;
     }
 

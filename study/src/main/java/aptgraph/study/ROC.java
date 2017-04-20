@@ -93,7 +93,8 @@ public final class ROC {
                 } else {
                     n_dom += 1.0;
                 }
-                roc_curve.add(new double[]{n_dom / n_dom_tot, n_apt / n_apt_tot});
+                roc_curve.add(new double[]{n_dom / n_dom_tot,
+                    n_apt / n_apt_tot});
             }
         }
         return roc_curve;
