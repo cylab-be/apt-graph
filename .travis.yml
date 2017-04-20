@@ -26,5 +26,5 @@ notifications:
       - gnnikolov87@gmail.com
       - thomas.gilon@gmail.com
 
-#after_success:
-#  - mvn clean cobertura:cobertura coveralls:report
+after_success:
+  - mvn clean cobertura:cobertura coveralls:report
