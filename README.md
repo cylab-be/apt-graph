@@ -1,6 +1,7 @@
 # APT-GRAPH
 
 [![Build Status](https://travis-ci.org/RUCD/apt-graph.svg?branch=master)](https://travis-ci.org/RUCD/apt-graph)
+[![API](http://api123.io/api123-head.svg)](http://api123.io/api/apt-graph/head/index.html)
 
 HTTP graph modeling for APT detection.
 
