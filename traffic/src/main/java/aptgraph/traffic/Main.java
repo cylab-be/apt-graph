@@ -48,6 +48,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 /**
+ * Main class for Traffic.
  *
  * @author Thomas Gilon
  */
@@ -58,7 +59,9 @@ public final class Main {
             = Logger.getLogger(Main.class.getName());
 
     /**
-     * @param args the command line arguments
+     * Main method of Traffic.
+     *
+     * @param args Arguments from the command line
      * @throws org.apache.commons.cli.ParseException If text can't be parsed
      */
     public static void main(final String[] args)
