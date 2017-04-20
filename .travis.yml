@@ -27,4 +27,4 @@ notifications:
       - thomas.gilon@gmail.com
 
 after_success:
-  - mvn clean cobertura:cobertura coveralls:report
+  - cd ../apt-graph && mvn clean cobertura:cobertura coveralls:report
