@@ -31,6 +31,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 
 /**
+ * File server management file.
  *
  * @author Thibault Debatty
  */
@@ -42,7 +43,7 @@ public class FileServer {
     /**
      * Start the file server (blocking).
      *
-     * @throws Exception if server cannot start
+     * @throws Exception If server cannot start
      */
     public final void start() throws Exception {
         LOGGER.info("Starting web interface at http://localhost:8000");

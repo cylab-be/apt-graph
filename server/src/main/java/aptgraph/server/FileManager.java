@@ -36,10 +36,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * File manager utilities.
  *
  * @author Thomas Gilon
  */
 public final class FileManager {
+
     private FileManager() {
     }
 
@@ -48,27 +50,28 @@ public final class FileManager {
 
     /**
      * Load the list of graphs for a given user.
-     * @param input_dir
-     * @param user
-     * @return List of graphs
+     *
+     * @param input_dir Input directory
+     * @param user User
+     * @return List of graphs : List of the feature graphs of the given user
      */
     public static LinkedList<Graph<Domain>> getUserGraphs(
             final Path input_dir, final String user) {
         LOGGER.log(Level.INFO, "Reading graphs of user {0} from disk...", user);
-        LinkedList<Graph<Domain>> user_graphs =
-                new LinkedList<Graph<Domain>>();
+        LinkedList<Graph<Domain>> user_graphs
+                = new LinkedList<Graph<Domain>>();
         try {
             File file = new File(input_dir.toString(), user + ".ser");
-            FileInputStream input_stream =
-                    new FileInputStream(file.toString());
+            FileInputStream input_stream
+                    = new FileInputStream(file.toString());
             ObjectInputStream input = new ObjectInputStream(
                     new BufferedInputStream(input_stream));
             user_graphs = (LinkedList<Graph<Domain>>) input.readObject();
             input.close();
         } catch (IOException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         } catch (ClassNotFoundException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         }
 
         return user_graphs;
@@ -76,22 +79,23 @@ public final class FileManager {
 
     /**
      * Load the value of k used for k-NN Graphs.
-     * @param input_dir
-     * @return List of graphs
+     *
+     * @param input_dir Input directory
+     * @return int : k value of the k-NN Graphs
      */
     public static int getK(final Path input_dir) {
         LOGGER.log(Level.INFO, "Reading k value from disk...");
         int k = 0;
         try {
             File file = new File(input_dir.toString(), "k.ser");
-            FileInputStream input_stream =
-                    new FileInputStream(file.toString());
+            FileInputStream input_stream
+                    = new FileInputStream(file.toString());
             ObjectInputStream input = new ObjectInputStream(
                     new BufferedInputStream(input_stream));
             k = (int) input.readInt();
             input.close();
         } catch (IOException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         }
 
         return k;

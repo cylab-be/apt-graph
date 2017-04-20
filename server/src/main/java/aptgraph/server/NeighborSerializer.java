@@ -30,6 +30,7 @@ import info.debatty.java.graphs.Neighbor;
 import java.io.IOException;
 
 /**
+ * Neighbor serialization definition file.
  *
  * @author Thibault Debatty
  */
@@ -44,7 +45,8 @@ public class NeighborSerializer extends StdSerializer<Neighbor> {
 
     /**
      * Default.
-     * @param type
+     *
+     * @param type Type
      */
     public NeighborSerializer(final Class<Neighbor> type) {
         super(type);
@@ -53,16 +55,16 @@ public class NeighborSerializer extends StdSerializer<Neighbor> {
     /**
      * Serialize a neighbor by emitting only the id of the target node, and the
      * similarity.
-     * @param neighbor
-     * @param jgen
-     * @param provider
-     * @throws IOException
+     *
+     * @param neighbor Neighbor
+     * @param jgen JSON Generator
+     * @param provider Serializer Provider
+     * @throws IOException If data can not be written
      */
     @Override
     public final void serialize(final Neighbor neighbor,
             final JsonGenerator jgen,
             final SerializerProvider provider) throws IOException {
-
 
         jgen.writeStartObject();
         jgen.writeStringField("node", neighbor.getNode().toString());

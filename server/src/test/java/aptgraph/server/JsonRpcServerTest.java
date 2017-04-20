@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package aptgraph.server;
 
 import java.nio.file.Paths;
@@ -30,6 +29,7 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 /**
+ * Test file for JSON RPC Server.
  *
  * @author Thibault Debatty
  */
@@ -37,8 +37,10 @@ public class JsonRpcServerTest extends TestCase {
 
     private static final int STARTUP_DELAY = 5000;
     private volatile Exception server_thread_ex = null;
+
     /**
      * Test of start method, of class Server.
+     *
      * @throws java.lang.InterruptedException
      */
     public final void testStart() throws InterruptedException, Exception {
@@ -58,12 +60,16 @@ public class JsonRpcServerTest extends TestCase {
             public void run() {
                 try {
                     server.start();
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(JsonRpcServerTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                catch (ClassNotFoundException ex) {
+                    Logger.getLogger(JsonRpcServerTest.class.getName())
+                            .log(Level.SEVERE, null, ex);
                     server_thread_ex = ex;
 
-                } catch (Exception ex) {
-                    Logger.getLogger(JsonRpcServerTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(JsonRpcServerTest.class.getName())
+                            .log(Level.SEVERE, null, ex);
                     server_thread_ex = ex;
                 }
             }

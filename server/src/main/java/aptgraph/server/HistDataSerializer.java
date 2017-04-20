@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
 
 /**
+ * HistData serialization definition file.
  *
  * @author Thomas Gilon
  */
@@ -43,7 +44,8 @@ public class HistDataSerializer extends StdSerializer<HistData> {
 
     /**
      * Default.
-     * @param type
+     *
+     * @param type Type
      */
     public HistDataSerializer(final Class<HistData> type) {
         super(type);
@@ -51,10 +53,11 @@ public class HistDataSerializer extends StdSerializer<HistData> {
 
     /**
      * Serialize HistData.
-     * @param hist_data
-     * @param jgen
-     * @param provider
-     * @throws IOException
+     *
+     * @param hist_data Histogram data
+     * @param jgen JSON Generator
+     * @param provider Serializer Provider
+     * @throws IOException If data can not be written
      */
     @Override
     public final void serialize(final HistData hist_data,

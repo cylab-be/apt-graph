@@ -13,20 +13,22 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 /**
+ * Main class for Server.
  *
  * @author Thibault Debatty
  */
 public final class Main {
 
     /**
+     * Main method of Server.
      *
-     * @param args
-     * @throws org.apache.commons.cli.ParseException if command line cannot be
+     * @param args Arguments from the command line
+     * @throws org.apache.commons.cli.ParseException If command line cannot be
      * parsed
-     * @throws java.io.FileNotFoundException if the graph file is not found
-     * @throws java.lang.ClassNotFoundException if the classes corresponding to
+     * @throws java.io.FileNotFoundException If the graph file is not found
+     * @throws java.lang.ClassNotFoundException If the classes corresponding to
      * graph elements are not found
-     * @throws java.lang.Exception if the server cannot start
+     * @throws java.lang.Exception If the server cannot start
      */
     public static void main(final String[] args)
             throws ParseException, FileNotFoundException,

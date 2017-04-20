@@ -35,47 +35,52 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Utility class definition which defines some tools for the Server.
  *
  * @author Thomas Gilon
  */
 public final class Utility {
+
     private Utility() {
     }
 
     /**
-     * Compute the mean of an ArrayList<Double>.
-     * @param list
-     * @return mean
+     * Compute the mean of an ArrayList&lt;Double&gt;.
+     *
+     * @param list List
+     * @return double : Mean of the given list
      */
     public static double getMean(final ArrayList<Double> list) {
-            double sum = 0.0;
-            for (double i : list) {
-                sum += i;
-            }
-            return sum / list.size();
+        double sum = 0.0;
+        for (double i : list) {
+            sum += i;
+        }
+        return sum / list.size();
     }
 
     /**
-     * Compute the mean and variance of an ArrayList<Double>.
-     * @param list
-     * @return double[] mean_variance
+     * Compute the mean and variance of an ArrayList&lt;Double&gt;.
+     *
+     * @param list List
+     * @return double[] : [mean variance]
      */
     public static double[] getMeanVariance(
             final ArrayList<Double> list) {
         double mean = getMean(list);
         double sum = 0.0;
-        for (double i :list) {
+        for (double i : list) {
             sum += (i - mean) * (i - mean);
         }
-        return new double[] {mean, sum / list.size()};
+        return new double[]{mean, sum / list.size()};
     }
 
     /**
      * Compute the z score of a value.
-     * @param mean
-     * @param variance
-     * @param value
-     * @return z
+     *
+     * @param mean Mean
+     * @param variance Variance
+     * @param value Value
+     * @return double : Z score of the given value
      */
     public static double getZ(final double mean, final double variance,
             final Double value) {
@@ -84,10 +89,11 @@ public final class Utility {
 
     /**
      * Compute the absolute value from the z score.
-     * @param mean
-     * @param variance
-     * @param z
-     * @return absolute value
+     *
+     * @param mean Mean
+     * @param variance Variance
+     * @param z Z score
+     * @return double : Absolute value of the given z score
      */
     public static double fromZ(final double mean, final double variance,
             final Double z) {
@@ -95,9 +101,10 @@ public final class Utility {
     }
 
     /**
-     * Compute maximum and minimum of an ArrayList<Double>.
-     * @param list
-     * @return ArrayList<Double> max_min
+     * Compute maximum and minimum of an ArrayList&lt;Double&gt;.
+     *
+     * @param list List
+     * @return ArrayList&lt;Double&gt; : [maximum minimum]
      */
     public static ArrayList<Double> getMaxMin(final ArrayList<Double> list) {
         Double max = 0.0;
@@ -114,10 +121,11 @@ public final class Utility {
 
     /**
      * Compute the absolute prune threshold based on z score.
-     * @param mean
-     * @param variance
-     * @param z_prune_threshold
-     * @return prune_threshold
+     *
+     * @param mean Mean
+     * @param variance Variance
+     * @param z_prune_threshold Z score of prune threshold
+     * @return double : Prune threshold in absolute value
      */
     public static double computePruneThreshold(final double mean,
             final double variance,
@@ -132,10 +140,11 @@ public final class Utility {
 
     /**
      * Compute the absolute maximum cluster size based on z score.
-     * @param mean
-     * @param variance
-     * @param z_max_cluster_size
-     * @return max_cluster_size
+     *
+     * @param mean Mean
+     * @param variance Variance
+     * @param z_max_cluster_size Z score of max cluster size
+     * @return double : Max cluster size in absolute value
      */
     public static double computeClusterSize(final double mean,
             final double variance,
@@ -149,11 +158,12 @@ public final class Utility {
         return max_cluster_size;
     }
 
-        /**
+    /**
      * Remove a list of nodes from a given graph (and update graph).
-     * @param <U>
-     * @param graph
-     * @param node
+     *
+     * @param <U> Class of the list of nodes
+     * @param graph Graph to clean
+     * @param nodes List of nodes
      */
     static <U> void remove(final Graph<U> graph, final LinkedList<U> nodes) {
         HashMap<U, NeighborList> map = graph.getHashMap();
@@ -163,8 +173,8 @@ public final class Utility {
             map.remove(node);
         }
         // Delete the invalid edges to avoid "NullPointerException"
-        Iterator<Map.Entry<U, NeighborList>> iterator_1 =
-                map.entrySet().iterator();
+        Iterator<Map.Entry<U, NeighborList>> iterator_1
+                = map.entrySet().iterator();
         while (iterator_1.hasNext()) {
             Map.Entry<U, NeighborList> entry = iterator_1.next();
             NeighborList neighborlist = entry.getValue();
@@ -184,17 +194,18 @@ public final class Utility {
 
     /**
      * Compute the histogram of a given list.
-     * @param list
-     * @param min
-     * @param max
-     * @param step
-     * @return HistData
+     *
+     * @param list List
+     * @param min Minimum
+     * @param max Maximum
+     * @param step Step between bins in the histogram
+     * @return HistData : Histogram data based on the list
      */
     public static HistData computeHistogram(
-        final ArrayList<Double> list,
-        final double min,
-        final double max,
-        final double step) {
+            final ArrayList<Double> list,
+            final double min,
+            final double max,
+            final double step) {
         HistData hist_data = new HistData();
         for (Double i = min; i <= max + step; i += step) {
             hist_data.put(i, 0.0);
@@ -216,9 +227,10 @@ public final class Utility {
 
     /**
      * Sorting function, based on the given index.
-     * @param list_domain
-     * @param index
-     * @return ArrayList<Domain> sorted list
+     *
+     * @param list_domain List of domains
+     * @param index Map of the indexes associated to each domain
+     * @return ArrayList&lt;Domain&gt; : Sorted list of domains
      */
     public static ArrayList<Domain> sortByIndex(final List<Domain> list_domain,
             final HashMap<Domain, Double> index) {

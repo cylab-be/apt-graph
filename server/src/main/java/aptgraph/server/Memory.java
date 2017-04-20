@@ -33,10 +33,12 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 /**
+ * Memory object of the Server.
  *
  * @author Thomas Gilon
  */
 public class Memory {
+
     // List of all the users
     private ArrayList<String> all_users_list;
     // List of all the subnets
@@ -47,14 +49,16 @@ public class Memory {
     private ArrayList<String> users_list;
     // Value of the k of manipulated graphs
     private int k;
-    // List of domains in the graphs
-    // term 'byUsers' will contain all domains without merge of requests
+    // List of all domains in the graphs
+    // Mode 'byUsers' will contain all domains without merge of requests
+    // from different users
     // (key = user:domain)
-    // term 'all' will contain all merged domains
+    // Mode 'all' will contain all domains with merge of requests from
+    // different users
     // (key = domain)
     private HashMap<String, HashMap<String, Domain>> all_domains
             = new HashMap<String, HashMap<String, Domain>>();
-    // List of individuals graphs of feature for each user
+    // Map of the feature graphs for each user
     private HashMap<String, LinkedList<Graph<Domain>>> users_graphs
             = new HashMap<String, LinkedList<Graph<Domain>>>();
     // Feature weights
@@ -71,7 +75,7 @@ public class Memory {
     private double prune_threshold_temp;
     // Pruning threshold used
     private double prune_threshold;
-    // Indicator for prune_threshold_temp : z value or not
+    // Indicator for prune_threshold_temp : z score or not (True if z score)
     private boolean prune_z_bool;
     // Mean and Variance of the cluster sizes
     private double[] mean_var_clusters;
@@ -83,25 +87,25 @@ public class Memory {
     private double max_cluster_size_temp;
     // Max cluster size used
     private double max_cluster_size;
-    // Indicator for max_cluster_size_temp : z value or not
+    // Indicator for max_cluster_size_temp : z score or not (True if z score)
     private boolean cluster_z_bool;
-    // List of graphs after filtering
+    // List of cluster after filtering
     private LinkedList<Graph<Domain>> filtered;
-    // Indicator for white listing
+    // Indicator for white listing (True if authorized)
     private boolean whitelist_bool;
-    // Path of the white list
+    // Path to the white list
     private static final Path PATH = Paths.get("src/main/resources/hosts");
     // List of white listed domains on the go
     private String white_ongo;
     // Minimum number of requests sent by user for a given domain
     private double number_requests;
-    // List of effectivly whitelisted domains
+    // List of effectively white listed domains
     private LinkedList<Domain> whitelisted;
-    // List of graphs after filtering and white listing
+    // List of cluster after filtering and white listing
     private LinkedList<Graph<Domain>> filtered_white_listed;
     // Ranking weights
     private double[] ranking_weights;
-    // Indicator for search of APT.FINDME.be
+    // Indicator for search of ".apt" domains (True if wanted)
     private boolean apt_search;
     // Info of Ranking for print
     private String ranking_print;
@@ -113,7 +117,8 @@ public class Memory {
 
     /**
      * Get the list of all the users.
-     * @return all_users_list
+     *
+     * @return ArrayList&lt;String&gt; : List of all users
      */
     public final ArrayList<String> getAllUsersList() {
         return this.all_users_list;
@@ -121,7 +126,8 @@ public class Memory {
 
     /**
      * Set the list of all the users.
-     * @param all_users_list
+     *
+     * @param all_users_list List of all users
      */
     public final void setAllUsersList(
             final ArrayList<String> all_users_list) {
@@ -130,7 +136,8 @@ public class Memory {
 
     /**
      * Get the list of all the subnets.
-     * @return all_subnets_list
+     *
+     * @return ArrayList&lt;String&gt; : List of all subnets
      */
     public final ArrayList<String> getAllSubnetsList() {
         return this.all_subnets_list;
@@ -138,7 +145,8 @@ public class Memory {
 
     /**
      * Set the list of all the subnet.
-     * @param all_subnets_list
+     *
+     * @param all_subnets_list List of all subnets
      */
     public final void setAllSubnetsList(
             final ArrayList<String> all_subnets_list) {
@@ -147,7 +155,8 @@ public class Memory {
 
     /**
      * Get the current user.
-     * @return user
+     *
+     * @return String : Current user
      */
     public final String getUser() {
         return this.user;
@@ -155,7 +164,8 @@ public class Memory {
 
     /**
      * Set the current user.
-     * @param user
+     *
+     * @param user Current user
      */
     public final void setUser(final String user) {
         this.user = user;
@@ -163,7 +173,8 @@ public class Memory {
 
     /**
      * Get the current list of users.
-     * @return users_list
+     *
+     * @return ArrayList&lt;String&gt; : Current list of users
      */
     public final ArrayList<String> getUsersList() {
         return this.users_list;
@@ -171,7 +182,8 @@ public class Memory {
 
     /**
      * Set the current list of users.
-     * @param users_list
+     *
+     * @param users_list Current list of users
      */
     public final void setUsersList(final ArrayList<String> users_list) {
         this.users_list = users_list;
@@ -179,7 +191,8 @@ public class Memory {
 
     /**
      * Get the current k.
-     * @return k
+     *
+     * @return int : Current k value of k-NN Graph used
      */
     public final int getCurrentK() {
         return this.k;
@@ -187,15 +200,21 @@ public class Memory {
 
     /**
      * Set the current k.
-     * @param k
+     *
+     * @param k Current k value of k-NN Graph used
      */
     public final void setCurrentK(final int k) {
         this.k = k;
     }
 
     /**
-     * Get the list of domains.
-     * @return all_domains
+     * Get the list of all domains in the graph. Mode 'byUsers' will contain all
+     * domains without merge of requests from different users (key =
+     * user:domain) Mode 'all' will contain all domains with merge of requests
+     * from different users (key = domain)
+     *
+     * @return HashMap&lt;String, HashMap&lt;String, Domain&gt;&gt; : List of
+     * all domains
      */
     public final HashMap<String, HashMap<String, Domain>> getAllDomains() {
         if (this.all_domains.get("byUsers") == null) {
@@ -208,9 +227,13 @@ public class Memory {
     }
 
     /**
-     * Get the list of domains for specific mode.
-     * @param mode
-     * @return all_domains
+     * Get the list of all domains in the graph for specific mode. Mode
+     * 'byUsers' will contain all domains without merge of requests from
+     * different users (key = user:domain) Mode 'all' will contain all domains
+     * with merge of requests from different users (key = domain)
+     *
+     * @param mode Mode
+     * @return HashMap&lt;String, Domain&gt; : List of all domains
      */
     public final HashMap<String, Domain> getAllDomains(final String mode) {
         if (this.all_domains.get(mode) == null) {
@@ -220,9 +243,13 @@ public class Memory {
     }
 
     /**
-     * Set the list of domains.
-     * @param all_domains_by_users
-     * @param all_domains_all
+     * Set the list of domains. Mode 'byUsers' will contain all domains without
+     * merge of requests from different users (key = user:domain) Mode 'all'
+     * will contain all domains with merge of requests from different users (key
+     * = domain)
+     *
+     * @param all_domains_by_users Map of all the domains in 'byUsers' mode
+     * @param all_domains_all Map of all the domains in 'all' mode
      */
     public final void setAllDomains(
             final HashMap<String, Domain> all_domains_by_users,
@@ -232,8 +259,12 @@ public class Memory {
     }
 
     /**
-     * Set the list of domains (only for domains by users).
-     * @param all_domains_by_users
+     * Set the list of domains (only for domains by users). Mode 'byUsers' will
+     * contain all domains without merge of requests from different users (key =
+     * user:domain) Mode 'all' will contain all domains with merge of requests
+     * from different users (key = domain)
+     *
+     * @param all_domains_by_users Map of all the domains in 'byUsers' mode
      */
     public final void setAllDomainsByUsers(
             final HashMap<String, Domain> all_domains_by_users) {
@@ -241,8 +272,12 @@ public class Memory {
     }
 
     /**
-     * Set the list of domains (only for global domains).
-     * @param all_domains_all
+     * Set the list of domains (only for global domains). Mode 'byUsers' will
+     * contain all domains without merge of requests from different users (key =
+     * user:domain) Mode 'all' will contain all domains with merge of requests
+     * from different users (key = domain)
+     *
+     * @param all_domains_all Map of all the domains in 'all' mode
      */
     public final void setAllDomainsAll(
             final HashMap<String, Domain> all_domains_all) {
@@ -250,16 +285,19 @@ public class Memory {
     }
 
     /**
-     * Get the list of graphs of feature for each user.
-     * @return users_graphs
+     * Get the map of the feature graphs for each user.
+     *
+     * @return HashMap&lt;String, LinkedList&lt;Graph&lt;Domain&gt;&gt;&gt; :
+     * Map of the feature graphs for each user
      */
     public final HashMap<String, LinkedList<Graph<Domain>>> getUsersGraphs() {
         return this.users_graphs;
     }
 
     /**
-     * Set the list of graphs of feature for each user.
-     * @param users_graphs
+     * Set the map of the feature graphs for each user.
+     *
+     * @param users_graphs Map of the feature graphs for each user
      */
     public final void setUsersGraphs(
             final HashMap<String, LinkedList<Graph<Domain>>> users_graphs) {
@@ -268,7 +306,8 @@ public class Memory {
 
     /**
      * Get the feature weights.
-     * @return feature_weights
+     *
+     * @return double[] : Feature weights
      */
     public final double[] getFeatureWeights() {
         return this.feature_weights.clone();
@@ -276,7 +315,8 @@ public class Memory {
 
     /**
      * Set the feature weights.
-     * @param feature_weights
+     *
+     * @param feature_weights Feature weights
      */
     public final void setFeatureWeights(final double[] feature_weights) {
         this.feature_weights = feature_weights.clone();
@@ -284,7 +324,8 @@ public class Memory {
 
     /**
      * Get the feature ordered weights.
-     * @return feature_ordered_weights
+     *
+     * @return double[] : Feature ordered weights
      */
     public final double[] getFeatureOrderedWeights() {
         return this.feature_ordered_weights.clone();
@@ -292,7 +333,8 @@ public class Memory {
 
     /**
      * Set the feature ordered weights.
-     * @param feature_ordered_weights
+     *
+     * @param feature_ordered_weights Feature ordered weights
      */
     public final void setFeatureOrderedWeights(
             final double[] feature_ordered_weights) {
@@ -300,16 +342,20 @@ public class Memory {
     }
 
     /**
-     * Get the Merged Graph.
-     * @return merged_graph
+     * Get the Merged Graph (graph after fusion of features and users, known as
+     * final graph).
+     *
+     * @return Graph&lt;Domain&gt; : Merged Graph
      */
     public final Graph<Domain> getMergedGraph() {
         return this.merged_graph;
     }
 
     /**
-     * Set the Merged Graph.
-     * @param merged_graph
+     * Set the Merged Graph (graph after fusion of features and users, known as
+     * final graph).
+     *
+     * @param merged_graph Merged Graph
      */
     public final void setMergedGraph(final Graph<Domain> merged_graph) {
         this.merged_graph = merged_graph;
@@ -317,7 +363,8 @@ public class Memory {
 
     /**
      * Get the mean and variance for the similarities of merged graph.
-     * @return mean_var_similarities
+     *
+     * @return double[] : Mean and variance for the similarities of merged graph
      */
     public final double[] getMeanVarSimilarities() {
         return this.mean_var_similarities.clone();
@@ -325,7 +372,9 @@ public class Memory {
 
     /**
      * Set the mean and variance for the similarities of merged graph.
-     * @param mean_var_similarities
+     *
+     * @param mean_var_similarities Mean and variance for the similarities of
+     * merged graph
      */
     public final void setMeanVarSimilarities(
             final double[] mean_var_similarities) {
@@ -334,7 +383,8 @@ public class Memory {
 
     /**
      * Get the histogram data of similarities of merged graph.
-     * @return hist_similarities_store
+     *
+     * @return HistData : Histogram data of similarities of merged graph
      */
     public final HistData getHistDataSimilarities() {
         return this.hist_similarities;
@@ -342,7 +392,8 @@ public class Memory {
 
     /**
      * Set the histogram data of similarities of merged graph.
-     * @param hist_similarities
+     *
+     * @param hist_similarities Histogram data of similarities of merged graph
      */
     public final void setHistDataSimilarities(
             final HistData hist_similarities) {
@@ -350,16 +401,20 @@ public class Memory {
     }
 
     /**
-     * Get the pruning threshold given by user (before conversion, if needed).
-     * @return prune_threshold_temp
+     * Get the pruning threshold given by user (absolute value or z score)
+     * (before conversion, if needed).
+     *
+     * @return double : Pruning threshold given by user
      */
     public final double getPruningThresholdTemp() {
         return this.prune_threshold_temp;
     }
 
     /**
-     * Set the pruning threshold given by user (before conversion, if needed).
-     * @param prune_threshold_temp
+     * Set the pruning threshold given by user (absolute value or z score)
+     * (before conversion, if needed).
+     *
+     * @param prune_threshold_temp Pruning threshold given by user
      */
     public final void setPruningThresholdTemp(
             final double prune_threshold_temp) {
@@ -367,16 +422,18 @@ public class Memory {
     }
 
     /**
-     * Get the pruning threshold used.
-     * @return prune_threshold
+     * Get the pruning threshold used (absolute value).
+     *
+     * @return double : Pruning threshold used
      */
     public final double getPruningThreshold() {
         return this.prune_threshold;
     }
 
     /**
-     * Set the pruning threshold used.
-     * @param prune_threshold
+     * Set the pruning threshold used (absolute value).
+     *
+     * @param prune_threshold Pruning threshold used
      */
     public final void setPruningThreshold(
             final double prune_threshold) {
@@ -384,16 +441,18 @@ public class Memory {
     }
 
     /**
-     * Get the indicator for prune_threshold_temp : z value or not.
-     * @return prune_z_bool
+     * Get the indicator for prune_threshold_temp : z score or not.
+     *
+     * @return boolean : Indicator for prune_threshold_temp (True if z score)
      */
     public final boolean getPruneZBool() {
         return this.prune_z_bool;
     }
 
     /**
-     * Set the indicator for prune_threshold_temp : z value or not.
-     * @param prune_z_bool
+     * Set the indicator for prune_threshold_temp : z score or not.
+     *
+     * @param prune_z_bool Indicator for prune_threshold_temp (True if z score)
      */
     public final void setPruneZBool(
             final boolean prune_z_bool) {
@@ -402,7 +461,8 @@ public class Memory {
 
     /**
      * Get the mean and Variance of the cluster sizes.
-     * @return mean_var_cluster
+     *
+     * @return double[] : Mean and Variance of the cluster sizes
      */
     public final double[] getMeanVarClusters() {
         return this.mean_var_clusters.clone();
@@ -410,7 +470,8 @@ public class Memory {
 
     /**
      * Set the mean and Variance of the cluster sizes.
-     * @param mean_var_clusters
+     *
+     * @param mean_var_clusters Mean and Variance of the cluster sizes
      */
     public final void setMeanVarClusters(
             final double[] mean_var_clusters) {
@@ -419,7 +480,8 @@ public class Memory {
 
     /**
      * Get the histogram data of cluster sizes.
-     * @return hist_cluster
+     *
+     * @return HistData : Histogram data of cluster sizes
      */
     public final HistData getHistDataClusters() {
         return this.hist_cluster;
@@ -427,7 +489,8 @@ public class Memory {
 
     /**
      * Set the histogram data of cluster sizes.
-     * @param hist_cluster
+     *
+     * @param hist_cluster Histogram data of cluster sizes
      */
     public final void setHistDataClusters(
             final HistData hist_cluster) {
@@ -436,7 +499,8 @@ public class Memory {
 
     /**
      * Get the clusters.
-     * @return clusters
+     *
+     * @return ArrayList&lt;Graph&lt;Domain&gt;&gt; : Clusters
      */
     public final ArrayList<Graph<Domain>> getClusters() {
         return this.clusters;
@@ -444,7 +508,8 @@ public class Memory {
 
     /**
      * Set the clusters.
-     * @param clusters
+     *
+     * @param clusters Clusters
      */
     public final void setClusters(
             final ArrayList<Graph<Domain>> clusters) {
@@ -452,16 +517,20 @@ public class Memory {
     }
 
     /**
-     * Get the max cluster size given by user (before conversion, if needed).
-     * @return max_cluster_size_temp
+     * Get the max cluster size given by user (absolute value or z score)
+     * (before conversion, if needed).
+     *
+     * @return double : Max cluster size given by user
      */
     public final double getMaxClusterSizeTemp() {
         return this.max_cluster_size_temp;
     }
 
     /**
-     * Set the max cluster size given by user (before conversion, if needed).
-     * @param max_cluster_size_temp
+     * Set the max cluster size given by user (absolute value or z score)
+     * (before conversion, if needed).
+     *
+     * @param max_cluster_size_temp Max cluster size given by user
      */
     public final void setMaxClusterSizeTemp(
             final double max_cluster_size_temp) {
@@ -469,16 +538,18 @@ public class Memory {
     }
 
     /**
-     * Get the max cluster size used.
-     * @return max_cluster_size
+     * Get the max cluster size used (absolute value).
+     *
+     * @return double : Max cluster size used
      */
     public final double getMaxClusterSize() {
         return this.max_cluster_size;
     }
 
     /**
-     * Set the max cluster size used.
-     * @param max_cluster_size
+     * Set the max cluster size used (absolute value).
+     *
+     * @param max_cluster_size Max cluster size used
      */
     public final void setMaxClusterSize(
             final double max_cluster_size) {
@@ -487,7 +558,8 @@ public class Memory {
 
     /**
      * Get the indicator for max_cluster_size_temp : z value or not.
-     * @return cluster_z_bool
+     *
+     * @return boolean : Indicator for max_cluster_size_temp (True if z score)
      */
     public final boolean getClusterZBool() {
         return this.cluster_z_bool;
@@ -495,7 +567,9 @@ public class Memory {
 
     /**
      * Set the indicator for max_cluster_size_temp : z value or not.
-     * @param cluster_z_bool
+     *
+     * @param cluster_z_bool Indicator for max_cluster_size_temp (True if z
+     * score)
      */
     public final void setClusterZBool(
             final boolean cluster_z_bool) {
@@ -503,16 +577,19 @@ public class Memory {
     }
 
     /**
-     * Get the list of graphs after filtering.
-     * @return filtered
+     * Get the list of cluster after filtering.
+     *
+     * @return LinkedList&lt;Graph&lt;Domain&gt;&gt; : List of cluster after
+     * filtering
      */
     public final LinkedList<Graph<Domain>> getFiltered() {
         return this.filtered;
     }
 
     /**
-     * Set the list of graphs after filtering.
-     * @param filtered
+     * Set the list of cluster after filtering.
+     *
+     * @param filtered List of cluster after filtering
      */
     public final void setFiltered(
             final LinkedList<Graph<Domain>> filtered) {
@@ -521,7 +598,8 @@ public class Memory {
 
     /**
      * Get the indicator for white listing.
-     * @return whitelist_bool
+     *
+     * @return boolean : Indicator for white listing (True if authorized)
      */
     public final boolean getWhitelistBool() {
         return this.whitelist_bool;
@@ -529,7 +607,8 @@ public class Memory {
 
     /**
      * Set the indicator for white listing.
-     * @param whitelist_bool
+     *
+     * @param whitelist_bool Indicator for white listing (True if authorized)
      */
     public final void setWhitelistBool(
             final boolean whitelist_bool) {
@@ -537,8 +616,9 @@ public class Memory {
     }
 
     /**
-     * Get the path of the white list.
-     * @return PATH
+     * Get the path to the white list.
+     *
+     * @return Path : Path to the white list
      */
     public final Path getWhiteListPath() {
         return Memory.PATH;
@@ -546,15 +626,17 @@ public class Memory {
 
     /**
      * Get the list of white listed domains on the go.
-     * @return white_ongo
+     *
+     * @return String : List of white listed domains on the go
      */
     public final String getWhiteOngo() {
         return this.white_ongo;
     }
 
     /**
-     * Set the list of effectivly whitelisted domains.
-     * @param white_ongo
+     * Set the list of white listed domains on the go.
+     *
+     * @param white_ongo List of white listed domains on the go
      */
     public final void setWhiteOngo(
             final String white_ongo) {
@@ -563,7 +645,9 @@ public class Memory {
 
     /**
      * Get the minimum number of requests sent by user for a given domain.
-     * @return number_requests
+     *
+     * @return double : Minimum number of requests sent by user for a given
+     * domain
      */
     public final double getNumberRequests() {
         return this.number_requests;
@@ -571,7 +655,9 @@ public class Memory {
 
     /**
      * Set the minimum number of requests sent by user for a given domain.
-     * @param number_requests
+     *
+     * @param number_requests Minimum number of requests sent by user for a
+     * given domain
      */
     public final void setNumberRequests(
             final double number_requests) {
@@ -579,16 +665,19 @@ public class Memory {
     }
 
     /**
-     * Get the list of effectivly whitelisted domains.
-     * @return whitelisted
+     * Get the list of effectively white listed domains.
+     *
+     * @return LinkedList&lt;Domain&gt; : List of effectively white listed
+     * domains
      */
     public final LinkedList<Domain> getWhitelisted() {
         return this.whitelisted;
     }
 
     /**
-     * Set the list of white listed domains on the go.
-     * @param whitelisted
+     * Set the list of effectively white listed domains.
+     *
+     * @param whitelisted List of effectively white listed domains
      */
     public final void setWhitelisted(
             final LinkedList<Domain> whitelisted) {
@@ -596,16 +685,20 @@ public class Memory {
     }
 
     /**
-     * Get the list of graphs after filtering and white listing.
-     * @return filtered_white_listed
+     * Get the list of cluster after filtering and white listing.
+     *
+     * @return LinkedList&lt;Graph&lt;Domain&gt;&gt; : List of cluster after
+     * filtering and white listing
      */
     public final LinkedList<Graph<Domain>> getFilteredWhiteListed() {
         return this.filtered_white_listed;
     }
 
     /**
-     * Set the list of graphs after filtering and white listing.
-     * @param filtered_white_listed
+     * Set the list of cluster after filtering and white listing.
+     *
+     * @param filtered_white_listed List of cluster after filtering and white
+     * listing
      */
     public final void setFilteredWhiteListed(
             final LinkedList<Graph<Domain>> filtered_white_listed) {
@@ -614,7 +707,8 @@ public class Memory {
 
     /**
      * Get the ranking weights.
-     * @return ranking_weights
+     *
+     * @return double[] : Ranking weights
      */
     public final double[] getRankingWeights() {
         return this.ranking_weights.clone();
@@ -622,7 +716,8 @@ public class Memory {
 
     /**
      * Set the ranking weights.
-     * @param ranking_weights
+     *
+     * @param ranking_weights Ranking weights
      */
     public final void setRankingWeights(
             final double[] ranking_weights) {
@@ -630,16 +725,18 @@ public class Memory {
     }
 
     /**
-     * Get the indicator for search of APT.FINDME.be.
-     * @return apt_search
+     * Get the indicator for search of ".apt" domains.
+     *
+     * @return boolean : Indicator for search of ".apt" domains (True if wanted)
      */
     public final boolean getAptSearch() {
         return this.apt_search;
     }
 
     /**
-     * Set the indicator for search of APT.FINDME.be.
-     * @param apt_search
+     * Set the indicator for search of ".apt" domains.
+     *
+     * @param apt_search Indicator for search of ".apt" domains (True if wanted)
      */
     public final void setAptSearch(
             final boolean apt_search) {
@@ -648,7 +745,8 @@ public class Memory {
 
     /**
      * Get the info of Ranking for print.
-     * @return ranking_print
+     *
+     * @return String : Info of Ranking for print
      */
     public final String getRankingPrint() {
         return this.ranking_print;
@@ -656,7 +754,8 @@ public class Memory {
 
     /**
      * Set the info of Ranking for print.
-     * @param ranking_print
+     *
+     * @param ranking_print Info of Ranking for print
      */
     public final void setRankingPrint(
             final String ranking_print) {
@@ -665,7 +764,8 @@ public class Memory {
 
     /**
      * Concatenate input to the info of Ranking for print.
-     * @param ranking_print
+     *
+     * @param ranking_print New info of Ranking for print to concatenate
      */
     public final void concatRankingPrint(
             final String ranking_print) {
@@ -674,7 +774,8 @@ public class Memory {
 
     /**
      * Get the info of Ranking.
-     * @return ranking
+     *
+     * @return TreeMap&lt;Double, LinkedList&lt;Domain&gt;&gt; : Info of Ranking
      */
     public final TreeMap<Double, LinkedList<Domain>> getRanking() {
         return this.ranking;
@@ -682,7 +783,8 @@ public class Memory {
 
     /**
      * Set the info of Ranking.
-     * @param ranking
+     *
+     * @param ranking Info of Ranking
      */
     public final void setRanking(
             final TreeMap<Double, LinkedList<Domain>> ranking) {
@@ -691,7 +793,8 @@ public class Memory {
 
     /**
      * Get the standard output on UI.
-     * @return stdout
+     *
+     * @return String : Standard output on UI
      */
     public final String getStdout() {
         return this.stdout;
@@ -699,7 +802,8 @@ public class Memory {
 
     /**
      * Set the standard output on UI.
-     * @param stdout
+     *
+     * @param stdout Standard output on UI
      */
     public final void setStdout(
             final String stdout) {
@@ -708,7 +812,8 @@ public class Memory {
 
     /**
      * Concatenate input to the standard output on UI.
-     * @param input
+     *
+     * @param input New standard output on UI to concatenate
      */
     public final void concatStdout(
             final String input) {

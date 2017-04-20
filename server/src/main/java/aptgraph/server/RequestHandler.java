@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2016 Thibault Debatty.
+ * Copyright 2016 Thibault Debatty & Thomas Gilon.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package aptgraph.server;
 
 import aptgraph.core.Domain;
@@ -49,10 +48,13 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 /**
+ * Request Handler definition file.
  *
  * @author Thibault Debatty
+ * @author Thomas Gilon
  */
 public class RequestHandler {
+
     private final Path input_dir;
 
     private static final Logger LOGGER
@@ -62,7 +64,8 @@ public class RequestHandler {
 
     /**
      * Create new handler.
-     * @param input_dir
+     *
+     * @param input_dir Input directory
      */
     public RequestHandler(final Path input_dir) {
         this.input_dir = input_dir;
@@ -70,7 +73,8 @@ public class RequestHandler {
 
     /**
      * Give access to the internal memory of server.
-     * @return m
+     *
+     * @return m Server memory object
      */
     public final Memory getMemory() {
         return this.m;
@@ -78,7 +82,8 @@ public class RequestHandler {
 
     /**
      * A test json-rpc call, with no argument, that should return "hello".
-     * @return
+     *
+     * @return String : Test string "hello"
      */
     public final String test() {
         return "hello";
@@ -86,7 +91,8 @@ public class RequestHandler {
 
     /**
      * A dummy method that returns some clusters of nodes and edges.
-     * @return
+     *
+     * @return List&lt;Graph&lt;Domain&gt;&gt; : Dummy list of domains
      */
     public final List<Graph<Domain>> dummy() {
         String user = "219.253.194.242";
@@ -94,9 +100,7 @@ public class RequestHandler {
                 input_dir, user).getFirst();
 
         // Feature Fusion
-
         // URL/Domain clustering
-
         // Prune & clustering
         graph.prune(0.9);
         ArrayList<Graph<Domain>> clusters = graph.connectedComponents();
@@ -113,38 +117,40 @@ public class RequestHandler {
     }
 
     /**
-     * Give the list of users available in the log.
-     * @return List of users
+     * Give the list of users available in the log. This method modifies
+     * all_users_list and all_subnets_list of the Memory object of the Server.
+     *
+     * @return ArrayList&lt;String&gt; : List of users
      */
     public final ArrayList<String> getUsers() {
         LOGGER.info("Reading list of subnets from disk...");
         try {
             File file = new File(input_dir.toString(), "subnets.ser");
-            FileInputStream input_stream =
-                    new FileInputStream(file.toString());
+            FileInputStream input_stream
+                    = new FileInputStream(file.toString());
             ObjectInputStream input = new ObjectInputStream(
                     new BufferedInputStream(input_stream));
             m.setAllSubnetsList((ArrayList<String>) input.readObject());
             input.close();
         } catch (IOException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         } catch (ClassNotFoundException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         }
 
         LOGGER.info("Reading list of users from disk...");
         try {
             File file = new File(input_dir.toString(), "users.ser");
-            FileInputStream input_stream =
-                    new FileInputStream(file.toString());
+            FileInputStream input_stream
+                    = new FileInputStream(file.toString());
             ObjectInputStream input = new ObjectInputStream(
                     new BufferedInputStream(input_stream));
             m.setAllUsersList((ArrayList<String>) input.readObject());
             input.close();
         } catch (IOException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         } catch (ClassNotFoundException ex) {
-                System.err.println(ex);
+            System.err.println(ex);
         }
 
         ArrayList<String> output = new ArrayList<String>();
@@ -154,20 +160,24 @@ public class RequestHandler {
     }
 
     /**
-     * Analyze the graph of a specific user.
-     * @param user
-     * @param feature_ordered_weights
-     * @param prune_threshold_temp
-     * @param feature_weights
-     * @param max_cluster_size_temp
-     * @param prune_z_bool
-     * @param cluster_z_bool
-     * @param whitelist_bool
-     * @param white_ongo
-     * @param number_requests
-     * @param ranking_weights
-     * @param apt_search
-     * @return Output
+     * Analyze the graph of a specific user. This method modifies all necessary
+     * values in the Memory Object of the Server (possibly everything).
+     *
+     * @param user Targeted user or subnet
+     * @param feature_weights Weights for feature fusion
+     * @param feature_ordered_weights Ordered weights for feature fusion
+     * @param prune_threshold_temp Pruning threshold given by user
+     * @param max_cluster_size_temp Max cluster size given by user
+     * @param prune_z_bool Indicator for prune_threshold_temp (True if z score)
+     * @param cluster_z_bool Indicator for max_cluster_size_temp (True if z
+     * score)
+     * @param whitelist_bool Indicator for white listing (True if authorized)
+     * @param white_ongo List of white listed domains on the go
+     * @param number_requests Minimum number of requests sent by user for a
+     * given domain
+     * @param ranking_weights Ranking weights
+     * @param apt_search Indicator for search of ".apt" domains (True if wanted)
+     * @return Output : Output object of server needed for the web page
      */
     public final Output analyze(
             final String user,
@@ -225,10 +235,13 @@ public class RequestHandler {
                 m.setUsersList(m.getAllUsersList());
             } else if (Subnet.isSubnet(m.getUser())) {
                 m.setUsersList(Subnet.getUsersInSubnet(
-                       m.getUser(), m.getAllUsersList()));
+                        m.getUser(), m.getAllUsersList()));
             } else {
-                m.setUsersList(new ArrayList<String>()
-                { { add(m.getUser()); } });
+                m.setUsersList(new ArrayList<String>() {
+                    {
+                        add(m.getUser());
+                    }
+                });
             }
 
             // Load users graphs
@@ -249,7 +262,7 @@ public class RequestHandler {
                 + m.getUsersList().size());
         m.concatStdout("<br>k-NN Graph: k: " + m.getCurrentK());
         m.concatStdout("<br>Total number of domains: "
-                        + m.getAllDomains().get("all").values().size());
+                + m.getAllDomains().get("all").values().size());
 
         if (stages[1]) {
             // Compute each user graph
@@ -266,11 +279,11 @@ public class RequestHandler {
                 users_weights[i] = 1.0;
             }
             m.setMergedGraph(computeFusionGraphs(merged_graph_users, "",
-                            users_weights, new double[] {0.0}, "all"));
+                    users_weights, new double[]{0.0}, "all"));
 
             long estimated_time_4 = System.currentTimeMillis() - start_time;
             System.out.println("4: " + estimated_time_4
-                + " (Fusion of users done)");
+                    + " (Fusion of users done)");
         }
         if (stages[2]) {
             ArrayList<Double> similarities = listSimilarities();
@@ -390,7 +403,7 @@ public class RequestHandler {
 
         m.concatStdout(m.getRankingPrint());
         m.concatStdout("<br>Found " + m.getFilteredWhiteListed().size()
-            + " clusters</pre>");
+                + " clusters</pre>");
 
         // Output
         return createOutput();
@@ -398,15 +411,17 @@ public class RequestHandler {
 
     /**
      * Check input of user.
-     * @param user
-     * @param feature_weights
-     * @param feature_ordered_weights
-     * @param prune_threshold_temp
-     * @param max_cluster_size_temp
-     * @param prune_z_bool
-     * @param cluster_z_bool
-     * @param ranking_weights
-     * @return True if no problem
+     *
+     * @param user Targeted user or subnet
+     * @param feature_weights Weights for feature fusion
+     * @param feature_ordered_weights Ordered weights for feature fusion
+     * @param prune_threshold_temp Pruning threshold given by user
+     * @param max_cluster_size_temp Max cluster size given by user
+     * @param prune_z_bool Indicator for prune_threshold_temp (True if z score)
+     * @param cluster_z_bool Indicator for max_cluster_size_temp (True if z
+     * score)
+     * @param ranking_weights Ranking weights
+     * @return boolean : True if no problem
      */
     private boolean checkInputUser(
             final String user,
@@ -477,33 +492,36 @@ public class RequestHandler {
 
     /**
      * Determine which stage of the algorithm as to be computed.
-     * @param user
-     * @param k
-     * @param feature_weights
-     * @param feature_ordered_weights
-     * @param prune_threshold_temp
-     * @param max_cluster_size_temp
-     * @param prune_z_bool
-     * @param cluster_z_bool
-     * @param whitelist_bool
-     * @param white_ongo
-     * @param ranking_weights
-     * @param apt_search
+     *
+     * @param user Targeted user or subnet
+     * @param feature_weights Weights for feature fusion
+     * @param feature_ordered_weights Ordered weights for feature fusion
+     * @param prune_threshold_temp Pruning threshold given by user
+     * @param max_cluster_size_temp Max cluster size given by user
+     * @param prune_z_bool Indicator for prune_threshold_temp (True if z score)
+     * @param cluster_z_bool Indicator for max_cluster_size_temp (True if z
+     * score)
+     * @param whitelist_bool Indicator for white listing (True if authorized)
+     * @param white_ongo List of white listed domains on the go
+     * @param number_requests Minimum number of requests sent by user for a
+     * given domain
+     * @param ranking_weights Ranking weights
+     * @param apt_search Indicator for search of ".apt" domains (True if wanted)
      * @return boolean[]
      */
     private boolean[] checkInputChanges(
-        final String user,
-        final double[] feature_weights,
-        final double[] feature_ordered_weights,
-        final double prune_threshold_temp,
-        final double max_cluster_size_temp,
-        final boolean prune_z_bool,
-        final boolean cluster_z_bool,
-        final boolean whitelist_bool,
-        final String white_ongo,
-        final double number_requests,
-        final double[] ranking_weights,
-        final boolean apt_search) {
+            final String user,
+            final double[] feature_weights,
+            final double[] feature_ordered_weights,
+            final double prune_threshold_temp,
+            final double max_cluster_size_temp,
+            final boolean prune_z_bool,
+            final boolean cluster_z_bool,
+            final boolean whitelist_bool,
+            final String white_ongo,
+            final double number_requests,
+            final double[] ranking_weights,
+            final boolean apt_search) {
 
         // By default all stages have changed
         boolean[] stages = {true, true, true, true, true, true, true, true};
@@ -553,9 +571,10 @@ public class RequestHandler {
     }
 
     /**
-     * Load the graphs needed.
-     * @param start_time
-     * @return
+     * Load the graphs needed. This method modifies users_graphs of the Memory
+     * object of the Server.
+     *
+     * @param start_time Epoch of the start time of the computation
      */
     final void loadUsersGraphs(final long start_time) {
         m.setUsersGraphs(new HashMap<String, LinkedList<Graph<Domain>>>());
@@ -584,11 +603,13 @@ public class RequestHandler {
 
     /**
      * Fusion features of each user.
-     * @return merged_graph_users
+     *
+     * @return LinkedList&lt;Graph&lt;Domain&gt;&gt; : List of the merged graph
+     * of each user
      */
     final LinkedList<Graph<Domain>> computeUsersGraph() {
         LinkedList<Graph<Domain>> merged_graph_users
-                    = new LinkedList<Graph<Domain>>();
+                = new LinkedList<Graph<Domain>>();
         for (String user_temp : m.getUsersList()) {
             // Load user graph
             LinkedList<Graph<Domain>> graphs_temp
@@ -605,12 +626,15 @@ public class RequestHandler {
 
     /**
      * Compute the fusion of graphs.
-     * @param graphs
-     * @param user
-     * @param feature_weights
-     * @param feature_ordered_weights
-     * @param mode
-     * @return merged_graph
+     *
+     * @param graphs List of the feature graphs of the user
+     * @param user Targeted user
+     * @param feature_weights Weights for feature fusion
+     * @param feature_ordered_weights Ordered weights for feature fusion
+     * @param mode Mode of operation ('byUsers' of fusion of features, 'all' if
+     * fusion of users)
+     * @return Graph&lt;Domain&gt; : Merged graph (Fusion of feature if
+     * 'byUsers' mode and fusion of users if 'all' mode)
      */
     final Graph<Domain> computeFusionGraphs(
             final LinkedList<Graph<Domain>> graphs,
@@ -631,8 +655,8 @@ public class RequestHandler {
                     return null;
                 }
 
-                HashMap<Domain, Double> all_neighbors =
-                        new HashMap<Domain, Double>();
+                HashMap<Domain, Double> all_neighbors
+                        = new HashMap<Domain, Double>();
 
                 for (int i = 0; i < graphs.size(); i++) {
                     Graph<Domain> graph_temp = graphs.get(i);
@@ -648,12 +672,13 @@ public class RequestHandler {
                     if (graph_temp.containsKey(m.getAllDomains()
                             .get("byUsers").get(key_user))) {
                         NeighborList neighbors_temp = graph_temp
-                             .getNeighbors(m.getAllDomains().get("byUsers")
-                                     .get(key_user));
+                                .getNeighbors(m.getAllDomains().get("byUsers")
+                                        .get(key_user));
 
                         for (Neighbor<Domain> neighbor_temp : neighbors_temp) {
-                            double new_similarity =
-                                    weights[i] * neighbor_temp.getSimilarity();
+                            double new_similarity
+                                    = weights[i] * neighbor_temp
+                                            .getSimilarity();
 
                             if (mode.equals("byUsers") && all_neighbors
                                     .containsKey(neighbor_temp.getNode())) {
@@ -662,25 +687,26 @@ public class RequestHandler {
                             } else if (mode.equals("all")
                                     && all_neighbors.containsKey(
                                             m.getAllDomains().get("all")
-                                            .get(neighbor_temp.getNode()
-                                                    .getName()))) {
-                                new_similarity +=
-                                        all_neighbors.get(m.getAllDomains()
-                                            .get("all").get(neighbor_temp
-                                                    .getNode().getName()));
+                                                    .get(neighbor_temp.getNode()
+                                                            .getName()))) {
+                                new_similarity
+                                        += all_neighbors.get(m.getAllDomains()
+                                                .get("all").get(neighbor_temp
+                                                .getNode().getName()));
                             }
 
                             if (new_similarity != 0) {
                                 if (mode.equals("all")) {
                                     all_neighbors.put(
-                                      m.getAllDomains().get(mode)
-                                      .get(neighbor_temp.getNode().getName()),
-                                      new_similarity);
+                                            m.getAllDomains().get(mode)
+                                                    .get(neighbor_temp.getNode()
+                                                            .getName()),
+                                            new_similarity);
                                 } else if (mode.equals("byUsers")) {
-                                    all_neighbors.put(
-                                      m.getAllDomains().get(mode)
-                                      .get(user + ":" + neighbor_temp
-                                      .getNode().getName()), new_similarity);
+                                    all_neighbors.put(m.getAllDomains()
+                                            .get(mode).get(user + ":"
+                                            + neighbor_temp.getNode()
+                                                   .getName()), new_similarity);
                                 }
                             }
 
@@ -700,7 +726,8 @@ public class RequestHandler {
 
     /**
      * Compute the list of all the similarities of domain graph.
-     * @return similarities
+     *
+     * @return ArrayList&lt;Double&gt; : List of similarities
      */
     final ArrayList<Double> listSimilarities() {
         ArrayList<Double> similarities = new ArrayList<Double>();
@@ -714,10 +741,13 @@ public class RequestHandler {
     }
 
     /**
-     * Compute distribution of a list.
-     * @param list
-     * @param mode (= prune OR cluster)
-     * @return HashMap<Double, Integer>
+     * Compute histogram data of a given list. This method modifies
+     * hist_similarities or hist_cluster of the Memory object of the Server
+     * (depending of the mode used).
+     *
+     * @param list List to study
+     * @param mode Mode to use for the computation (= 'prune' OR 'cluster')
+     * @return HashMap&lt;Double, Integer&gt; : Histogram data of desired mode
      */
     private void computeHistData(
             final ArrayList<Double> list,
@@ -772,10 +802,12 @@ public class RequestHandler {
     }
 
     /**
-     * Make the pruning on the graph and analyze the similarities.
-     * @param graph
-     * @param start_time
-     * @return Graph<Domain>
+     * Make the pruning on the graph and analyze the similarities. This method
+     * modifies prune_threshold of the Memory object of the Server.
+     *
+     * @param graph Graph to prune
+     * @param start_time Epoch of the start time of the computation
+     * @return Graph&lt;Domain&gt; : Graph pruned
      */
     final Graph<Domain> doPruning(
             final Graph<Domain> graph,
@@ -784,7 +816,7 @@ public class RequestHandler {
             m.setPruningThreshold(Utility.computePruneThreshold(
                     m.getMeanVarSimilarities()[0],
                     m.getMeanVarSimilarities()[1],
-                        m.getPruningThresholdTemp()));
+                    m.getPruningThresholdTemp()));
         } else {
             m.setPruningThreshold(m.getPruningThresholdTemp());
         }
@@ -794,11 +826,12 @@ public class RequestHandler {
 
     /**
      * Compute the list of the sizes of clusters.
-     * @param clusters
-     * @return cluster_sizes
+     *
+     * @param clusters List of clusters
+     * @return ArrayList&lt;Double&gt; : List of clusters size
      */
     final ArrayList<Double> listClusterSizes(
-        final ArrayList<Graph<Domain>> clusters) {
+            final ArrayList<Graph<Domain>> clusters) {
         ArrayList<Double> cluster_sizes = new ArrayList<Double>();
         for (Graph<Domain> subgraph : clusters) {
             cluster_sizes.add((double) subgraph.size());
@@ -807,9 +840,10 @@ public class RequestHandler {
     }
 
     /**
-     * Make the filtering and analyze the cluster sizes.
-     * @param start_time
-     * @return HistData
+     * Make the filtering and analyze the cluster sizes. This method modifies
+     * max_cluster_size and filtered of the Memory object of the Server.
+     *
+     * @param start_time Epoch of the start time of the computation
      */
     final void doFiltering(final long start_time) {
         LinkedList<Graph<Domain>> filtered = new LinkedList<Graph<Domain>>();
@@ -829,8 +863,8 @@ public class RequestHandler {
     }
 
     /**
-     * White List unwanted domains.
-     * @return
+     * White List unwanted domains. This method modifies whitelisted and
+     * filtered_white_listed of the Memory object of the Server.
      */
     final void whiteListing() {
         LinkedList<Graph<Domain>> filtered_whitelisted
@@ -845,7 +879,7 @@ public class RequestHandler {
         LinkedList<Domain> whitelisted = new LinkedList<Domain>();
         try {
             whitelist = Files.readAllLines(m.getWhiteListPath(),
-                            StandardCharsets.UTF_8);
+                    StandardCharsets.UTF_8);
             whitelist_ongo.addAll(Arrays.asList(m.getWhiteOngo().split("\n")));
         } catch (IOException ex) {
             Logger.getLogger(RequestHandler.class.getName())
@@ -869,7 +903,7 @@ public class RequestHandler {
                         if (m.getAllDomains().get("byUsers").get(user
                                 + ":" + dom.getName()).toArray().length
                                 < m.getNumberRequests()
-                            && !whitelisted.contains(dom)) {
+                                && !whitelisted.contains(dom)) {
                             whitelisted.add(dom);
                         }
                     }
@@ -883,7 +917,8 @@ public class RequestHandler {
     }
 
     /**
-     * Print of the ranking list.
+     * Print of the ranking list. This method modifies ranking_print and ranking
+     * of the Memory object of the Server.
      */
     private void showRanking() {
         // Creation of a big graph with the result
@@ -906,14 +941,14 @@ public class RequestHandler {
         }
         m.setRankingPrint("<br>Number of domains shown: " + list_domain.size());
         // Number of children
-        HashMap<Domain, Double> index_children =
-                new HashMap<Domain, Double>();
+        HashMap<Domain, Double> index_children
+                = new HashMap<Domain, Double>();
         // Number of parents
-        HashMap<Domain, Double> index_parents =
-                new HashMap<Domain, Double>();
+        HashMap<Domain, Double> index_parents
+                = new HashMap<Domain, Double>();
         // Number of requests index
-        HashMap<Domain, Double> index_requests =
-                new HashMap<Domain, Double>();
+        HashMap<Domain, Double> index_requests
+                = new HashMap<Domain, Double>();
 
         // Number of children & Number of requests
         for (Domain dom : graph_all.getNodes()) {
@@ -924,7 +959,7 @@ public class RequestHandler {
         // Number of parents
         for (Domain parent : graph_all.getNodes()) {
             for (Neighbor<Domain> child : graph_all.getNeighbors(parent)) {
-               index_children.put(parent,
+                index_children.put(parent,
                         index_children.get(parent) + child.getSimilarity());
                 index_parents.put(child.getNode(), index_parents.get(
                         child.getNode()) + child.getSimilarity());
@@ -958,8 +993,9 @@ public class RequestHandler {
             }
             if (founded) {
                 m.concatRankingPrint("<br>TOP for first APT: "
-                       + Math.round(top / m.getAllDomains()
-                       .get("all").values().size() * 100 * 100) / 100.0 + "%");
+                        + Math.round(top / m.getAllDomains()
+                                .get("all").values().size() * 100 * 100)
+                        / 100.0 + "%");
             } else {
                 m.concatRankingPrint("<br>TOP for APT: NOT FOUND");
             }
@@ -982,14 +1018,15 @@ public class RequestHandler {
 
     /**
      * Create the output variable.
-     * @return Output
+     *
+     * @return Output : Output object of server needed for the web page
      */
     private Output createOutput() {
         Output output = new Output();
         output.setFilteredWhiteListed(m.getFilteredWhiteListed());
         output.setStdout(m.getStdout());
-        output.setHistPruning(m.getHistDataSimilarities());
-        output.setHistCluster(m.getHistDataClusters());
+        output.setHistDataSimilarities(m.getHistDataSimilarities());
+        output.setHistDataClusters(m.getHistDataClusters());
         output.setRanking(m.getRanking());
         return output;
     }

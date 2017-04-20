@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import static junit.framework.Assert.assertFalse;
 
 /**
+ * Test file for Utility methods.
  *
  * @author Thomas Gilon
  */
@@ -41,13 +42,14 @@ public class UtilityTest {
 
     /**
      * Test the effectiveness of the suppression of a node in a graph.
+     *
      * @throws java.io.IOException
      * @throws java.lang.ClassNotFoundException
      */
     public void testRemove()
             throws IOException, ClassNotFoundException {
         System.out.println("\nTest : remove");
-        
+
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
         RequestHandler handler = new RequestHandler(input_dir);
@@ -57,15 +59,15 @@ public class UtilityTest {
         handler.getMemory().setFeatureWeights(new double[]{0.7, 0.1, 0.2});
         handler.getMemory().setFeatureOrderedWeights(new double[]{0.0, 0.0});
         LinkedList<Graph<Domain>> merged_graph_users
-                    = handler.computeUsersGraph();
+                = handler.computeUsersGraph();
         double[] users_weights = new double[merged_graph_users.size()];
         for (int i = 0; i < merged_graph_users.size(); i++) {
             users_weights[i] = 1.0 / merged_graph_users.size();
         }
         Graph<Domain> merged_graph
                 = handler.computeFusionGraphs(merged_graph_users, "",
-                        users_weights, new double[] {0.0}, "all");
-        
+                        users_weights, new double[]{0.0}, "all");
+
         // Test 
         Domain first_node = merged_graph.first();
         LinkedList<Domain> nodes = new LinkedList<Domain>();
@@ -79,5 +81,5 @@ public class UtilityTest {
             }
         }
     }
-    
+
 }

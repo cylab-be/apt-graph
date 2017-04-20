@@ -27,23 +27,27 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 /**
+ * Histogram data object.
  *
  * @author Thomas Gilon
  */
 public class HistData extends TreeMap<Double, Double> {
+
     private String name = "";
 
     /**
-     * HistData name.
-     * @return
+     * Get HistData name.
+     *
+     * @return String : HistData name
      */
     public final String getName() {
         return name;
     }
 
     /**
-     * HistData keys.
-     * @return
+     * Get HistData keys.
+     *
+     * @return LinkedList&lt;Double&gt; : HistData keys.
      */
     public final LinkedList<Double> getKeys() {
         LinkedList<Double> list = new LinkedList();
@@ -54,8 +58,9 @@ public class HistData extends TreeMap<Double, Double> {
     }
 
     /**
-     * HistData values.
-     * @return
+     * Get HistData values.
+     *
+     * @return LinkedList&lt;Double&gt; : HistData values.
      */
     public final LinkedList<Double> getValues() {
         LinkedList<Double> list = new LinkedList();
@@ -66,8 +71,9 @@ public class HistData extends TreeMap<Double, Double> {
     }
 
     /**
-     * HistData serialization in array for Chartist.
-     * @return
+     * HistData serialization in array for Chartist library (see web site).
+     *
+     * @return String : Chartist format data
      */
     public final String getArray() {
         String data = "";
@@ -89,7 +95,8 @@ public class HistData extends TreeMap<Double, Double> {
 
     /**
      * Set HistData name.
-     * @param name
+     *
+     * @param name HistData name
      */
     public final void setName(final String name) {
         this.name = name;

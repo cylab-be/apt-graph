@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2016 Thibault Debatty.
+ * Copyright 2016 Thibault Debatty & Thomas Gilon.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,10 @@ import info.debatty.java.graphs.Graph;
 import java.io.IOException;
 
 /**
+ * Graph serialization definition file.
  *
  * @author Thibault Debatty
+ * @author Thomas Gilon
  */
 public class GraphSerializer extends StdSerializer<Graph> {
 
@@ -39,12 +41,13 @@ public class GraphSerializer extends StdSerializer<Graph> {
      * Default.
      */
     public GraphSerializer() {
-          this(null);
+        this(null);
     }
 
     /**
      * Default.
-     * @param type
+     *
+     * @param type Type
      */
     public GraphSerializer(final Class<Graph> type) {
         super(type);
@@ -52,10 +55,11 @@ public class GraphSerializer extends StdSerializer<Graph> {
 
     /**
      * Serialize a Graph.
-     * @param graph
-     * @param jgen
-     * @param provider
-     * @throws IOException
+     *
+     * @param graph Graph
+     * @param jgen JSON Generator
+     * @param provider Serializer Provider
+     * @throws IOException If data can not be written
      */
     @Override
     public final void serialize(

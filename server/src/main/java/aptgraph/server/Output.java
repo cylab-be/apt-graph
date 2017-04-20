@@ -30,76 +30,89 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 /**
+ * Output object definition. This contains all the values returned from the
+ * server and needed on the web page.
  *
  * @author Thomas Gilon
  */
 public class Output implements Serializable {
+
     private String name = "";
     private LinkedList<Graph<Domain>> filtered_white_listed;
     private String stdout;
     private TreeMap<Double, LinkedList<Domain>> ranking;
-    private HistData hist_pruning;
+    private HistData hist_similarities;
     private HistData hist_cluster;
 
     /**
      * Return name.
-     * @return
+     *
+     * @return String : Name
      */
     public final String getName() {
         return name;
     }
 
     /**
-     * Return filtered_white_listed.
-     * @return
+     * Return the list of cluster after filtering and white listing.
+     *
+     * @return LinkedList&lt;Graph&lt;Domain&gt;&gt; : List of cluster after
+     * filtering and white listing
      */
     public final LinkedList<Graph<Domain>> getFilteredWhiteListed() {
         return filtered_white_listed;
     }
 
     /**
-     * Return standard output.
-     * @return
+     * Return Standard output on UI.
+     *
+     * @return String : Standard output on UI
      */
     public final String getStdout() {
         return stdout;
     }
 
     /**
-     * Return ranking TreeMap.
-     * @return
+     * Return info of Ranking.
+     *
+     * @return TreeMap&lt;Double, LinkedList&lt;Domain&gt;&gt; : Info of Ranking
      */
     public final TreeMap<Double, LinkedList<Domain>> getRanking() {
         return ranking;
     }
 
     /**
-     * Return histogram for pruning.
-     * @return
+     * Return histogram data of similarities of merged graph.
+     *
+     * @return HistData : Histogram data of similarities of merged graph
      */
-    public final HistData getHistPruning() {
-        return hist_pruning;
+    public final HistData getHistDataSimilarities() {
+        return hist_similarities;
     }
 
     /**
-     * Return histogram of cluster size.
-     * @return
+     * Return histogram data of cluster sizes.
+     *
+     * @return HistData : Histogram data of cluster sizes
      */
-    public final HistData getHistCluster() {
+    public final HistData getHistDataClusters() {
         return hist_cluster;
     }
 
     /**
      * Set output name.
-     * @param name
+     *
+     * @param name Name
      */
     public final void setName(final String name) {
         this.name = name;
     }
 
     /**
-     * Set filtered_white_listed.
-     * @param filtered_white_listed
+     * Set list of cluster after filtering and white listing.
+     *
+     * @param filtered_white_listed List of cluster after filtering and white
+     * listing
      */
     public final void setFilteredWhiteListed(
             final LinkedList<Graph<Domain>> filtered_white_listed) {
@@ -107,16 +120,18 @@ public class Output implements Serializable {
     }
 
     /**
-     * Set stdout.
-     * @param stdout
+     * Set standard output on UI.
+     *
+     * @param stdout Standard output on UI
      */
     public final void setStdout(final String stdout) {
         this.stdout = stdout;
     }
 
     /**
-     * Set ranking TreeMap.
-     * @param ranking
+     * Set info of Ranking.
+     *
+     * @param ranking Info of Ranking
      */
     public final void setRanking(
             final TreeMap<Double, LinkedList<Domain>> ranking) {
@@ -124,26 +139,29 @@ public class Output implements Serializable {
     }
 
     /**
-     * Set histogram for pruning.
-     * @param hist_pruning
+     * Set histogram data of similarities of merged graph.
+     *
+     * @param hist_similarities Histogram data of similarities of merged graph
      */
-    public final void setHistPruning(
-            final HistData hist_pruning) {
-        this.hist_pruning = hist_pruning;
+    public final void setHistDataSimilarities(
+            final HistData hist_similarities) {
+        this.hist_similarities = hist_similarities;
     }
 
     /**
-     * Set histogram for cluster size.
-     * @param hist_cluster
+     * Set histogram data of cluster sizes.
+     *
+     * @param hist_cluster Histogram data of cluster sizes
      */
-    public final void setHistCluster(
+    public final void setHistDataClusters(
             final HistData hist_cluster) {
         this.hist_cluster = hist_cluster;
     }
 
     /**
-     * Return ReturnAnalyze name.
-     * @return
+     * Return name.
+     *
+     * @return String : Name
      */
     @Override
     public final String toString() {
@@ -152,8 +170,9 @@ public class Output implements Serializable {
 
     /**
      * Compare two outputs.
-     * @param obj
-     * @return boolean
+     *
+     * @param obj Output to compare
+     * @return boolean : True if two outputs are equal
      */
     @Override
     public final boolean equals(final Object obj) {
@@ -165,11 +184,11 @@ public class Output implements Serializable {
         }
         final Output output = (Output) obj;
         if (this.filtered_white_listed.equals(output.filtered_white_listed)
-            && this.hist_cluster.equals(output.hist_cluster)
-            && this.hist_pruning.equals(output.hist_pruning)
-            && this.name.equals(output.name)
-            && this.stdout.equals(output.stdout)
-            && this.ranking.equals(output.ranking)) {
+                && this.hist_cluster.equals(output.hist_cluster)
+                && this.hist_similarities.equals(output.hist_similarities)
+                && this.name.equals(output.name)
+                && this.stdout.equals(output.stdout)
+                && this.ranking.equals(output.ranking)) {
             return true;
         }
         return false;
@@ -181,10 +200,9 @@ public class Output implements Serializable {
         hash = 23 * hash + this.name.hashCode()
                 + this.filtered_white_listed.hashCode()
                 + this.hist_cluster.hashCode()
-                + this.hist_pruning.hashCode()
+                + this.hist_similarities.hashCode()
                 + this.stdout.hashCode()
                 + this.ranking.hashCode();
         return hash;
     }
 }
-

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2016 Thibault Debatty.
+ * Copyright 2016 Thibault Debatty & Thomas Gilon.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,10 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
 
 /**
+ * Domain serialization definition file.
  *
  * @author Thibault Debatty
+ * @author Thomas Gilon
  */
 public class DomainSerializer extends StdSerializer<Domain> {
 
@@ -44,7 +46,8 @@ public class DomainSerializer extends StdSerializer<Domain> {
 
     /**
      * Default.
-     * @param type
+     *
+     * @param type Type
      */
     public DomainSerializer(final Class<Domain> type) {
         super(type);
@@ -52,10 +55,11 @@ public class DomainSerializer extends StdSerializer<Domain> {
 
     /**
      * Serialize a Domain.
-     * @param domain
-     * @param jgen
-     * @param provider
-     * @throws IOException
+     *
+     * @param domain Domain
+     * @param jgen JSON Generator
+     * @param provider Serializer Provider
+     * @throws IOException If data can not be written
      */
     @Override
     public final void serialize(final Domain domain,

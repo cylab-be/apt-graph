@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package aptgraph.server;
 
 import com.googlecode.jsonrpc4j.JsonRpcServer;
@@ -33,6 +32,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 /**
+ * Jetty Handler.
  *
  * @author Thibault Debatty
  */

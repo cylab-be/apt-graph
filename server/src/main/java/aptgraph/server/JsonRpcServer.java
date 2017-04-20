@@ -38,6 +38,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 /**
+ * JSON RPC Server.
  *
  * @author Thibault Debatty
  */
@@ -52,7 +53,8 @@ public class JsonRpcServer {
 
     /**
      * Instantiate a server with default configuration.
-     * @param input_dir
+     *
+     * @param input_dir Input directory
      */
     public JsonRpcServer(final Path input_dir) {
         config = new Config();
@@ -61,7 +63,8 @@ public class JsonRpcServer {
 
     /**
      * Set a non-default config.
-     * @param config
+     *
+     * @param config Configuration
      */
     public final void setConfig(final Config config) {
         this.config = config;
@@ -70,19 +73,20 @@ public class JsonRpcServer {
     /**
      * Start the server, blocking. This method will only return if the server
      * crashed...
-     * @throws java.io.IOException if the graph file cannot be read
-     * @throws java.lang.ClassNotFoundException if the Graph class is not found
-     * @throws java.lang.Exception if the server cannot start...
+     *
+     * @throws java.io.IOException If the graph file cannot be read
+     * @throws java.lang.ClassNotFoundException If the Graph class is not found
+     * @throws java.lang.Exception If the server cannot start...
      */
     public final void start()
             throws IOException, ClassNotFoundException, Exception {
 
         LOGGER.log(Level.INFO, "Starting JSON-RPC server at http://{0}:{1}",
-             new Object[]{config.getServerHost(), "" + config.getServerPort()});
+                new Object[]{config.getServerHost(), ""
+                        + config.getServerPort()});
 
-        RequestHandler request_handler =
-                new RequestHandler(input_dir);
-
+        RequestHandler request_handler
+                = new RequestHandler(input_dir);
 
         ObjectMapper object_mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
@@ -92,11 +96,10 @@ public class JsonRpcServer {
         module.addSerializer(Neighbor.class, new NeighborSerializer());
         object_mapper.registerModule(module);
 
-        com.googlecode.jsonrpc4j.JsonRpcServer jsonrpc_server =
-                new com.googlecode.jsonrpc4j.JsonRpcServer(
+        com.googlecode.jsonrpc4j.JsonRpcServer jsonrpc_server
+                = new com.googlecode.jsonrpc4j.JsonRpcServer(
                         object_mapper,
                         request_handler);
-
 
         QueuedThreadPool thread_pool = new QueuedThreadPool(
                 config.getMaxThreads(),
@@ -139,7 +142,7 @@ public class JsonRpcServer {
     }
 
     /**
-     *
+     * Stop the server.
      */
     public final void stop() {
         LOGGER.info("Stopping server...");
