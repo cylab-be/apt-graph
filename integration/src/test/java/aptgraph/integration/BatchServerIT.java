@@ -33,8 +33,8 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 /**
- * Integration test for the batch processor + JSON RPC Server.
- * Create a graph with batch processor and check it is correctly used by server.
+ * Integration test for the batch processor + JSON RPC Server. Create a graph
+ * with batch processor and check it is correctly used by server.
  *
  * @author Thibault Debatty
  */
