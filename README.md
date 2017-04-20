@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/RUCD/apt-graph.svg?branch=master)](https://travis-ci.org/RUCD/apt-graph)
 [![API](http://api123.io/api123-head.svg)](http://api123.io/api/apt-graph/head/index.html)
+[![Coverage Status](https://coveralls.io/repos/github/RUCD/apt-graph/badge.svg?branch=master)](https://coveralls.io/github/RUCD/apt-graph?branch=master)
 
 HTTP graph modeling for APT detection.
 

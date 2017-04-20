@@ -97,6 +97,7 @@
             <format>xml</format>
           </formats>
           <maxmem>256m</maxmem>
+          <aggregate>true</aggregate>
           <instrumentation>
             <excludes />
           </instrumentation>
