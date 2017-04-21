@@ -216,7 +216,7 @@ public class RequestHandler {
         m.setUser(user);
         m.setFeatureWeights(feature_weights);
         m.setFeatureOrderedWeights(feature_ordered_weights);
-        m.setPruningThresholdTemp(prune_threshold_temp);
+        m.setPruneThresholdTemp(prune_threshold_temp);
         m.setMaxClusterSizeTemp(max_cluster_size_temp);
         m.setPruneZBool(prune_z_bool);
         m.setClusterZBool(cluster_z_bool);
@@ -333,7 +333,7 @@ public class RequestHandler {
             m.concatStdout("<br>    Variance = "
                     + m.getMeanVarSimilarities()[1]);
             m.concatStdout("<br>    Prune Threshold = "
-                    + m.getPruningThreshold());
+                    + m.getPruneThreshold());
         }
 
         if (stages[4]) {
@@ -537,7 +537,7 @@ public class RequestHandler {
                 if (m.getPruneZBool() == prune_z_bool) {
                     stages[2] = false;
 
-                    if (m.getPruningThresholdTemp() == prune_threshold_temp) {
+                    if (m.getPruneThresholdTemp() == prune_threshold_temp) {
                         stages[3] = false;
 
                         if (m.getClusterZBool() == cluster_z_bool) {
@@ -820,14 +820,14 @@ public class RequestHandler {
             final Graph<Domain> graph,
             final long start_time) {
         if (m.getPruneZBool()) {
-            m.setPruningThreshold(Utility.computePruneThreshold(
+            m.setPruneThreshold(Utility.computePruneThreshold(
                     m.getMeanVarSimilarities()[0],
                     m.getMeanVarSimilarities()[1],
-                    m.getPruningThresholdTemp()));
+                    m.getPruneThresholdTemp()));
         } else {
-            m.setPruningThreshold(m.getPruningThresholdTemp());
+            m.setPruneThreshold(m.getPruneThresholdTemp());
         }
-        graph.prune(m.getPruningThreshold());
+        graph.prune(m.getPruneThreshold());
         return graph;
     }
 

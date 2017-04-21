@@ -419,11 +419,11 @@ public class RequestHandlerTest extends TestCase {
         // Test both method to prune
         handler.getMemory().setMeanVarSimilarities(Utility.getMeanVariance(similarities));
         double prune_threshold = 0.01;
-        handler.getMemory().setPruningThresholdTemp(prune_threshold);
+        handler.getMemory().setPruneThresholdTemp(prune_threshold);
         handler.getMemory().setPruneZBool(false);
         merged_graph_1 = handler.doPruning(merged_graph_1, (long) 0);
         assertFalse(merged_graph_1.equals(handler.getMemory().getMergedGraph()));
-        handler.getMemory().setPruningThresholdTemp(0.0);
+        handler.getMemory().setPruneThresholdTemp(0.0);
         handler.getMemory().setPruneZBool(true);
         merged_graph_2 = handler.doPruning(merged_graph_2, (long) 0);
         assertFalse(handler.getMemory().getMergedGraph().equals(merged_graph_2));
@@ -520,7 +520,7 @@ public class RequestHandlerTest extends TestCase {
         Graph<Domain> merged_graph
                 = handler.computeFusionGraphs(merged_graph_users, "",
                         users_weights, new double[]{0.0}, "all");
-        handler.getMemory().setPruningThresholdTemp(0.5);
+        handler.getMemory().setPruneThresholdTemp(0.5);
         handler.getMemory().setPruneZBool(false);
         merged_graph = handler.doPruning(merged_graph, (long) 0);
         ArrayList<Graph<Domain>> clusters = merged_graph.connectedComponents();
@@ -591,7 +591,7 @@ public class RequestHandlerTest extends TestCase {
         Graph<Domain> merged_graph
                 = handler.computeFusionGraphs(merged_graph_users, "",
                         users_weights, new double[]{0.0}, "all");
-        handler.getMemory().setPruningThresholdTemp(0.5);
+        handler.getMemory().setPruneThresholdTemp(0.5);
         handler.getMemory().setPruneZBool(false);
         merged_graph = handler.doPruning(merged_graph, (long) 0);
         handler.getMemory().setClusters(merged_graph.connectedComponents());

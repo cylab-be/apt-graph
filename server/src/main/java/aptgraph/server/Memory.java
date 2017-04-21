@@ -406,7 +406,7 @@ public class Memory {
      *
      * @return double : Pruning threshold given by user
      */
-    public final double getPruningThresholdTemp() {
+    public final double getPruneThresholdTemp() {
         return this.prune_threshold_temp;
     }
 
@@ -416,7 +416,7 @@ public class Memory {
      *
      * @param prune_threshold_temp Pruning threshold given by user
      */
-    public final void setPruningThresholdTemp(
+    public final void setPruneThresholdTemp(
             final double prune_threshold_temp) {
         this.prune_threshold_temp = prune_threshold_temp;
     }
@@ -426,7 +426,7 @@ public class Memory {
      *
      * @return double : Pruning threshold used
      */
-    public final double getPruningThreshold() {
+    public final double getPruneThreshold() {
         return this.prune_threshold;
     }
 
@@ -435,7 +435,7 @@ public class Memory {
      *
      * @param prune_threshold Pruning threshold used
      */
-    public final void setPruningThreshold(
+    public final void setPruneThreshold(
             final double prune_threshold) {
         this.prune_threshold = prune_threshold;
     }
