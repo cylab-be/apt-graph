@@ -571,8 +571,8 @@ public class RequestHandler {
     }
 
     /**
-     * Load the graphs needed. This method modifies users_graphs of the Memory
-     * object of the Server.
+     * Load the graphs needed. This method modifies users_graphs and all_domains
+     * of the Memory object of the Server.
      *
      * @param start_time Epoch of the start time of the computation
      */
