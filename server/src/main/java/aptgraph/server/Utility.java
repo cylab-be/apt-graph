@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Utility class definition which defines some tools for the Server.
@@ -223,6 +224,30 @@ public final class Utility {
                     + 1.0); // / list.size() * 100);
         }
         return hist_data;
+    }
+
+    /**
+     * Clean the histogram to avoid consecutive identical values. This is needed
+     * to speed up the web site plot.
+     *
+     * @param hist_data_in Histogram to clean up
+     * @return HistData Histogram cleaned
+     */
+    public static HistData cleanHistogram(final HistData hist_data_in) {
+        System.out.println("cleaning");
+        HistData hist_data_out = new HistData();
+        LinkedList<Double> keys = hist_data_in.getKeys();
+        LinkedList<Double> values = hist_data_in.getValues();
+        hist_data_out.put(keys.get(0), values.get(0));
+        for (int i = 1; i < keys.size() - 1; i++) {
+            if ((Math.abs(values.get(i) - values.get(i - 1))) > 1E-10
+                    || (Math.abs(values.get(i) - values.get(i + 1))) > 1E-10) {
+                hist_data_out.put(keys.get(i), values.get(i));
+            }
+        }
+        hist_data_out.put(keys.get(keys.size() - 1),
+                values.get(keys.size() - 1));
+        return hist_data_out;
     }
 
     /**

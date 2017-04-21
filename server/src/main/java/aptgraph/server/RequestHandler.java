@@ -483,7 +483,7 @@ public class RequestHandler {
             }
         }
 
-        if (sum_ranking_weights != 1) {
+        if (Math.abs(sum_ranking_weights - 1) > 1E-10) {
             return false;
         }
 
@@ -785,13 +785,20 @@ public class RequestHandler {
             step = 1.0;
         } else {
             if (!z_bool) {
-                max = Math.min(5.0, max);
+                max = Utility.fromZ(mean, variance, 1.0); //Math.min(5.0, max);
+                max = Math.max(1.0, max);
             }
             step = 0.01;
         }
 
-        HistData hist_data = Utility.computeHistogram(
+        HistData hist_data_temp = Utility.computeHistogram(
                 list_func, min, max, step);
+        HistData hist_data;
+        if (hist_data_temp.size() > 3) {
+            hist_data = Utility.cleanHistogram(hist_data_temp);
+        } else {
+            hist_data = hist_data_temp;
+        }
 
         // there ara actually (bins + 2) bins (to include max in the histogram)
         if (mode.equals("prune")) {

@@ -83,7 +83,7 @@
                         </div>
                         <div class="modal-body" id="hist_pruning">
                           <div class="ct-chart ct-perfect-fourth" id="chart_pruning"></div>
-                          <div>N.B.: Similarities higher than 5 have been set to 5.</div>
+                          <div>N.B.: Similarities higher than z score = 1 have been set to z score = 1 to speed up the process.</div>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-default" id="reset_button_pruning" style="display:none">Reset Zoom</button>
@@ -539,7 +539,7 @@ function printRequests(d) {
     $("#histogram_pruning").on('shown.bs.modal', function() {
       if($("#chart_pruning").is(':empty')) {
         // Function to draw an histogram
-          var data = Chartist.deserialize(json.result.histPruning.array);
+          var data = Chartist.deserialize(json.result.histDataSimilarities.array);
           var options = {                    
             axisX: {
               referenceValue: 0,
@@ -599,7 +599,7 @@ function printRequests(d) {
     $("#histogram_cluster").on('shown.bs.modal', function() {
       if($("#chart_cluster").is(':empty')) {
         // Function to draw an histogram
-          var data = Chartist.deserialize(json.result.histCluster.array);
+          var data = Chartist.deserialize(json.result.histDataClusters.array);
           var options = {
             axisX: {
               referenceValue: 0,
@@ -704,7 +704,7 @@ function printRequests(d) {
           !$("#rank_parent").val() || !$("#rank_child").val() || !$("#rank_req").val() ||
           parseFloat($("#number_requests").val()) < 0.0 ||
           parseFloat($("#rank_parent").val()) < 0.0 || parseFloat($("#rank_child").val()) < 0.0 || 
-          ((parseFloat($("#rank_parent").val()) + parseFloat($("#rank_child").val()) + parseFloat($("#rank_req").val())) != 1.0)){
+          (Math.abs((parseFloat($("#rank_parent").val()) + parseFloat($("#rank_child").val()) + parseFloat($("#rank_req").val()) - 1.0) > 1E-10))) {
             alert("Some of the parameter values are wrong!");
             return;
       }
@@ -756,7 +756,7 @@ function printRequests(d) {
 	        } else {
 	          $("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
 	          $("#panel_head").css('color', 'red');
-	          $("#panel_body").text("Server Response: " + json.result.filteredWhiteListed.length + " Clusters");
+	          $("#panel_body").text("Server Response: error");
 
 	        } 
 	      });
