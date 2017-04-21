@@ -987,11 +987,13 @@ public class RequestHandler {
             double top = 0.0;
             double rank = Double.MAX_VALUE;
             boolean founded = false;
+            LinkedList<Domain> apt_domains = new LinkedList<Domain>();
             for (Domain dom : sorted) {
                 if (dom.getName().endsWith(".apt")) {
                     rank = index.get(dom);
                     top++;
                     founded = true;
+                    apt_domains.add(dom);
                 }
                 if (!dom.getName().endsWith(".apt")
                         && index.get(dom) <= rank) {
@@ -1003,6 +1005,14 @@ public class RequestHandler {
                         + Math.round(top / m.getAllDomains()
                                 .get("all").values().size() * 100 * 100)
                         / 100.0 + "%");
+                m.concatRankingPrint("<br>Number of APT domains : "
+                        + apt_domains.size());
+                m.concatRankingPrint("<br>APT domains : ");
+                for (Domain apt_dom : apt_domains) {
+                    m.concatRankingPrint("<br>    ("
+                            + Math.round(index.get(apt_dom) * 100) / 100.0
+                            + ") " + apt_dom.getName());
+                }
             } else {
                 m.concatRankingPrint("<br>TOP for APT: NOT FOUND");
             }
