@@ -1018,17 +1018,17 @@ public class RequestHandler {
             }
         }
         m.concatRankingPrint("<br>Ranking:");
-        m.setRanking(new TreeMap<Double, LinkedList<Domain>>());
+        m.setRanking(new TreeMap<Double, LinkedList<String>>());
         for (Domain dom : sorted) {
             m.concatRankingPrint("<br>    ("
                     + Math.round(index.get(dom) * 100) / 100.0 + ") "
                     + dom.getName());
             if (!m.getRanking().keySet().contains(index.get(dom))) {
-                LinkedList<Domain> list = new LinkedList<Domain>();
-                list.add(dom);
+                LinkedList<String> list = new LinkedList<String>();
+                list.add(dom.getName());
                 m.getRanking().put(index.get(dom), list);
             } else {
-                m.getRanking().get(index.get(dom)).add(dom);
+                m.getRanking().get(index.get(dom)).add(dom.getName());
             }
         }
     }

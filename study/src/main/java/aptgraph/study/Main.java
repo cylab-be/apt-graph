@@ -140,7 +140,7 @@ public final class Main {
                         obj.getDouble("ranking_weights_requests")},
                         obj.getBoolean("apt_search"));
 
-                TreeMap<Double, LinkedList<Domain>> ranking
+                TreeMap<Double, LinkedList<String>> ranking
                         = output.getRanking();
 
                 int n_apt_tot = obj.getInt("n_apt_tot");

@@ -40,7 +40,7 @@ public class Output implements Serializable {
     private String name = "";
     private LinkedList<Graph<Domain>> filtered_white_listed;
     private String stdout;
-    private TreeMap<Double, LinkedList<Domain>> ranking;
+    private TreeMap<Double, LinkedList<String>> ranking;
     private HistData hist_similarities;
     private HistData hist_cluster;
 
@@ -75,9 +75,9 @@ public class Output implements Serializable {
     /**
      * Return info of Ranking.
      *
-     * @return TreeMap&lt;Double, LinkedList&lt;Domain&gt;&gt; : Info of Ranking
+     * @return TreeMap&lt;Double, LinkedList&lt;String&gt;&gt; : Info of Ranking
      */
-    public final TreeMap<Double, LinkedList<Domain>> getRanking() {
+    public final TreeMap<Double, LinkedList<String>> getRanking() {
         return ranking;
     }
 
@@ -134,7 +134,7 @@ public class Output implements Serializable {
      * @param ranking Info of Ranking
      */
     public final void setRanking(
-            final TreeMap<Double, LinkedList<Domain>> ranking) {
+            final TreeMap<Double, LinkedList<String>> ranking) {
         this.ranking = ranking;
     }
 

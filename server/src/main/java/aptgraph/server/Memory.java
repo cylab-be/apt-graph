@@ -110,8 +110,8 @@ public class Memory {
     // Info of Ranking for print
     private String ranking_print;
     // Info of Ranking
-    private TreeMap<Double, LinkedList<Domain>> ranking
-            = new TreeMap<Double, LinkedList<Domain>>();
+    private TreeMap<Double, LinkedList<String>> ranking
+            = new TreeMap<Double, LinkedList<String>>();
     // Standard output on UI
     private String stdout;
 
@@ -775,9 +775,9 @@ public class Memory {
     /**
      * Get the info of Ranking.
      *
-     * @return TreeMap&lt;Double, LinkedList&lt;Domain&gt;&gt; : Info of Ranking
+     * @return TreeMap&lt;Double, LinkedList&lt;String&gt;&gt; : Info of Ranking
      */
-    public final TreeMap<Double, LinkedList<Domain>> getRanking() {
+    public final TreeMap<Double, LinkedList<String>> getRanking() {
         return this.ranking;
     }
 
@@ -787,7 +787,7 @@ public class Memory {
      * @param ranking Info of Ranking
      */
     public final void setRanking(
-            final TreeMap<Double, LinkedList<Domain>> ranking) {
+            final TreeMap<Double, LinkedList<String>> ranking) {
         this.ranking = ranking;
     }
 

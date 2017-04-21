@@ -56,7 +56,7 @@ public final class ROC {
      * @param output_file Output file (CSV format)
      */
     public static void makeROC(
-            final TreeMap<Double, LinkedList<Domain>> ranking,
+            final TreeMap<Double, LinkedList<String>> ranking,
             final int n_dom_tot, final int n_apt_tot,
             final String output_file) {
         ArrayList<double[]> roc_curve
@@ -80,15 +80,15 @@ public final class ROC {
      * @return ArrayList&lt;double[]&gt; : ROC curve as list of [x y]
      */
     private static ArrayList<double[]> computeROC(
-            final TreeMap<Double, LinkedList<Domain>> ranking,
+            final TreeMap<Double, LinkedList<String>> ranking,
             final int n_dom_tot, final int n_apt_tot) {
         double n_dom = 0;
         double n_apt = 0;
         ArrayList<double[]> roc_curve = new ArrayList<double[]>();
-        for (Entry<Double, LinkedList<Domain>> entry : ranking.entrySet()) {
-            LinkedList<Domain> list = entry.getValue();
-            for (Domain dom : list) {
-                if (dom.getName().endsWith(".apt")) {
+        for (Entry<Double, LinkedList<String>> entry : ranking.entrySet()) {
+            LinkedList<String> list = entry.getValue();
+            for (String dom : list) {
+                if (dom.endsWith(".apt")) {
                     n_apt += 1.0;
                 } else {
                     n_dom += 1.0;

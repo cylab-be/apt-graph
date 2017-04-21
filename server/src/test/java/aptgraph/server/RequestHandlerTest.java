@@ -955,21 +955,5 @@ public class RequestHandlerTest extends TestCase {
                 }
             }
         }
-        for (Entry<Double, LinkedList<Domain>> entry : out_34.getRanking().entrySet()) {
-            for (Domain dom : entry.getValue()) {
-                for (Request req : dom) {
-                    assertFalse(req.getClient().startsWith("219.253."));
-                    assertTrue(req.getClient().startsWith("202.154.66."));
-                }
-            }
-        }
-        for (Entry<Double, LinkedList<Domain>> entry : out_35.getRanking().entrySet()) {
-            for (Domain dom : entry.getValue()) {
-                for (Request req : dom) {
-                    assertFalse(req.getClient().startsWith("202.154.66."));
-                    assertTrue(req.getClient().startsWith("219.253."));
-                }
-            }
-        }
     }
 }
