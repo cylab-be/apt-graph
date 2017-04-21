@@ -23,7 +23,6 @@
  */
 package aptgraph.study;
 
-import aptgraph.core.Domain;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

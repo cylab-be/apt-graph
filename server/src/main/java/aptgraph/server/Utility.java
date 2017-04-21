@@ -234,7 +234,6 @@ public final class Utility {
      * @return HistData Histogram cleaned
      */
     public static HistData cleanHistogram(final HistData hist_data_in) {
-        System.out.println("cleaning");
         HistData hist_data_out = new HistData();
         LinkedList<Double> keys = hist_data_in.getKeys();
         LinkedList<Double> values = hist_data_in.getValues();

@@ -23,7 +23,6 @@
  */
 package aptgraph.study;
 
-import aptgraph.core.Domain;
 import aptgraph.server.RequestHandler;
 import aptgraph.server.Output;
 import java.io.File;
