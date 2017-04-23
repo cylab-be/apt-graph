@@ -68,14 +68,15 @@ public final class Main {
 
         // Parse command line arguments
         Options options = new Options();
-        options.addOption("i", true, "Input config file (required)");
+        options.addOption("i", true, "Input configuration file (required)");
         Option arg_overwrite = Option.builder("x")
                 .optionalArg(true)
-                .desc("Overwrite existing files (default : false)")
+                .desc("Overwrite existing files (option, default : false)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_overwrite);
+        options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);

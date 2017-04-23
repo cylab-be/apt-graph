@@ -69,15 +69,16 @@ public final class Main {
 
         // Parse command line arguments
         Options options = new Options();
-        options.addOption("i", true, "Input file (required)");
-        options.addOption("o", true, "Output file (required)");
-        options.addOption("d", true, "APT domain (required)");
+        options.addOption("i", true, "Input log file (required)");
+        options.addOption("o", true, "Output log file (required)");
+        options.addOption("d", true, "APT domain name (required)");
         options.addOption("t", true, "Type (periodic or traffic) (required)");
-        options.addOption("u", true, "User (required)");
+        options.addOption("u", true, "Targeted user or subnet (required)");
         Option arg_time_step = Option.builder("step")
                 .optionalArg(true)
                 .desc("Specify time step between periodic"
-                        + " injection (required for periodic APT)")
+                        + " injection in milliseconds (required for"
+                        + " periodic APT)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
@@ -92,7 +93,7 @@ public final class Main {
         options.addOption(arg_delta_time);
         Option arg_duration = Option.builder("duration")
                 .optionalArg(true)
-                .desc("Duration of a burst to allow APT injection"
+                .desc("Minimal duration of a burst to allow APT injection"
                         + " (required for traffic APT)")
                 .hasArg(true)
                 .numberOfArgs(1)
@@ -100,16 +101,16 @@ public final class Main {
         options.addOption(arg_duration);
         Option arg_injection_day = Option.builder("injection")
                 .optionalArg(true)
-                .desc("Daily number of injection (option for traffic APT,"
-                        + " default : no limitation)")
+                .desc("Maximal daily number of injection (option for traffic"
+                        + " APT, default : no limitation)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_injection_day);
         Option arg_proportion = Option.builder("proportion")
                 .optionalArg(true)
-                .desc("Injection rate in the bursts (1 = inject in all "
-                        + "possible burst) (option for traffic APT,"
+                .desc("Injection rate in the possible bursts (1 = inject"
+                        + " in all possible bursts) (option for traffic APT,"
                         + " default : 1)")
                 .hasArg(true)
                 .numberOfArgs(1)
@@ -125,7 +126,7 @@ public final class Main {
         options.addOption(arg_distance);
         Option arg_delay = Option.builder("delay")
                 .optionalArg(true)
-                .desc("Delay between start of the burst and injection "
+                .desc("Delay between start of the burst and injection of APT "
                         + "(option for traffic APT, default :"
                         + " middle of the burst)")
                 .hasArg(true)
@@ -134,7 +135,8 @@ public final class Main {
         options.addOption(arg_delay);
         Option arg_format = Option.builder("f")
                 .optionalArg(true)
-                .desc("Specify format of input file (default : squid)")
+                .desc("Specify format of input file (squid or json) "
+                        + "(option, default : squid)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();

@@ -68,32 +68,33 @@ public final class Main {
 
         // Parse command line arguments
         Options options = new Options();
-        options.addOption("i", true, "Input file (required)");
-        options.addOption("o", true, "Output directory (required)");
+        options.addOption("i", true, "Input log file (required)");
+        options.addOption("o", true, "Output directory for graphs (required)");
         Option arg_k = Option.builder("k")
                 .optionalArg(true)
-                .desc("Impose k value of k-NN graphs (default: 20)")
+                .desc("Impose k value of k-NN graphs (option, default: 20)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_k);
         Option arg_child = Option.builder("c")
                 .optionalArg(true)
-                .desc("Select only temporal children (default: true)")
+                .desc("Select only temporal children (option, default: true)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_child);
         Option arg_overwrite = Option.builder("x")
                 .optionalArg(true)
-                .desc("Overwrite existing graphs (default : false)")
+                .desc("Overwrite existing graphs (option, default : false)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_overwrite);
         Option arg_format = Option.builder("f")
                 .optionalArg(true)
-                .desc("Specify format of input file (default : squid)")
+                .desc("Specify format of input file (squid or json) "
+                        + "(option, default : squid)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();

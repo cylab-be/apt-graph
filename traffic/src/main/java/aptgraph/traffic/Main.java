@@ -73,14 +73,17 @@ public final class Main {
         Options options = new Options();
         options.addOption("i", true, "Input log file (required)");
         options.addOption("o", true, "Output CSV file (required)");
-        options.addOption("r", true, "Resolution (required)");
+        options.addOption("r", true, "Time resolution in milliseconds"
+                + " (required)");
         Option arg_format = Option.builder("f")
                 .optionalArg(true)
-                .desc("Specify format of input file (default : squid)")
+                .desc("Specify format of input file (squid or json) "
+                        + "(option, default : squid)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_format);
+        options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);

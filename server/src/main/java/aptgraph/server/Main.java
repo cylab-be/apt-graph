@@ -36,7 +36,7 @@ public final class Main {
 
         // Parse command line arguments
         Options options = new Options();
-        options.addOption("i", true, "Input directory (required)");
+        options.addOption("i", true, "Input directory with graphs (required)");
         options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();

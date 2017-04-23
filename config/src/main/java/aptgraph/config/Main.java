@@ -64,20 +64,23 @@ public final class Main {
 
         // Parse command line arguments
         Options options = new Options();
-        options.addOption("i", true, "Input config file (required)");
-        options.addOption("o", true, "Output config file (required)");
-        options.addOption("field", true, "Config field to sweep (required)");
+        options.addOption("i", true, "Input configuration file (required)");
+        options.addOption("o", true, "Output configuration file (required)");
+        options.addOption("field", true, "Configuration field to sweep"
+                + " (required)");
         options.addOption("start", true, "Start value of sweep (required)");
         options.addOption("stop", true, "Stop value of sweep (required)");
-        options.addOption("step", true, "Step value of sweep (required)");
+        options.addOption("step", true, "Step of sweep (required)");
         Option arg_multi = Option.builder("multi")
                 .optionalArg(true)
-                .desc("Sweep the given field in complement to 1 "
-                        + "of the first one")
+                .desc("Sweep the given field as complement to stop value "
+                        + "of the first field (option, default : no"
+                        + " second field)")
                 .hasArg(true)
                 .numberOfArgs(1)
                 .build();
         options.addOption(arg_multi);
+        options.addOption("h", false, "Show this help");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
