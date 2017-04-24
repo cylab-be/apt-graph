@@ -785,8 +785,11 @@ public class RequestHandler {
             step = 1.0;
         } else {
             if (!z_bool) {
-                max = Utility.fromZ(mean, variance, 1.0); //Math.min(5.0, max);
+                max = Math.min(max, Utility.fromZ(mean, variance, 2.0));
                 max = Math.max(1.0, max);
+            } else {
+                max = Math.min(max, 2.0);
+                max = Math.max(0.5, max);
             }
             step = 0.01;
         }
