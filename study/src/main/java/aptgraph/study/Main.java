@@ -143,6 +143,21 @@ public final class Main {
                 TreeMap<Double, LinkedList<String>> ranking
                         = output.getRanking();
 
+                // Show APT founded
+                String[] apt_infos = output.getStdout().split("<br>");
+                boolean apt_print = false;
+                for (int i = 0; i < apt_infos.length; i++) {
+                    if (apt_infos[i].startsWith("Number of APT domains")) {
+                        apt_print = true;
+                    }
+                    if (apt_infos[i].startsWith("Ranking")) {
+                        break;
+                    }
+                    if (apt_print) {
+                        System.out.println(apt_infos[i]);
+                    }
+                }
+
                 int n_apt_tot = obj.getInt("n_apt_tot");
                 ROC.makeROC(ranking, handler.getMemory().getAllDomains()
                         .get("all").values().size() - n_apt_tot, n_apt_tot,
