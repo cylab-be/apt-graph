@@ -56,6 +56,7 @@ import java.util.TreeMap;
 public class RequestHandler {
 
     private final Path input_dir;
+    private final boolean study_out;
 
     private static final Logger LOGGER
             = Logger.getLogger(RequestHandler.class.getName());
@@ -66,9 +67,11 @@ public class RequestHandler {
      * Create new handler.
      *
      * @param input_dir Input directory
+     * @param study_out Study output mode
      */
-    public RequestHandler(final Path input_dir) {
+    public RequestHandler(final Path input_dir, final boolean study_out) {
         this.input_dir = input_dir;
+        this.study_out = study_out;
     }
 
     /**
@@ -289,11 +292,13 @@ public class RequestHandler {
             ArrayList<Double> similarities = listSimilarities();
             m.setMeanVarSimilarities(Utility.getMeanVariance(similarities));
 
-            computeHistData(similarities, "prune");
+            if (!study_out) {
+                computeHistData(similarities, "prune");
 
-            long estimated_time_5 = System.currentTimeMillis() - start_time;
-            System.out.println("5: " + estimated_time_5
-                    + " (Similarities hist. created)");
+                long estimated_time_5 = System.currentTimeMillis() - start_time;
+                System.out.println("5: " + estimated_time_5
+                        + " (Similarities hist. created)");
+            }
         }
 
         // The json-rpc request was probably canceled by the user
@@ -340,11 +345,13 @@ public class RequestHandler {
             ArrayList<Double> cluster_sizes = listClusterSizes(m.getClusters());
             m.setMeanVarClusters(Utility.getMeanVariance(cluster_sizes));
 
-            computeHistData(cluster_sizes, "cluster");
+            if (!study_out) {
+                computeHistData(cluster_sizes, "cluster");
 
-            long estimated_time_8 = System.currentTimeMillis() - start_time;
-            System.out.println("8: " + estimated_time_8
-                    + " (Clusters hist. created)");
+                long estimated_time_8 = System.currentTimeMillis() - start_time;
+                System.out.println("8: " + estimated_time_8
+                        + " (Clusters hist. created)");
+            }
         }
 
         // The json-rpc request was probably canceled by the user
@@ -1043,11 +1050,15 @@ public class RequestHandler {
      */
     private Output createOutput() {
         Output output = new Output();
-        output.setFilteredWhiteListed(m.getFilteredWhiteListed());
         output.setStdout(m.getStdout());
-        output.setHistDataSimilarities(m.getHistDataSimilarities());
-        output.setHistDataClusters(m.getHistDataClusters());
-        output.setRanking(m.getRanking());
+        if (!study_out) {
+            output.setFilteredWhiteListed(m.getFilteredWhiteListed());
+            output.setHistDataSimilarities(m.getHistDataSimilarities());
+            output.setHistDataClusters(m.getHistDataClusters());
+        }
+        if (study_out) {
+            output.setRanking(m.getRanking());
+        }
         return output;
     }
 }

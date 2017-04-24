@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2016 Thibault Debatty.
+ * Copyright 2016 Thibault Debatty & Thomas Gilon.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
  * JSON RPC Server.
  *
  * @author Thibault Debatty
+ * @author Thomas Gilon
  */
 public class JsonRpcServer {
 
@@ -50,15 +51,18 @@ public class JsonRpcServer {
     private volatile org.eclipse.jetty.server.Server http_server;
     private Config config;
     private final Path input_dir;
+    private final boolean study_out;
 
     /**
      * Instantiate a server with default configuration.
      *
      * @param input_dir Input directory
+     * @param study_out Study output mode
      */
-    public JsonRpcServer(final Path input_dir) {
+    public JsonRpcServer(final Path input_dir, final boolean study_out) {
         config = new Config();
         this.input_dir = input_dir;
+        this.study_out = study_out;
     }
 
     /**
@@ -86,7 +90,7 @@ public class JsonRpcServer {
                         + config.getServerPort()});
 
         RequestHandler request_handler
-                = new RequestHandler(input_dir);
+                = new RequestHandler(input_dir, study_out);
 
         ObjectMapper object_mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();

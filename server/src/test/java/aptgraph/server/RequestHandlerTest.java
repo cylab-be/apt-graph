@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
 import static junit.framework.Assert.assertTrue;
 import junit.framework.TestCase;
 
@@ -56,8 +55,8 @@ public class RequestHandlerTest extends TestCase {
     public void testTest() throws IOException, ClassNotFoundException {
         System.out.println("\ntest");
 
-        RequestHandler handler
-                = new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        RequestHandler handler = new RequestHandler(
+                Paths.get("src/test/resources/dummyDir"), false);
         handler.test();
     }
 
@@ -70,8 +69,8 @@ public class RequestHandlerTest extends TestCase {
     public void testDummy() throws IOException, ClassNotFoundException {
         System.out.println("\ndummy");
 
-        RequestHandler handler
-                = new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        RequestHandler handler = new RequestHandler(
+                Paths.get("src/test/resources/dummyDir"), false);
         handler.dummy();
     }
 
@@ -84,8 +83,8 @@ public class RequestHandlerTest extends TestCase {
     public void testAnalyze() throws IOException, ClassNotFoundException {
         System.out.println("\nanalyze");
 
-        RequestHandler handler
-                = new RequestHandler(Paths.get("src/test/resources/dummyDir"));
+        RequestHandler handler = new RequestHandler(
+                Paths.get("src/test/resources/dummyDir"), false);
         handler.getUsers();
         handler.analyze("253.115.106.54", new double[]{0.7, 0.1, 0.2},
                 new double[]{0.8, 0.2}, 0.0, 0.0, true, true, true, "", 2,
@@ -100,7 +99,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
         handler.loadUsersGraphs(System.currentTimeMillis());
@@ -139,7 +138,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
         handler.loadUsersGraphs(System.currentTimeMillis());
@@ -224,7 +223,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
         handler.loadUsersGraphs(System.currentTimeMillis());
@@ -271,7 +270,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
         handler.loadUsersGraphs(System.currentTimeMillis());
@@ -369,7 +368,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
         handler.loadUsersGraphs(System.currentTimeMillis());
@@ -395,7 +394,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getMemory().setStdout("");
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
@@ -505,7 +504,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
         handler.loadUsersGraphs(System.currentTimeMillis());
@@ -576,7 +575,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
         handler.loadUsersGraphs(System.currentTimeMillis());
@@ -646,7 +645,7 @@ public class RequestHandlerTest extends TestCase {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir_whitelist");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getMemory().setStdout("");
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
@@ -743,7 +742,7 @@ public class RequestHandlerTest extends TestCase {
 
         RequestHandler handler
                 = new RequestHandler(Paths.get(
-                        "src/test/resources/dummyDir_whitelist"));
+                        "src/test/resources/dummyDir_whitelist"), false);
         handler.getUsers();
 
         // Test Stage 0
@@ -929,7 +928,7 @@ public class RequestHandlerTest extends TestCase {
         // Test integrity of Domains
         RequestHandler handler_bis
                 = new RequestHandler(Paths.get(
-                        "src/test/resources/dummyDir/"));
+                        "src/test/resources/dummyDir/"), false);
         Output out_34
                 = handler_bis.analyze("202.154.66.0", new double[]{0.6, 0.4, 0.0},
                         new double[]{0.8, 0.2}, 0.02, 5, false, false, true, "", 1,

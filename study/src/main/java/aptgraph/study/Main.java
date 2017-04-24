@@ -117,7 +117,7 @@ public final class Main {
             if (!input_dir_store.equals(obj.getString("input_dir"))) {
                 input_dir_store = obj.getString("input_dir");
                 handler = new RequestHandler(
-                    Paths.get(input_dir_store));
+                    Paths.get(input_dir_store), true);
             }
 
             File file = new File(obj.getString("output_file"));

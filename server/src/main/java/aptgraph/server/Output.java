@@ -37,21 +37,13 @@ import java.util.TreeMap;
  */
 public class Output implements Serializable {
 
-    private String name = "";
-    private LinkedList<Graph<Domain>> filtered_white_listed;
-    private String stdout;
-    private TreeMap<Double, LinkedList<String>> ranking;
-    private HistData hist_similarities;
-    private HistData hist_cluster;
-
-    /**
-     * Return name.
-     *
-     * @return String : Name
-     */
-    public final String getName() {
-        return name;
-    }
+    private LinkedList<Graph<Domain>> filtered_white_listed
+            = new LinkedList<Graph<Domain>>();
+    private String stdout = "";
+    private TreeMap<Double, LinkedList<String>> ranking = new TreeMap<Double,
+            LinkedList<String>>();
+    private HistData hist_similarities = new HistData();
+    private HistData hist_cluster = new HistData();
 
     /**
      * Return the list of cluster after filtering and white listing.
@@ -97,15 +89,6 @@ public class Output implements Serializable {
      */
     public final HistData getHistDataClusters() {
         return hist_cluster;
-    }
-
-    /**
-     * Set output name.
-     *
-     * @param name Name
-     */
-    public final void setName(final String name) {
-        this.name = name;
     }
 
     /**
@@ -159,16 +142,6 @@ public class Output implements Serializable {
     }
 
     /**
-     * Return name.
-     *
-     * @return String : Name
-     */
-    @Override
-    public final String toString() {
-        return name;
-    }
-
-    /**
      * Compare two outputs.
      *
      * @param obj Output to compare
@@ -186,7 +159,6 @@ public class Output implements Serializable {
         if (this.filtered_white_listed.equals(output.filtered_white_listed)
                 && this.hist_cluster.equals(output.hist_cluster)
                 && this.hist_similarities.equals(output.hist_similarities)
-                && this.name.equals(output.name)
                 && this.stdout.equals(output.stdout)
                 && this.ranking.equals(output.ranking)) {
             return true;
@@ -197,7 +169,7 @@ public class Output implements Serializable {
     @Override
     public final int hashCode() {
         int hash = 5;
-        hash = 23 * hash + this.name.hashCode()
+        hash = 23 * hash
                 + this.filtered_white_listed.hashCode()
                 + this.hist_cluster.hashCode()
                 + this.hist_similarities.hashCode()

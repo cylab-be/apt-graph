@@ -9,6 +9,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -18,6 +19,8 @@ import org.apache.commons.cli.ParseException;
  * @author Thibault Debatty
  */
 public final class Main {
+
+    private static final boolean DEFAULT_STUDY_OUT = false;
 
     /**
      * Main method of Server.
@@ -33,11 +36,21 @@ public final class Main {
     public static void main(final String[] args)
             throws ParseException, FileNotFoundException,
             ClassNotFoundException, Exception {
+        // Default value of arguments
+        boolean study_out = DEFAULT_STUDY_OUT;
 
         // Parse command line arguments
         Options options = new Options();
         options.addOption("i", true, "Input directory with graphs (required)");
         options.addOption("h", false, "Show this help");
+        Option arg_study = Option.builder("study")
+                .optionalArg(true)
+                .desc("Study output mode (false = web output, true ="
+                        + " study output) (option, default: false)")
+                .hasArg(true)
+                .numberOfArgs(1)
+                .build();
+        options.addOption(arg_study);
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -49,9 +62,17 @@ public final class Main {
             return;
         }
 
+        try {
+            if (cmd.hasOption("study")) {
+                study_out = Boolean.parseBoolean(cmd.getOptionValue("study"));
+            }
+        } catch (IllegalArgumentException ex) {
+            System.err.println(ex);
+        }
+
         // Start the json-rpc server
         JsonRpcServer jsonrpc_server = new JsonRpcServer(
-                Paths.get(cmd.getOptionValue("i")));
+                Paths.get(cmd.getOptionValue("i")), study_out);
         jsonrpc_server.startInBackground();
 
         String url = "http://127.0.0.1:8000";

@@ -52,7 +52,7 @@ public class UtilityTest {
 
         // Creation of the data
         Path input_dir = Paths.get("src/test/resources/dummyDir");
-        RequestHandler handler = new RequestHandler(input_dir);
+        RequestHandler handler = new RequestHandler(input_dir, false);
         handler.getUsers();
         handler.getMemory().setUsersList(handler.getMemory().getAllUsersList());
         handler.loadUsersGraphs(System.currentTimeMillis());

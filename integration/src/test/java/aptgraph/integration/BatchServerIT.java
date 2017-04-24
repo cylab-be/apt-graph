@@ -53,7 +53,7 @@ public class BatchServerIT extends TestCase {
                 getClass().getResourceAsStream("/1000_http_requests.txt"),
                 temp_dir, "squid", true, true);
 
-        final JsonRpcServer server = new JsonRpcServer(temp_dir);
+        final JsonRpcServer server = new JsonRpcServer(temp_dir, false);
 
         // Start the server in a separate thread, so we can wait and stop it
         // from the main thread...
