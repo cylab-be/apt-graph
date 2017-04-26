@@ -1061,4 +1061,16 @@ public class RequestHandler {
         }
         return output;
     }
+
+    /**
+     * Give the list of requests of a specific domain. This method is used by
+     * the web page to show log lines of a specific domain.
+     *
+     * @param domain Domain name
+     * @return Object[] : Array of requests of a specific domain
+     */
+    public final Object[] getRequests(final String domain) {
+        LOGGER.log(Level.INFO, "Sending requests of the domain {0}", domain);
+        return m.getAllDomains("all").get(domain).toArray();
+    }
 }

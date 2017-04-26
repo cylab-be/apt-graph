@@ -1,5 +1,5 @@
 // jscs:disable
-function draw_graph(json_data, printRequests) {
+function draw_graph(json_data, json_post, printRequests) {
 	var data = json_data;
 	var links = []; // dict = {source: , target: , value: ,}
 	var similarity;
@@ -10,18 +10,17 @@ function draw_graph(json_data, printRequests) {
 		for (var i = 0; i < cluster_nodes.length; i++) {
 			var current_node = cluster_nodes[i];
 			var name = current_node.name;
-			var requests = current_node.requests;
 			var node_neighbors = neighbors[name];
 			if (node_neighbors.length === 0) {
 				similarity = 0;
-				links.push({"source": [name, requests], "target": [name, requests], "value": similarity});
+				links.push({"source": name, "target": name, "value": similarity});
 			} else {
 				for (var m = 0; m < node_neighbors.length; m++) {
 					var neighbor = node_neighbors[m];
-					var source = [name, requests];
+					var source = name;
 					for (var t = 0; t < cluster_nodes.length; t++) {
 						if (cluster_nodes[t].name === neighbor.node) {
-							target = [cluster_nodes[t].name, cluster_nodes[t].requests];
+							target = cluster_nodes[t].name;
 							similarity = neighbor.similarity;
 							break;
 						}
@@ -131,21 +130,40 @@ function draw_graph(json_data, printRequests) {
 			var g = d3.select(this); // The node
 			// The class is used to remove the additional text later
 			if (d3.select(this).select('text.info')[0][0] === null){
-				printRequests(d.name[1]);
-				g.select('text').remove();
-				var info = g.append('text')
-					.classed('info', true)
-					.attr("x", 12)
-					.attr("dy", ".35em")
-					.attr("font-size","30px")
-					.text(function(d) { return d.name[0] + " (" + d.name[1].length + ")"; });
+				var jsonbody = {"jsonrpc": "2.0",
+								"method": "getRequests",
+								"params": [d.name],
+								"id": 167
+								};
+				var request = json_post("http://127.0.0.1:8080", jsonbody);
+				request.addEventListener('load', function() {
+				if (request.readyState == 4 && request.status == 200){
+					var json_requests = JSON.parse(request.responseText);
+					printRequests(json_requests.result);
+					g.select('text').remove();
+					var info = g.append('text')
+						.classed('info', true)
+						.attr("x", 12)
+						.attr("dy", ".35em")
+						.attr("font-size","30px")
+						.text(function(d) { return d.name + " (" + json_requests.result.length + ")"; });
+					document.getElementById('panel_head').text('Request Status = ' + request.status + ' ' + request.statusText);
+					document.getElementById('panel_head').css('color', 'green');
+					document.getElementById('panel_body').text("Server Response: Requests of " + d.name + " loaded");
+				}
+				else if (request.status != 400) {
+					document.getElementById('panel_head').text('Request Status Error = ' + request.status + ' ' + request.statusText);
+					document.getElementById('panel_head').css('color', 'red');
+					document.getElementById('panel_body').text("Server Response: Error while loading requests of " + d.name);
+				}
+				});
 			} else {
 				d3.select(this).select('text.info').remove();
 				d3.select(this).append('text')
 					.attr("x", 12)
 					.attr("dy", ".35em")
 					.attr("font-size", "10xp")
-					.text(function(d) { return d.name[0]; });
+					.text(function(d) { return d.name; });
 			}
 		})
 	/*		.on("mouseout", function() {
@@ -164,7 +182,7 @@ function draw_graph(json_data, printRequests) {
 		.attr("x", 12)
 		.attr("dy", ".35em")
 		.attr("font-size", "10xp")
-		.text(function(d) { return d.name[0]; });
+		.text(function(d) { return d.name; });
 
 
 	resize();

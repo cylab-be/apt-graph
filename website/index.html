@@ -14,8 +14,8 @@
   <script src="js/libs/jquery-3.1.1.min.js"></script>
   <script src="js/libs/d3.min.js"></script>
   <script src="js/libs/bootstrap.min.js"></script>
-  <script src="js/graph.js"></script>
   <script src="js/json_methods.js"></script>
+  <script src="js/graph.js"></script>
   <script src="js/change_visibility.js"></script>
   <script src="chartist/chartist.js"></script>
   <script src="chartist/axistitle/chartist-plugin-axistitle.js"></script>
@@ -505,12 +505,11 @@ function printRequests(d) {
         var request = json_post("http://127.0.0.1:8080" , jsonbody); 
         request.addEventListener('load', function(){
             if (request.readyState == 4 && request.status == 200){
-              json = JSON.parse(request.responseText);
-              users = json.result;
-              //console.log("Server Response: " + json.result);
+              json_users = JSON.parse(request.responseText);
+              users = json_users.result;
               var counter = 0;
-              for (var i = 0; i < json.result.length; i++) {
-                if (!isSubnet(json.result[i])) {
+              for (var i = 0; i < json_users.result.length; i++) {
+                if (!isSubnet(json_users.result[i])) {
                   counter += 1;
                 }
               }
@@ -539,7 +538,7 @@ function printRequests(d) {
     $("#histogram_pruning").on('shown.bs.modal', function() {
       if($("#chart_pruning").is(':empty')) {
         // Function to draw an histogram
-          var data = Chartist.deserialize(json.result.histDataSimilarities.array);
+          var data = Chartist.deserialize(json_graphs.result.histDataSimilarities.array);
           var options = {                    
             axisX: {
               referenceValue: 0,
@@ -599,7 +598,7 @@ function printRequests(d) {
     $("#histogram_cluster").on('shown.bs.modal', function() {
       if($("#chart_cluster").is(':empty')) {
         // Function to draw an histogram
-          var data = Chartist.deserialize(json.result.histDataClusters.array);
+          var data = Chartist.deserialize(json_graphs.result.histDataClusters.array);
           var options = {
             axisX: {
               referenceValue: 0,
@@ -657,12 +656,31 @@ function printRequests(d) {
 // Functions to manage the print of requests
     $("#show_all_domains_button").click(function() {
     var domains_printed = [];
-    for (var i = 0; i < json.result.filteredWhiteListed.length; i++) {
-      for (var j = 0; j < json.result.filteredWhiteListed[i].nodes.length; j++) {
-        var name = json.result.filteredWhiteListed[i].nodes[j].name;
+    for (var i = 0; i < json_graphs.result.filteredWhiteListed.length; i++) {
+      for (var j = 0; j < json_graphs.result.filteredWhiteListed[i].nodes.length; j++) {
+        var name = json_graphs.result.filteredWhiteListed[i].nodes[j].name;
         if (!domains_printed.includes(name)) {
-          printRequests(json.result.filteredWhiteListed[i].nodes[j].requests);
-          domains_printed.push(name);
+          var jsonbody = {"jsonrpc": "2.0",
+                              "method": "getRequests",
+                              "params": [name],
+                              "id": 167
+                              };
+          var request = json_post("http://127.0.0.1:8080" , jsonbody);
+          request.addEventListener('load', function() {
+              if (this.readyState == 4 && this.status == 200){
+                var json_requests = JSON.parse(this.responseText);
+                printRequests(json_requests.result);
+                domains_printed.push(json_requests.result[0].domain);
+                $("#panel_head").text('Request Status = ' + this.status + ' ' + this.statusText);
+                $("#panel_head").css('color', 'green');
+                $("#panel_body").text("Server Response: Requests of all the domains loaded");
+              }
+              else if (this.status != 400) {
+                $("#panel_head").text('Request Status Error = ' + this.status + ' ' + this.statusText);
+                $("#panel_head").css('color', 'red');
+                $("#panel_body").text("Server Response: Error while loading requests of all the domains");
+              }
+          });
         }
       }
     }
@@ -736,16 +754,15 @@ function printRequests(d) {
 	      var request = json_post("http://127.0.0.1:8080" , jsonbody); 
 	      request.addEventListener('load', function(){
 	        if (request.readyState == 4 && request.status == 200){
-	          json = JSON.parse(request.responseText);
-	          if (json.result != null) {
-	            //console.log("Server Response: " + json.result);
+	          json_graphs = JSON.parse(request.responseText);
+	          if (json_graphs.result != null) {
 	            $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
 	            $("#panel_head").css('color', 'green');
-	            $("#panel_body").text("Server Response: " + json.result.filteredWhiteListed.length + " Clusters");
-	            draw_graph(json.result.filteredWhiteListed, printRequests); 
+	            $("#panel_body").text("Server Response: " + json_graphs.result.filteredWhiteListed.length + " Clusters");
+	            draw_graph(json_graphs.result.filteredWhiteListed, json_post, printRequests); 
 	            $("#request_text").html("");
 	            var domains_printed = [];
-	            $("#stdout_body").prepend(json.result.stdout);
+	            $("#stdout_body").prepend(json_graphs.result.stdout);
 	            document.getElementById("show_all_domains_button").style.display = 'inline';
 	            document.getElementById("clear_domains_button").style.display = 'inline';
 	          } else {

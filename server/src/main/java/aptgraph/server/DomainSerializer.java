@@ -68,7 +68,7 @@ public class DomainSerializer extends StdSerializer<Domain> {
 
         jgen.writeStartObject();
         jgen.writeStringField("name", domain.getName());
-        jgen.writeObjectField("requests", domain.toArray());
+        //jgen.writeObjectField("requests", domain.toArray());
         jgen.writeEndObject();
 
     }
