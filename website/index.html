@@ -329,6 +329,10 @@
       <div class="col-md-3" id="stdout">
         <div class="container-fluid" id="stdout_group">
             <h3>STANDARD OUTPUT</h3>
+            <div class="container-fluid" id="copy_buttons" style="text-align:center">
+              <button type="button" class="btn btn-default" id="copy_button">Copy last output to clipboard</button>
+            </div>
+            <div class="spacer"></div>
             <div class="tab-pane active" id="stdout_body">
             </div>    
         </div>
@@ -689,6 +693,10 @@ function printRequests(d) {
     $("#request_text").html("");
     var domains_printed = [];
   });
+
+// Function allowing copy of the last stdout to clipboard
+$("#copy_button").click(function() {
+  window.prompt("Just copy this to clipboard :", json_graphs.result.stdout)});
 
  // Function to check if selected user is a subnet
  function isSubnet(user) {
