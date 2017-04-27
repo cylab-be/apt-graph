@@ -794,11 +794,12 @@ public class RequestHandler {
             if (!z_bool) {
                 max = Math.min(max, Utility.fromZ(mean, variance, 1.0));
                 max = Math.max(1.0, max);
+                step = 0.1;
             } else {
                 max = Math.min(max, 1.0);
                 max = Math.max(0.5, max);
+                step = 0.01;
             }
-            step = 0.1;
         }
 
         HistData hist_data_temp = Utility.computeHistogram(
