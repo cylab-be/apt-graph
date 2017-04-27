@@ -84,6 +84,7 @@ public final class ROC {
         double n_dom = 0;
         double n_apt = 0;
         ArrayList<double[]> roc_curve = new ArrayList<double[]>();
+        roc_curve.add(new double[]{0.0, 0.0});
         for (Entry<Double, LinkedList<String>> entry : ranking.entrySet()) {
             LinkedList<String> list = entry.getValue();
             for (String dom : list) {
@@ -92,9 +93,9 @@ public final class ROC {
                 } else {
                     n_dom += 1.0;
                 }
-                roc_curve.add(new double[]{n_dom / n_dom_tot,
-                    n_apt / n_apt_tot});
             }
+            roc_curve.add(new double[]{n_dom / n_dom_tot,
+                    n_apt / n_apt_tot});
         }
         return roc_curve;
     }
