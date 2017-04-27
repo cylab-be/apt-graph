@@ -319,6 +319,17 @@
               </div>
             </div>
           </div>
+          <div class="container-fluid" id="anonymization">
+            <h4>ANONYMIZATION</h4>
+            <div class="form-horizontal">
+              <div class="form-group">
+                 <label for="anon_button" class="col-md-4 control-label" style="text-align: left; width: 200px;">Anonymize window</label>
+                 <div class="col-md-2">
+                   <input type="checkbox" id="anon_button" value="">
+                 </div>
+              </div>
+            </div>
+          </div>
           <div class="container-fluid" id="buttons">
             <button type="button" class="btn btn-primary" id="apply_button">Apply</button>
             <button type="button" class="btn btn-default" id="cancel_button">Cancel</button>
@@ -712,6 +723,20 @@ $("#copy_button").click(function() {
  	return bool;
  }
 
+ // Function to anonymize domain names
+ function anonymize(anon_bool, name_string) {
+  if (anon_bool) {
+    if (name_string.startsWith("<pre>Number of users selected")) {
+      return name_string.replace(/(\) (?!APT\.FINDME_[0-9]+\.apt).*?<br>)/g, "\) ***<br>");
+    } else {
+      return name_string.replace(/(^(?!APT\.FINDME_[0-9]+\.apt).*)/, "***");
+    }
+    return name_string_anon;
+  } else {
+    return name_string;
+  }
+ }
+
  // Functions to do with taking the variables filled in the fields
  // and creating a request to the server for method analyze()   
     $("#apply_button").click(function(){
@@ -767,10 +792,10 @@ $("#copy_button").click(function() {
 	            $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
 	            $("#panel_head").css('color', 'green');
 	            $("#panel_body").text("Server Response: " + json_graphs.result.filteredWhiteListed.length + " Clusters");
-	            draw_graph(json_graphs.result.filteredWhiteListed, json_post, printRequests); 
+	            draw_graph(json_graphs.result.filteredWhiteListed, json_post, printRequests, anonymize); 
 	            $("#request_text").html("");
 	            var domains_printed = [];
-	            $("#stdout_body").prepend(json_graphs.result.stdout);
+	            $("#stdout_body").prepend(anonymize(anon_button.checked, json_graphs.result.stdout));
 	            document.getElementById("show_all_domains_button").style.display = 'inline';
 	            document.getElementById("clear_domains_button").style.display = 'inline';
 	          } else {

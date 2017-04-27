@@ -1,6 +1,6 @@
 // jscs:disable
 /* eslint-env jquery */
-function draw_graph(json_data, json_post, printRequests) {	
+function draw_graph(json_data, json_post, printRequests, anonymize) {	
 	var data = json_data;
 	var links = []; // dict = {source: , target: , value: ,}
 	var similarity;
@@ -147,18 +147,18 @@ function draw_graph(json_data, json_post, printRequests) {
 						.attr("x", 12)
 						.attr("dy", ".35em")
 						.attr("font-size","30px")
-						.text(function(d) { return d.name + " (" + json_requests.result.length + ")"; });
+						.text(function(d) { return anonymize(document.getElementById("anon_button").checked, d.name) + " (" + json_requests.result.length + ")"; });
 						$(document).ready(function() {
 							$("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
 							$("#panel_head").css('color', 'green');
-							$("#panel_body").text("Server Response: Requests of " + d.name + " loaded");
+							$("#panel_body").text("Server Response: Requests of " + anonymize(document.getElementById("anon_button").checked, d.name) + " loaded");
 						});
 				}
 				else if (request.status != 400) {
 					$(document).ready(function() {
 							$("#panel_head").text('Request Status Error = ' + request.status + ' ' + request.statusText);
 							$("#panel_head").css('color', 'red');
-							$("#panel_body").text("Server Response: Error while loading requests of " + d.name);
+							$("#panel_body").text("Server Response: Error while loading requests of " + anonymize(document.getElementById("anon_button").checked, d.name));
 						});
 				}
 				});
@@ -168,7 +168,7 @@ function draw_graph(json_data, json_post, printRequests) {
 					.attr("x", 12)
 					.attr("dy", ".35em")
 					.attr("font-size", "10xp")
-					.text(function(d) { return d.name; });
+					.text(function(d) { return anonymize(document.getElementById("anon_button").checked, d.name); });
 			}
 		})
 	/*		.on("mouseout", function() {
@@ -187,7 +187,7 @@ function draw_graph(json_data, json_post, printRequests) {
 		.attr("x", 12)
 		.attr("dy", ".35em")
 		.attr("font-size", "10xp")
-		.text(function(d) { return d.name; });
+		.text(function(d) { return anonymize(document.getElementById("anon_button").checked, d.name); });
 
 
 	resize();
