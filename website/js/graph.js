@@ -154,7 +154,7 @@ function drawGraph(jsonData, jsonPost, printRequests, anonymize) {
               .attr('dy', '.35em')
               .attr('font-size', '30px')
               .text(function(d) { return anonymize(document.getElementById(
-                'anonqbutton').checked, d.name) + ' (' + jsonRequests.result
+                'anon_button').checked, d.name) + ' (' + jsonRequests.result
                 .length + ')'; });
             $(document).ready(function() {
               $('#panel_head').text('Request Status = ' + request.status + ' ' +
