@@ -517,7 +517,7 @@ function printRequests(d) {
                         "method": "getUsers",
                         "id": 167
                         };
-        var request = json_post("http://127.0.0.1:8080" , jsonbody); 
+        var request = jsonPost("http://127.0.0.1:8080" , jsonbody); 
         request.addEventListener('load', function(){
             if (request.readyState == 4 && request.status == 200){
               json_users = JSON.parse(request.responseText);
@@ -680,7 +680,7 @@ function printRequests(d) {
                               "params": [name],
                               "id": 167
                               };
-          var request = json_post("http://127.0.0.1:8080" , jsonbody);
+          var request = jsonPost("http://127.0.0.1:8080" , jsonbody);
           request.addEventListener('load', function() {
               if (this.readyState == 4 && this.status == 200){
                 var json_requests = JSON.parse(this.responseText);
@@ -784,7 +784,7 @@ $("#copy_button").click(function() {
                           apt_search.checked],
 	                        "id": 167
 	                      };
-	      var request = json_post("http://127.0.0.1:8080" , jsonbody); 
+	      var request = jsonPost("http://127.0.0.1:8080" , jsonbody); 
 	      request.addEventListener('load', function(){
 	        if (request.readyState == 4 && request.status == 200){
 	          json_graphs = JSON.parse(request.responseText);
@@ -792,7 +792,7 @@ $("#copy_button").click(function() {
 	            $("#panel_head").text('Request Status = ' + request.status + ' ' + request.statusText);
 	            $("#panel_head").css('color', 'green');
 	            $("#panel_body").text("Server Response: " + json_graphs.result.filteredWhiteListed.length + " Clusters");
-	            draw_graph(json_graphs.result.filteredWhiteListed, json_post, printRequests, anonymize); 
+	            drawGraph(json_graphs.result.filteredWhiteListed, jsonPost, printRequests, anonymize); 
 	            $("#request_text").html("");
 	            var domains_printed = [];
 	            $("#stdout_body").prepend(anonymize(anon_button.checked, json_graphs.result.stdout));

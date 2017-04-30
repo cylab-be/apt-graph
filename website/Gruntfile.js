@@ -7,7 +7,7 @@ module.exports = function(grunt) {
             all: ['js/*.js']
         },
         eslint: {
-            src: ["js/*.js"]
+            src: ['js/*.js']
         },
         htmlhint: {
             html1: {
@@ -26,12 +26,12 @@ module.exports = function(grunt) {
               src: ['*.html']
             }
           },
-          jscs: {
-              src: "js/*.js",
-              options: {
-                  "preset": "google"
-              }
-          }
+        jscs: {
+            src: "js/*.js",
+            options: {
+                "preset": "google"
+            }
+        }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
