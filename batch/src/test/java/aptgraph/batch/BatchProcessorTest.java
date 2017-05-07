@@ -31,6 +31,7 @@ import aptgraph.core.TimeSimilarity;
 import info.debatty.java.graphs.Graph;
 import info.debatty.java.graphs.Neighbor;
 import info.debatty.java.graphs.NeighborList;
+import info.debatty.java.graphs.build.ThreadedNNDescent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -275,6 +276,34 @@ public class BatchProcessorTest extends TestCase {
             assertTrue(requests.contains(req));
         }
         assertTrue(total_requests == requests.size());
+    }
+
+    /**
+     * Test the resistance of ThreadedNNDescent
+     * algorithm to simultaneous requests.
+     * @throws IOException 
+     */
+    public void testSimultaneousRequests()
+            throws IOException {
+        System.out.println("Test simultaneous requests");
+        
+        // Creation of the data
+        BatchProcessor processor = new BatchProcessor();
+        HashMap<String, LinkedList<Request>> user_requests =
+                processor.computeUserLog(processor.parseFile(getClass()
+                        .getResourceAsStream("/simultaneous.txt"),
+                        "squid"));
+        LinkedList<Request> requests = user_requests.get("127.0.0.1");
+        ThreadedNNDescent<Request> nndes = new ThreadedNNDescent<Request>();
+        nndes.setSimilarity(new TimeSimilarity());
+        nndes.setK(20);
+        System.out.println("START with ThreadedNNDescent");
+        System.out.println("Wait for the STOP");
+        System.out.println("Test fail if it never stops !");
+        Graph<Request>  graph = nndes.computeGraph(requests);
+        System.out.println("STOP");
+
+        // Test fail because it never stops       
     }
 
     /**
