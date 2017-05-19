@@ -64,7 +64,8 @@ public final class Main {
 
         // Parse command line arguments
         Options options = new Options();
-        options.addOption("i", true, "Input configuration file (required)");
+        options.addOption("i", true, "Input configuration file "
+                + "(default configuration line) (required)");
         options.addOption("o", true, "Output configuration file (required)");
         options.addOption("field", true, "Configuration field to sweep"
                 + " (required)");
