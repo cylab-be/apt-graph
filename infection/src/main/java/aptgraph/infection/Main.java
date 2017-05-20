@@ -77,7 +77,7 @@ public final class Main {
         Option arg_time_step = Option.builder("step")
                 .optionalArg(true)
                 .desc("Specify time step between periodic"
-                        + " injection in milliseconds (required for"
+                        + " injections in milliseconds (required for"
                         + " periodic APT)")
                 .hasArg(true)
                 .numberOfArgs(1)
@@ -101,7 +101,7 @@ public final class Main {
         options.addOption(arg_duration);
         Option arg_injection_day = Option.builder("injection")
                 .optionalArg(true)
-                .desc("Maximal daily number of injection (option for traffic"
+                .desc("Maximal daily number of injections (option for traffic"
                         + " APT, default : no limitation)")
                 .hasArg(true)
                 .numberOfArgs(1)
