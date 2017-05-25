@@ -269,13 +269,13 @@ The Core defines the similarities used to compute the k-NN graphs of each user. 
 
 * Time similarity: 
 
-		![eq_1](http://latex.codecogs.com/gif.latex?%5Cmu_%7B%5CDelta%20t%7D%20%3D%20%5Cfrac%7B1%7D%7B1&plus;%7C%5CDelta%20t%7C%7D)
+	![eq_1](http://latex.codecogs.com/gif.latex?%5Cmu_%7B%5CDelta%20t%7D%20%3D%20%5Cfrac%7B1%7D%7B1&plus;%7C%5CDelta%20t%7C%7D)
 
   with ![eq_3](http://latex.codecogs.com/gif.latex?%5CDelta%20t) defined as the temporal difference between the request timestamps (in second).
 
 * Domain name based similarity:
 
-		![eq_2](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7B%5Cbeta_%7Btot%7D%7D)
+	![eq_2](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7B%5Cbeta_%7Btot%7D%7D)
 
   with ![eq_4](http://latex.codecogs.com/gif.latex?%5Cbeta) defined as the number of common labels between the two domain names, starting from the Top Level Domain (TLD), TLD excluded but equal to each other; ![eq_5](http://latex.codecogs.com/gif.latex?%5Cbeta_%7Btot%7D) defined as the biggest number of labels between the two domain names, TLD excluded.
 
