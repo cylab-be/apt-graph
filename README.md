@@ -242,8 +242,7 @@ The following example is a typical line of a _Squid_ format file :
 
 The following example is a typical line of a _JSON_ format file :
 ```
-{"@version":"1","@timestamp":"2014-10-10T23:12:24.000Z",
-"type":"proxy_fwd_iwsva","timestamp":"Sat, 11 Oct 2014 01:12:24,CEST","tk_username":"192.168.2.167","tk_url":"http://weather.service.msn.com/data.aspx?src=Windows7&amp;wealocations=wc:8040075&amp;weadegreetype=F&amp;culture=en-US","tk_size":0,"tk_date_field":"2014-10-11 01:12:24+0200","tk_protocol":"http","tk_mime_content":"text/xml","tk_client_ip":"192.168.2.167","tk_server_ip":"92.122.122.162","tk_domain":"weather.service.msn.com","tk_path":"data.aspx","tk_file_name":"data.aspx","tk_operation":"GET","tk_uid":"0271674894-29fe6b562438c1f7e996","tk_category":"40","tk_category_type":"0","geoip":{"ip":"92.122.122.162","country_code2":"EU","country_code3":"EU","country_name":"Europe","continent_code":"EU","latitude":47.0,"longitude":8.0,"location":[8.0,47.0]},"category":"Search Engines/Portals"}
+{"@version":"1","@timestamp":"2014-10-10T23:12:24.000Z","type":"proxy_fwd_iwsva","timestamp":"Sat, 11 Oct 2014 01:12:24,CEST","tk_username":"192.168.2.167","tk_url":"http://weather.service.msn.com/data.aspx?src=Windows7&amp;wealocations=wc:8040075&amp;weadegreetype=F&amp;culture=en-US","tk_size":0,"tk_date_field":"2014-10-11 01:12:24+0200","tk_protocol":"http","tk_mime_content":"text/xml","tk_client_ip":"192.168.2.167","tk_server_ip":"92.122.122.162","tk_domain":"weather.service.msn.com","tk_path":"data.aspx","tk_file_name":"data.aspx","tk_operation":"GET","tk_uid":"0271674894-29fe6b562438c1f7e996","tk_category":"40","tk_category_type":"0","geoip":{"ip":"92.122.122.162","country_code2":"EU","country_code3":"EU","country_name":"Europe","continent_code":"EU","latitude":47.0,"longitude":8.0,"location":[8.0,47.0]},"category":"Search Engines/Portals"}
 ```
 
 
@@ -270,15 +269,15 @@ The Core defines the similarities used to compute the k-NN graphs of each user. 
 
 * Time similarity: 
 
-![eq_1](http://latex.codecogs.com/gif.latex?%5Cmu_%7B%5CDelta%20t%7D%20%3D%20%5Cfrac%7B1%7D%7B1&plus;%7C%5CDelta%20t%7C%7D)
+		![eq_1](http://latex.codecogs.com/gif.latex?%5Cmu_%7B%5CDelta%20t%7D%20%3D%20%5Cfrac%7B1%7D%7B1&plus;%7C%5CDelta%20t%7C%7D)
 
   with ![eq_3](http://latex.codecogs.com/gif.latex?%5CDelta%20t) defined as the temporal difference between the request timestamps (in second).
 
 * Domain name based similarity:
 
-![eq_2](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7B%5Cbeta_%7Btot%7D%7D)
+		![eq_2](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7B%5Cbeta_%7Btot%7D%7D)
 
-  with ![eq_4](http://latex.codecogs.com/gif.latex?%5Cbeta) defined as the number of common labels between the two domain names, starting from the Top Level Domain (TLD), TLD excluded but equal to each other;![eq_5](http://latex.codecogs.com/gif.latex?%5Cbeta_%7Btot%7D) defined as the biggest number of labels between the two domain names, TLD excluded.
+  with ![eq_4](http://latex.codecogs.com/gif.latex?%5Cbeta) defined as the number of common labels between the two domain names, starting from the Top Level Domain (TLD), TLD excluded but equal to each other; ![eq_5](http://latex.codecogs.com/gif.latex?%5Cbeta_%7Btot%7D) defined as the biggest number of labels between the two domain names, TLD excluded.
 
 
 ​	e.g.: _edition.cnn.com_ and _cnn.com_ have ![eq_6](http://latex.codecogs.com/gif.latex?%5Cbeta%3D1), ![eq_7](http://latex.codecogs.com/gif.latex?%5Cbeta_%7Btot%7D%3D2) and ![eq_8](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%3D0.5)
