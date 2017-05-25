@@ -35,14 +35,19 @@ The focus of APT-GRAPH is the detection of Advanced Persistent Threat (APT). Mor
 
 ## Quick Start
 
-Get the latest version from GitHub.
+Clone the repository.
+```
+git clone https://github.com/RUCD/apt-graph.git
+```
+
+Or get the latest version from GitHub.
 ```
 git pull
 ```
 
 Build all the modules together.
 ```
-cd apt-graph
+cd apt-graph/apt-graph
 mvn clean install
 ```
 
