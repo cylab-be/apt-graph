@@ -7,22 +7,13 @@
 The focus of APT-GRAPH is the detection of Advanced Persistent Threat (APT). More specifically, the aim is to study proxy log files and to detect a domain used as Command and Control (C2) by an APT. The implemented algorithm models the traffic by means of a graph and tries to detect infections by looking for anomaly within the graph. The algorithm has been designed to work closely with an analyst. This analyst can work interactively with a set of parameters and adapt the algorithm to focus on a specific type of APT.
 
 
-
-
-
 ## Requirements
 
 - Java 8
 - Apache Maven
 
 
-
-
-
-
 ## Maven modules
-
-
 
 ### Main modules
 
@@ -33,8 +24,6 @@ The focus of APT-GRAPH is the detection of Advanced Persistent Threat (APT). Mor
 - **website**: contains the UI (HTML/JavaScript). This UI lets the analyst choose parameters needed by the Server and gives a visualization of the results (computed graph and ranking list of suspicious domains).
 
 
-
-
 ### Auxiliary modules
 
 - **integration**: checks that the Batch Processor and the Server work smoothly together.
@@ -42,10 +31,6 @@ The focus of APT-GRAPH is the detection of Advanced Persistent Threat (APT). Mor
 - **traffic**: is an additional tool to study the traffic intensity of a provided proxy log file.
 - **study**: is an additional tool allowing an in depth impact study of a given parameter on the detection. This tool uses Receiver Operating Characteristics (ROC) to evaluate the impact.
 - **config**: is an additional tool which helps to generate configuration files used by the study tool.
-
-
-
-
 
 
 ## Quick Start
@@ -94,12 +79,7 @@ If everything is alright you should get something like this:
 ![UI-example](./readme_fig/UI-example_2.png)
 
 
-
-
-
 ## Usage
-
-
 
 ### batch
 
@@ -121,7 +101,6 @@ The next command is typical to start the preprocessing:
 ```
 
 
-
 ### server
 
 ```
@@ -136,7 +115,6 @@ The next command is typical to start the Server:
 ```
 ./start.sh -i <graphs directory>
 ```
-
 
 
 ### infection
@@ -182,7 +160,6 @@ The next command is typical to simulate traffic based infection:
 ```
 
 
-
 ### traffic
 
 ```
@@ -199,7 +176,6 @@ The next command is typical to compute a traffic histogram:
 ```
 ./traffic.sh -i <input log file> -o <output CSV file> -r 1000
 ```
-
 
 
 ### config
@@ -239,7 +215,6 @@ The next command is typical to create a configuration file studying the pruning 
 ```
 
 
-
 ### study
 
 ```
@@ -254,15 +229,9 @@ The next command is typical to produced ROC based on provided configuration file
 ./study.sh -i <input configuration file>
 ```
 
+## Data representation
 
-
-
-
-##Data representation
-
-
-
-###Resquest
+### Resquest
 
 The _Request_ Object contains all the needed information about a request. Two types of proxy log files are supported : _Squid_ and _JSON_.
 
@@ -278,49 +247,41 @@ The following example is a typical line of a _JSON_ format file :
 ```
 
 
-
-###Domain
+### Domain
 
 A _Domain_ Object is defined as a list of _Requests_. This list has a given name : the domain name. The similarity between two domains is defined as the sum of the similarities between the requests of these domains.
 
 
-
-###Graph
+### Graph
 
 The graphs of requests build by the Batch Processor are k-NN graphs. All the other graphs are general graphs. The implementation of the tools to compute and process the graphs has been done in [java-graphs](https://github.com/tdebatty/java-graphs).
 
 
-
-###Clusters
+### Clusters
 
 A graph of cluster is modeled as a list of graphs. Each of these graphs represent a cluster.
 
 
-
-
-
-
 ## Algorithm
-
-
 
 ### Core
 
 The Core defines the similarities used to compute the k-NN graphs of each user. The used similarities are the following:
 
-* Time similarity:  
-  ![eq_1](http://latex.codecogs.com/gif.latex?%5Cmu_%7B%5CDelta%20t%7D%20%3D%20%5Cfrac%7B1%7D%7B1&plus;%7C%5CDelta%20t%7C%7D)
+* Time similarity: 
+
+![eq_1](http://latex.codecogs.com/gif.latex?%5Cmu_%7B%5CDelta%20t%7D%20%3D%20%5Cfrac%7B1%7D%7B1&plus;%7C%5CDelta%20t%7C%7D)
 
   with ![eq_3](http://latex.codecogs.com/gif.latex?%5CDelta%20t) defined as the temporal difference between the request timestamps (in second).
 
 * Domain name based similarity:
-  ![eq_2](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7B%5Cbeta_%7Btot%7D%7D)
+
+![eq_2](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7B%5Cbeta_%7Btot%7D%7D)
 
   with ![eq_4](http://latex.codecogs.com/gif.latex?%5Cbeta) defined as the number of common labels between the two domain names, starting from the Top Level Domain (TLD), TLD excluded but equal to each other;![eq_5](http://latex.codecogs.com/gif.latex?%5Cbeta_%7Btot%7D) defined as the biggest number of labels between the two domain names, TLD excluded.
 
 
 ​	e.g.: _edition.cnn.com_ and _cnn.com_ have ![eq_6](http://latex.codecogs.com/gif.latex?%5Cbeta%3D1), ![eq_7](http://latex.codecogs.com/gif.latex?%5Cbeta_%7Btot%7D%3D2) and ![eq_8](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%3D0.5)
-
 
 
 ### Batch Processor
@@ -332,8 +293,6 @@ The Batch Processor is composed of the following processing steps:
 4. select the children requests among the neighbour requests (optional)
 5. compute graph of domains for each similarity and each user;
 6. store all necessary data in graphs directory (user graphs (_ip.address.ser_, e.g.: _192.168.2.1.ser_), list of users (_users.ser_), list of subnets (_subnets.ser_), k value (_k.ser_)).
-
-
 
 
 ### Server
@@ -349,8 +308,6 @@ The Server is composed of the following processing steps:
 8. compute the rank list of suspicious domains.
 
 
-
-
 ### UI
 
 The UI gives access to the following parameters:
@@ -362,16 +319,9 @@ The UI gives access to the following parameters:
 * weights of ranking indexes.
 
 
-
-
-
-
 ## Further details
 
 Documentation is available [here](http://api123.io/api/apt-graph/head/index.html). Further details can be found in the code itself, where each method has been documented. 
-
-
-
 
 
 ## License
