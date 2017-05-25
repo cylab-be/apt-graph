@@ -4,310 +4,257 @@
 [![API](http://api123.io/api123-head.svg)](http://api123.io/api/apt-graph/head/index.html)
 [![Coverage Status](https://coveralls.io/repos/github/RUCD/apt-graph/badge.svg?branch=master)](https://coveralls.io/github/RUCD/apt-graph?branch=master)
 
-HTTP graph modeling for APT detection.
+The focus of APT-GRAPH is the detection of Advanced Persistent Threat (APT). More specifically, the aim is to study proxy log files and to detect a domain used as Command and Control (C2) by an APT. The implemented algorithm models the traffic by means of a graph and tries to detect infections by looking for anomaly within the graph. The algorithm has been designed to work closelly with an analyst. This analyst can work interactively with a set of parameters and adapt the algorithm to focus on a specific type of APT.
+
 
 ## Requirements
-- java
+
+- Java 8
 - Apache Maven
 
+
 ## Maven modules
-- **core** : contains classes used by the batch processor and the server (Request, etc.).
-- **batch** : contains the batch processor
-- **server** : contains the json-rpc server and interactive fusion engine
-- **integration** : check that batch processor and server work smootly together
-- **apt-graph** : parent module, allows to build all modules at once...
+
+### Main modules
+
+- **apt-graph**: is the parent module. It allows the build and the testing of all the modules at once.
+- **core**: defines Objects and Classes used by the Batch Processor and the Server. It mainly defines the similarities used to build the graphs.
+- **batch**: contains the Batch Processor. The Batch Processor is the module of the algorithm preprocessing the data .
+- **server**: contains the JSON-RPC Server. The Server gives access to a set of parameters. With these parameters the Server is able to interactively complete the processing of the graph and gives the results to the UI (using JSON-RPC).
+- **website**: contains the UI (HTML/JavaScript). This UI lets the analyst choose parameters needed by the Server and gives a visualisation of the results (computed graph and ranking list of suspicious domains).
+
+
+### Auxiliary modules
+
+- **integration**: checks that the Batch Processor and the Server work smootly together.
+- **infection**: is an additional tool to simulate infections in a provided proxy log file.
+- **traffic**: is an additional tool to study the traffic intensity of a provided proxy log file.
+- **study**: is an additional tool allowing an in depth impact study of a given parameter on the detection. This tool uses Receiver Operating Characteristics (ROC) to evaluate the impact.
+- **config**: is an additional tool which helps to generate configuration files used by the study tool.
+
+
+## Quick Start
+
+Get the latest version from GitHub.
+```
+git pull
+```
+
+Build all the modules together.
+```
+cd apt-graph
+mvn clean install
+```
+
+Run the Batch Processor to build the graphs.
+```
+cd ../batch
+./analyze.sh -i <proxy log file> -o <graphs directory>
+```
+
+There is a test file in _batch/src/test/resources/_. Use the following command to check the Batch Processor with the test file:
+```
+./analyze.sh -i ./src/test/resources/1000_http_requests.txt -o /tmp/mytest/
+```
+
+Run the server.
+```
+cd ../server
+./start.sh -i <graphs directory>
+```
+
+By default, the UI is available at http://127.0.0.1:8000 and the JSON-RPC Server is at http://127.0.0.1:8080.
+
+There is a folder in _server/src/test/resources_/ containing dummy graphs. Use the following command to check the Server with these graphs:
+```
+./start.sh -i ./src/test/resources/dummyDir/
+```
+
+Connect to the UI using a browser (http://127.0.0.1:8000). Choose your parameters as shown on the screenshots below and click on "Apply" to get the result.
+
+If everything is alright you should get something like this:
+
+![UI-example](./readme_fig/UI-example_1.png)
+
+![UI-example](./readme_fig/UI-example_2.png)
+
+
+## Algorithm
+
+### Core
+
+The Core defines the similarities used to compute the k-NN graphs of each user. The used similarities are the following:
+
+* Time similarity:  
+  $$
+  \mu_{\Delta t} = \frac{1}{1+|\Delta t|}
+  $$
+  with $\Delta t$ defined as the temporal difference between the request timestamps (in second).
+
+* Domain name based similarity:
+  $$
+  \mu_{dom} = \frac{\beta}{\beta_{tot}}
+  $$
+  with $\beta$ defined as the number of common labels between the two domain names, starting from the Top Level Domain (TLD), TLD excluded but equal to each other; $\beta_{tot}$ defined as the biggest number of labels between the two domain names, TLD excluded.
+
+
+​	e.g.: _edition.cnn.com_ and _cnn.com_ have $\beta=1$, $\beta_{tot}=2$ and $\mu_{dom}=0.5
+
+### Batch Processor
+
+The Batch Processor is composed of the following processing steps:
+1. parse a proxy log file (squid or JSON format);
+2. split the data by user;
+3. build k-NN graph of requests for each similarity and each user;
+4. select the children requests among the neighbour requests (optional)
+5. compute graph of domains for each similarity and each user;
+6. store all necessary data in graphs directory (user graphs (_ip.address.ser_), list of users (_users.ser_), list of subnets (_subnets.ser_), k vallue (_k.ser_)).
+
+
+### Server
+
+The Server is composed of the following processing steps:
+1. load the data of users selected by the analyst (_ip.address.ser_, _users.ser_, _subnets.ser_, _k.ser_);
+2. merge similarity graphs for each user;
+3. merge all user graphs;
+4. prune the merged graph;
+5. compute clusters in the graph (deprecated);
+6. filter large clusters (deprecated);
+7. clean the graph based on white listing (optional);
+8. compute the rank list of suspicious domains.
+
+
+### UI
+
+The UI gives access to the following parameters:
+* user or subnet;
+* weights for fusion of the similarities;
+* pruning threshold (absolute value or z-score);
+* maximum cluster size (absolute value or z-score);
+* white listing settings (optional): _on the go_ white listed domains, minimum number of requests by domain and by user;
+* weights of ranking indexes.
+
 
 ## Usage
 
-```
-# get the latest version from github
-git pull
-
-# build all the modules together
-cd apt-graph
-mvn clean install
-
-# to run the batch processor and build the graph
-cd ../batch
-./analyze.sh -i <proxy log file> -o <graph file>
-
-# there is a test file in src/test/resources
-# so you can test with
-./analyze.sh -i ./src/test/resources/1000_http_requests.txt -o /tmp/mytest.ser
-
-# to run the server
-cd ../server
-./start.sh -i <graph file>
-
-# by default, the web interface is available at http://127.0.0.1:8000
-# and the json-rpc server is at http://127.0.0.1:8080
-
-# There is a dummy graph file in folder src/test/resources
-# so you can make tests with
-./start.sh -i ./src/test/resources/dummy_graph.ser
-```
-
-## Architecture
-
-### Batch processor
-- parses a proxy log file
-- build one **requests k-nn graph** for each feature (time, url similarity, etc.)
-- stores the graphs in a database
-
-### website
-javascript UI that allows the user to choose:
-- parameters for aggregating **request graphs** into **URL k-nn graphs**
-- parameters for aggregating feature graphs into a single **combined graph** (simple version uses weighted average, a more evolved version might implement OWA or WOWA)
-- prunning threshold for cutting low weight edges
-- maximum cluster size for filtering resulting clusters
-
-### Server
-Starts a web server to server the website UI, and a json-rpc server that, based on user parameters, will:
-- compute the **URL graphs**
-- compute the **combined graph**
-- **prune** the combined graph
-- **cluster** the graph
-- **filter** the clustered graph
-- return the remaining nodes and edges
-
-## Implemented RPC's
-
-### analyze
-Analyze the graph:
-
-1. fusion of the features to create a single graph of requests
-2. clustering of requests by domain
-3. compute similarity between domains (currently: sum of similarities between requests)
-4. prune: remove edges between domains that have a similarity lower than a threshold
-5. cluster
-6. filter: keep only domains that are weakly connected to other domains
+### batch
 
 ```
-public final List<Graph<Domain>> analyze(
-            final double[] ordered_weights,
-            final double[] feature_weights,
-            final double prune_threshold,
-            final int max_cluster_size)
+./analyze.sh -h
+usage: java -jar batch-<version>.jar
+-c <arg>   Select only temporal children (option, default: true)
+-f <arg>   Specify format of input file (squid or json) (option,
+			default: squid)
+-h         Show this help
+-i <arg>   Input log file (required)
+-k <arg>   Impose k value of k-NN graphs (option, default: 20)
+-o <arg>   Output directory for graphs (required)
+-x <arg>   Overwrite existing graphs (option, default: false)
 ```
 
-- *ordered_weights* and *feature_weights* are used at **step 1**
-- *prune_threshold* is used at **step 4**
-- *max_cluster_size* is used at **step 6**
 
-![](./analyze-rpc.png)
-
-The result is an array of Graph of Domain. Each Graph has two fields:
-* nodes : the list of domains, where each domain has:
-  - a name
-  - a list of requests to this domain
-* neighbors : the neighbors of each domain
-  - it's a hash map, where the key is the name of the domain and the value is the list of neighbors
-  - each neighbor mentions the name and the similarity of the neighbor
-
-### dummy
-
-The **dummy** rpc returns a list of disconnected graphs (the clusters):
-- Each graph consists of nodes and edges
-- Each node has an id and a value
-- the edges are represented as a hashmap that associates a source node and a destionation node
-
-The example below contains one cluster of 7 nodes...
+### server
 
 ```
-{
-  "jsonrpc": "2.0",
-  "id": 155,
-  "result": [
-    {
-      "similarity": null,
-      "k": 10,
-      "nodes": [
-        {
-          "id": "1",
-          "value": {
-            "time": 1472083251,
-            "elapsed": 920,
-            "client": "198.36.158.8",
-            "code": "TCP_MISS",
-            "status": 200,
-            "bytes": 765,
-            "method": "GET",
-            "url": "http://epnazrk.wmaj.ga/zlrsmtcc.html",
-            "domain": "epnazrk.wmaj.ga",
-            "peerstatus": "DIRECT",
-            "peerhost": "130.167.210.247",
-            "type": "text/html"
-          }
-        },
-        {
-          "id": "2",
-          "value": {
-            "time": 1472083251,
-            "elapsed": 444,
-            "client": "198.36.158.8",
-            "code": "TCP_MISS",
-            "status": 200,
-            "bytes": 755,
-            "method": "GET",
-            "url": "http://epnazrk.wmaj.ga/zjeglwir.html",
-            "domain": "epnazrk.wmaj.ga",
-            "peerstatus": "DIRECT",
-            "peerhost": "130.167.210.247",
-            "type": "text/html"
-          }
-        },
-        {
-          "id": "3",
-          "value": {
-            "time": 1472083251,
-            "elapsed": 590,
-            "client": "198.36.158.8",
-            "code": "TCP_MISS",
-            "status": 200,
-            "bytes": 1083,
-            "method": "GET",
-            "url": "http://kfiger.wfltjx.cc/uxmt.html",
-            "domain": "kfiger.wfltjx.cc",
-            "peerstatus": "DIRECT",
-            "peerhost": "47.238.242.2",
-            "type": "text/html"
-          }
-        },
-        {
-          "id": "4",
-          "value": {
-            "time": 1472083251,
-            "elapsed": 683,
-            "client": "198.36.158.8",
-            "code": "TCP_MISS",
-            "status": 200,
-            "bytes": 1419,
-            "method": "GET",
-            "url": "http://isogbg.hgwpxah.nz/roeefw.html",
-            "domain": "isogbg.hgwpxah.nz",
-            "peerstatus": "DIRECT",
-            "peerhost": "233.4.82.7",
-            "type": "text/html"
-          }
-        },
-        {
-          "id": "5",
-          "value": {
-            "time": 1472083251,
-            "elapsed": 442,
-            "client": "198.36.158.8",
-            "code": "TCP_MISS",
-            "status": 200,
-            "bytes": 1960,
-            "method": "GET",
-            "url": "http://rkfko.apyeqwrqg.cm/rdhufye.html",
-            "domain": "rkfko.apyeqwrqg.cm",
-            "peerstatus": "DIRECT",
-            "peerhost": "249.70.126.8",
-            "type": "text/html"
-          }
-        },
-        {
-          "id": "6",
-          "value": {
-            "time": 1472083251,
-            "elapsed": 276,
-            "client": "198.36.158.8",
-            "code": "TCP_MISS",
-            "status": 200,
-            "bytes": 111,
-            "method": "GET",
-            "url": "http://ootlgeqo.fomu.ve/sfidbhq.html",
-            "domain": "ootlgeqo.fomu.ve",
-            "peerstatus": "DIRECT",
-            "peerhost": "243.179.195.173",
-            "type": "text/html"
-          }
-        },
-        {
-          "id": "0",
-          "value": {
-            "time": 1472083251,
-            "elapsed": 575,
-            "client": "198.36.158.8",
-            "code": "TCP_MISS",
-            "status": 200,
-            "bytes": 1411,
-            "method": "GET",
-            "url": "http://ajdd.rygxzzaid.mk/xucjehmkd.html",
-            "domain": "ajdd.rygxzzaid.mk",
-            "peerstatus": "DIRECT",
-            "peerhost": "118.220.140.185",
-            "type": "text/html"
-          }
-        }
-      ],
-      "hashMap": {
-        "(1 => 1472083251\thttp://epnazrk.wmaj.ga/zlrsmtcc.html 198.36.158.8)": [
-          {
-            "node": {
-              "id": "6",
-              "value": {
-                "time": 1472083251,
-                "elapsed": 276,
-                "client": "198.36.158.8",
-                "code": "TCP_MISS",
-                "status": 200,
-                "bytes": 111,
-                "method": "GET",
-                "url": "http://ootlgeqo.fomu.ve/sfidbhq.html",
-                "domain": "ootlgeqo.fomu.ve",
-                "peerstatus": "DIRECT",
-                "peerhost": "243.179.195.173",
-                "type": "text/html"
-              }
-            },
-            "similarity": 1
-          },
-          {
-            "node": {
-              "id": "4",
-              "value": {
-                "time": 1472083251,
-                "elapsed": 683,
-                "client": "198.36.158.8",
-                "code": "TCP_MISS",
-                "status": 200,
-                "bytes": 1419,
-                "method": "GET",
-                "url": "http://isogbg.hgwpxah.nz/roeefw.html",
-                "domain": "isogbg.hgwpxah.nz",
-                "peerstatus": "DIRECT",
-                "peerhost": "233.4.82.7",
-                "type": "text/html"
-              }
-            },
-            "similarity": 1
-          },
-          {
-            "node": {
-              "id": "0",
-              "value": {
-                "time": 1472083251,
-                "elapsed": 575,
-                "client": "198.36.158.8",
-                "code": "TCP_MISS",
-                "status": 200,
-                "bytes": 1411,
-                "method": "GET",
-                "url": "http://ajdd.rygxzzaid.mk/xucjehmkd.html",
-                "domain": "ajdd.rygxzzaid.mk",
-                "peerstatus": "DIRECT",
-                "peerhost": "118.220.140.185",
-                "type": "text/html"
-              }
-            },
-            "similarity": 1
-          },
-          {
-            "node": {
-              "id": "2",
-          ...
+./start.sh -h
+usage: java -jar server-<version>.jar
+-h             Show this help
+-i <arg>       Input directory with graphs (required)
+-study <arg>   Study output mode (false = web output, true = 
+				study output) (option, default: false)
 ```
 
- ![dummy-rpc](dummy-rpc.png)
+
+### infection
+
+    ./infect.sh -h
+    usage: java -jar infection-<version>.jar
+     -d <arg>            APT domain name (required)
+     -delay <arg>        Delay between start of the burst and injection
+     					of APT (option for traffic APT, default: middle 
+     					of the burst)
+     -delta <arg>        Duration between two requests of the same burst 
+     					(required for traffic APT)
+     -distance <arg>     Minimal time distance between two injections (option
+     					for traffic APT, default: no limitation)
+     -duration <arg>     Minimal duration of a burst to allow APT injection
+                         (required for traffic APT)
+     -f <arg>            Specify format of input file (squid or json) (option,
+                         default: squid)
+     -h                  Show this help
+     -i <arg>            Input log file (required)
+     -injection <arg>    Maximal daily number of injections (option for traffic
+     					APT, default: no limitation)
+     -o <arg>            Output log file (required)
+     -proportion <arg>   Injection rate in the possible bursts (1 = inject
+     					in all possible bursts) (option for traffic APT,
+     					default: 1)
+     -step <arg>         Specify time step between periodic injections in 
+     					milliseconds (required for periodic APT)
+     -t <arg>            Type (periodic or traffic) (required)
+     -u <arg>            Targeted user or subnet (required)
+
+
+### traffic
+
+```
+./traffic.sh -h
+usage: java -jar traffic-<version>.jar
+ -f <arg>   Specify format of input file (squid or json) (option, 
+ 			default: squid)
+ -h         Show this help
+ -i <arg>   Input log file (required)
+ -o <arg>   Output CSV file (required)
+ -r <arg>   Time resolution in milliseconds (required)
+```
+
+
+### study
+
+```
+./study.sh -h
+usage: java -jar study-<version>.jar
+ -h         Show this help
+ -i <arg>   Input configuration file (required)
+ -x <arg>   Overwrite existing files (option, default: false)
+```
+
+### config
+
+```
+./config.sh -h
+usage: java -jar config-<version>.jar
+ -field <arg>   Configuration field to sweep (required)
+ -h             Show this help
+ -i <arg>       Input configuration file (default configuration line) 
+ 				(required)
+ -multi <arg>   Sweep the given field as complement to stop value of 
+ 				the first field (option, default: no second field)
+ -o <arg>       Output configuration file (required)
+ -start <arg>   Start value of sweep (required)
+ -step <arg>    Step of sweep (required)
+ -stop <arg>    Stop value of sweep (required)
+```
+
+A typical default configuration line is: 
+
+```
+{"input_dir":"<input directory>",
+"output_file":"<output file path>/ROC_anon.csv",
+"n_apt_tot":"2","user":"108.142.213.0","feature_weights_time":"0.1",
+"feature_weights_domain":"0.9","feature_weights_url":"0.0",
+"feature_ordered_weights_1":"0.8","feature_ordered_weights_2":"0.2",
+"prune_threshold":"0.00","max_cluster_size":"1000000",
+"prune_z":"true","cluster_z":"false","whitelist":"true",
+"white_ongo":"","number_requests":"5","ranking_weights_parents":"0.4",
+"ranking_weights_children":"0.4","ranking_weights_requests":"0.2",
+"apt_search":"true"}
+```
+
+## Futher details
+
+Futher details can be found in the code itself, where each function has been documented.
+
+## Licence
+
+MIT License
