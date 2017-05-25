@@ -231,7 +231,7 @@ The next command is typical to produced ROC based on provided configuration file
 
 ## Data representation
 
-### Resquest
+### Request
 
 The _Request_ Object contains all the needed information about a request. Two types of proxy log files are supported : _Squid_ and _JSON_.
 
