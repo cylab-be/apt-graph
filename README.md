@@ -309,19 +309,17 @@ A graph of cluster is modeled as a list of graphs. Each of these graphs represen
 The Core defines the similarities used to compute the k-NN graphs of each user. The used similarities are the following:
 
 * Time similarity:  
-  $$
-  \mu_{\Delta t} = \frac{1}{1+|\Delta t|}
-  $$
-  with $\Delta t$ defined as the temporal difference between the request timestamps (in second).
+  ![eq_1](http://latex.codecogs.com/gif.latex?%5Cmu_%7B%5CDelta%20t%7D%20%3D%20%5Cfrac%7B1%7D%7B1&plus;%7C%5CDelta%20t%7C%7D)
+
+  with ![eq_3](http://latex.codecogs.com/gif.latex?%5CDelta%20t) defined as the temporal difference between the request timestamps (in second).
 
 * Domain name based similarity:
-  $$
-  \mu_{dom} = \frac{\beta}{\beta_{tot}}
-  $$
-  with $\beta$ defined as the number of common labels between the two domain names, starting from the Top Level Domain (TLD), TLD excluded but equal to each other; $\beta_{tot}$ defined as the biggest number of labels between the two domain names, TLD excluded.
+  ![eq_2](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7B%5Cbeta_%7Btot%7D%7D)
+
+  with ![eq_4](http://latex.codecogs.com/gif.latex?%5Cbeta) defined as the number of common labels between the two domain names, starting from the Top Level Domain (TLD), TLD excluded but equal to each other;![eq_5](http://latex.codecogs.com/gif.latex?%5Cbeta_%7Btot%7D) defined as the biggest number of labels between the two domain names, TLD excluded.
 
 
-​	e.g.: _edition.cnn.com_ and _cnn.com_ have $\beta=1$, $\beta_{tot}=2$ and $\mu_{dom}=0.5
+​	e.g.: _edition.cnn.com_ and _cnn.com_ have ![eq_6](http://latex.codecogs.com/gif.latex?%5Cbeta%3D1), ![eq_7](http://latex.codecogs.com/gif.latex?%5Cbeta_%7Btot%7D%3D2) and ![eq_8](http://latex.codecogs.com/gif.latex?%5Cmu_%7Bdom%7D%3D0.5)
 
 
 
