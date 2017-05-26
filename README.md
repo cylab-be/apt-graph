@@ -4,7 +4,7 @@
 [![API](http://api123.io/api123-head.svg)](http://api123.io/api/apt-graph/head/index.html)
 [![Coverage Status](https://coveralls.io/repos/github/RUCD/apt-graph/badge.svg?branch=master)](https://coveralls.io/github/RUCD/apt-graph?branch=master)
 
-The focus of APT-GRAPH is the detection of Advanced Persistent Threat (APT). More specifically, the aim is to study proxy log files and to detect a domain used as Command and Control (C2) by an APT. The implemented algorithm models the traffic by means of a graph and tries to detect infections by looking for anomaly within the graph. The algorithm has been designed to work closely with an analyst. This analyst can work interactively with a set of parameters and adapt the algorithm to focus on a specific type of APT.
+The focus of APT-GRAPH is the detection of Advanced Persistent Threat (APT). More specifically, the aim is to study proxy log files and to detect a domain used as Command and Control (C2) by an APT. The implemented algorithm models the traffic by means of a graph and tries to detect infections by looking for anomaly within this graph. The algorithm has been designed to work closely with an analyst. This analyst can work interactively with a set of parameters and adapt the algorithm to focus on a specific type of APT.
 
 
 ## Requirements
@@ -21,7 +21,7 @@ The focus of APT-GRAPH is the detection of Advanced Persistent Threat (APT). Mor
 - **core**: defines Objects and Classes used by the Batch Processor and the Server. It mainly defines the similarities used to build the graphs.
 - **batch**: contains the Batch Processor. The Batch Processor is the module of the algorithm preprocessing the data .
 - **server**: contains the JSON-RPC Server. The Server gives access to a set of parameters. With these parameters the Server is able to interactively complete the processing of the graph and gives the results to the UI (using JSON-RPC).
-- **website**: contains the UI (HTML/JavaScript). This UI lets the analyst choose parameters needed by the Server and gives a visualization of the results (computed graph and ranking list of suspicious domains).
+- **website**: contains the UI (HTML/JavaScript). This UI lets the analyst choose the parameters needed by the Server and gives a visualization of the results (computed graph and ranking list of suspicious domains).
 
 
 ### Auxiliary modules
@@ -70,7 +70,7 @@ There is a folder in _server/src/test/resources_/ containing dummy graphs. Use t
 ./start.sh -i ./src/test/resources/dummyDir/
 ```
 
-Connect to the UI using a browser (http://127.0.0.1:8000). Choose your parameters as shown on the screenshots below and click on "Apply" to get the result.
+Connect to the UI using a browser (http://127.0.0.1:8000). Choose the parameters as shown on the screenshots below and click on "Apply" to get the result.
 
 If everything is alright you should get something like this:
 
@@ -165,8 +165,7 @@ The next command is typical to simulate a traffic based infection:
 ```
 ./traffic.sh -h
 usage: java -jar traffic-<version>.jar
- -f <arg>   Specify format of input file (squid or json) (option, 
- 			default: squid)
+ -f <arg>   Specify format of input file (squid or json) (option, default: squid)
  -h         Show this help
  -i <arg>   Input log file (required)
  -o <arg>   Output CSV file (required)
@@ -185,8 +184,7 @@ The next command is typical to compute a traffic histogram:
 usage: java -jar config-<version>.jar
  -field <arg>   Configuration field to sweep (required)
  -h             Show this help
- -i <arg>       Input configuration file (default configuration line) 
- 				(required)
+ -i <arg>       Input configuration file (default configuration line) (required)
  -multi <arg>   Sweep the given field as complement to stop value of 
  				the first field (option, default: no second field)
  -o <arg>       Output configuration file (required)
@@ -265,7 +263,7 @@ A graph of clusters is modeled as a list of graphs. Each of these graphs represe
 
 ### Core
 
-The Core defines the similarities used to compute the k-NN graphs of each user. The used similarities are the following:
+The Core defines the similarities used to compute the k-NN graphs of each user. The chosen similarities are the following:
 
 * Time similarity: 
 
@@ -288,16 +286,16 @@ The Core defines the similarities used to compute the k-NN graphs of each user. 
 The Batch Processor is composed of the following processing steps:
 1. parse a proxy log file (squid or JSON format);
 2. split the data by user;
-3. build k-NN graph of requests for each similarity and each user;
+3. build k-NN graphs of requests for each similarity and each user;
 4. select the children requests among the neighbour requests (optional)
-5. compute graph of domains for each similarity and each user;
-6. store all necessary data in graphs directory (user graphs (_ip.address.ser_, e.g.: _192.168.2.1.ser_), list of users (_users.ser_), list of subnets (_subnets.ser_), k value (_k.ser_)).
+5. compute graphs of domains for each similarity and each user;
+6. store all necessary data in graphs directory : user graphs (_ip.address.ser_, e.g.: _192.168.2.1.ser_), list of users (_users.ser_), list of subnets (_subnets.ser_), k value (_k.ser_).
 
 
 ### Server
 
 The Server is composed of the following processing steps:
-1. load the data of users selected by the analyst (_ip.address.ser_, _users.ser_, _subnets.ser_, _k.ser_);
+1. load data of the users selected by the analyst (_ip.address.ser_, _users.ser_, _subnets.ser_, _k.ser_);
 2. merge similarity graphs for each user using a weighted sum of similarities;
 3. merge all user graphs using a sum of similarities;
 4. prune the merged graph;
