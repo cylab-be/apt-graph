@@ -87,8 +87,7 @@ If everything is alright you should get something like this:
 ./analyze.sh -h
 usage: java -jar batch-<version>.jar
 -c <arg>   Select only temporal children (option, default: true)
--f <arg>   Specify format of input file (squid or json) (option,
-			default: squid)
+-f <arg>   Specify format of input file (squid or json) (option, default: squid)
 -h         Show this help
 -i <arg>   Input log file (required)
 -k <arg>   Impose k value of k-NN graphs (option, default: 20)
@@ -108,8 +107,7 @@ The next command is typical to start the preprocessing:
 usage: java -jar server-<version>.jar
 -h             Show this help
 -i <arg>       Input directory with graphs (required)
--study <arg>   Study output mode (false = web output, true = 
-				study output) (option, default: false)
+-study <arg>   Study output mode (false = web output, true = study output) (option, default: false)
 ```
 The next command is typical to start the Server:
 ```
@@ -123,30 +121,22 @@ The next command is typical to start the Server:
     ./infect.sh -h
     usage: java -jar infection-<version>.jar
      -d <arg>            APT domain name (required)
-     -delay <arg>        Delay between start of the burst and injection
-     					of APT (option for traffic APT, default:
-						middle 
-     					of the burst)
-     -delta <arg>        Duration between two requests of the same
-						burst (required for traffic APT)
-     -distance <arg>     Minimal time distance between two
-						injections (option for traffic APT, 
-						default: no limitation)
-     -duration <arg>     Minimal duration of a burst to allow APT
-						injection (required for traffic APT)
-     -f <arg>            Specify format of input file (squid
-       					or json) (option, default: squid)
+     -delay <arg>        Delay between start of the burst and injection of APT
+     				(option for traffic APT, default: middle of the burst)
+     -delta <arg>        Duration between two requests of the same burst (required for traffic APT)
+     -distance <arg>     Minimal time distance between two injections
+				(option for traffic APT, default: no limitation)
+     -duration <arg>     Minimal duration of a burst to allow APT injection (required for traffic APT)
+     -f <arg>            Specify format of input file (squid or json) (option, default: squid)
      -h                  Show this help
      -i <arg>            Input log file (required)
      -injection <arg>    Maximal daily number of injections
-       					(option for traffic APT, default: no
-						limitation)
+     				(option for traffic APT, default: no limitation)
      -o <arg>            Output log file (required)
-     -proportion <arg>   Injection rate in the possible bursts
-						(1 = inject in all possible bursts)
-						(option for traffic APT, default: 1)
-     -step <arg>         Specify time step between periodic injections
-						in milliseconds (required for periodic APT)
+     -proportion <arg>   Injection rate in the possible bursts (1 = inject in all possible bursts)
+				(option for traffic APT, default: 1)
+     -step <arg>         Specify time step between periodic injections in milliseconds 
+     				(required for periodic APT)
      -t <arg>            Type (periodic or traffic) (required)
      -u <arg>            Targeted user or subnet (required)
 ```
@@ -185,8 +175,8 @@ usage: java -jar config-<version>.jar
  -field <arg>   Configuration field to sweep (required)
  -h             Show this help
  -i <arg>       Input configuration file (default configuration line) (required)
- -multi <arg>   Sweep the given field as complement to stop value of 
- 				the first field (option, default: no second field)
+ -multi <arg>   Sweep the given field as complement to stop value of the first field
+ 			(option, default: no second field)
  -o <arg>       Output configuration file (required)
  -start <arg>   Start value of sweep (required)
  -step <arg>    Step of sweep (required)
@@ -231,14 +221,14 @@ The next command is typical to produce several ROC based on the provided configu
 
 ### Request
 
-The _Request_ Object contains all the needed information about a request. Two types of proxy log files are supported : _Squid_ and _JSON_.
+The _Request_ Object contains all the needed information about a request. Two types of proxy log files are supported: _Squid_ and _JSON_.
 
-The following example is a typical line of a _Squid_ format file :
+The following example is a typical line of a _Squid_ format file:
 ```
 1425971539.000   1364 108.142.226.170 TCP_NC_MISS/200 342 GET http://77efee5dcb3635e09435eb33a8351364.3da9819b747e806d78f83f22c703d178.an/59a543c185f3330a33a47736d6879e16 - -/146.159.80.113 image/gif
 ```
 
-The following example is a typical line of a _JSON_ format file :
+The following example is a typical line of a _JSON_ format file:
 ```
 {"@version":"1","@timestamp":"2014-10-10T23:12:24.000Z","type":"proxy_fwd_iwsva","timestamp":"Sat, 11 Oct 2014 01:12:24,CEST","tk_username":"192.168.2.167","tk_url":"http://weather.service.msn.com/data.aspx?src=Windows7&amp;wealocations=wc:8040075&amp;weadegreetype=F&amp;culture=en-US","tk_size":0,"tk_date_field":"2014-10-11 01:12:24+0200","tk_protocol":"http","tk_mime_content":"text/xml","tk_client_ip":"192.168.2.167","tk_server_ip":"92.122.122.162","tk_domain":"weather.service.msn.com","tk_path":"data.aspx","tk_file_name":"data.aspx","tk_operation":"GET","tk_uid":"0271674894-29fe6b562438c1f7e996","tk_category":"40","tk_category_type":"0","geoip":{"ip":"92.122.122.162","country_code2":"EU","country_code3":"EU","country_name":"Europe","continent_code":"EU","latitude":47.0,"longitude":8.0,"location":[8.0,47.0]},"category":"Search Engines/Portals"}
 ```
@@ -289,7 +279,7 @@ The Batch Processor is composed of the following processing steps:
 3. build k-NN graphs of requests for each similarity and each user;
 4. select the children requests among the neighbour requests (optional)
 5. compute graphs of domains for each similarity and each user;
-6. store all necessary data in graphs directory : user graphs (_ip.address.ser_, e.g.: _192.168.2.1.ser_), list of users (_users.ser_), list of subnets (_subnets.ser_), k value (_k.ser_).
+6. store all necessary data in graphs directory: user graphs (_ip.address.ser_, e.g.: _192.168.2.1.ser_), list of users (_users.ser_), list of subnets (_subnets.ser_), k value (_k.ser_).
 
 
 ### Server
