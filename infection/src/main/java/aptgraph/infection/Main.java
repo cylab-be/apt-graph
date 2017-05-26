@@ -85,7 +85,7 @@ public final class Main {
         options.addOption(arg_time_step);
         Option arg_delta_time = Option.builder("delta")
                 .optionalArg(true)
-                .desc("Duration between two requests of the same burst"
+                .desc("Maximal duration between two requests of the same burst"
                         + " (required for traffic APT)")
                 .hasArg(true)
                 .numberOfArgs(1)
