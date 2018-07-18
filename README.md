@@ -1,8 +1,9 @@
 # APT-GRAPH
 
 [![Build Status](https://travis-ci.org/RUCD/apt-graph.svg?branch=master)](https://travis-ci.org/RUCD/apt-graph)
-[![API](http://api123.io/api123-head.svg)](http://api123.io/api/apt-graph/head/index.html)
 [![Coverage Status](https://coveralls.io/repos/github/RUCD/apt-graph/badge.svg?branch=master)](https://coveralls.io/github/RUCD/apt-graph?branch=master)
+
+Developement takes place at https://gitlab.cylab.be/cylab/apt-graph
 
 The focus of APT-GRAPH is the detection of Advanced Persistent Threat (APT). More specifically, the aim is to study proxy log files and to detect a domain used as Command and Control (C2) by an APT. The implemented algorithm models the traffic by means of a graph and tries to detect infections by looking for anomaly within this graph. The algorithm has been designed to work closely with an analyst. This analyst can work interactively with a set of parameters and adapt the algorithm to focus on a specific type of APT.
 
